@@ -1,0 +1,246 @@
+{
+  "name": "Order Processing & Notifications",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "order-notification",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "id": "webhook-order",
+      "name": "Order Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 1,
+      "position": [250, 300],
+      "webhookId": "order-notification"
+    },
+    {
+      "parameters": {
+        "values": {
+          "string": [
+            {
+              "name": "orderId",
+              "value": "={{ $json.body.orderId }}"
+            },
+            {
+              "name": "userId",
+              "value": "={{ $json.body.userId }}"
+            },
+            {
+              "name": "eventType",
+              "value": "={{ $json.body.eventType }}"
+            },
+            {
+              "name": "errorMessage",
+              "value": "={{ $json.body.errorMessage }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "extract-order-data",
+      "name": "Extract Order Data",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 1,
+      "position": [470, 300]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "string": [
+            {
+              "value1": "={{ $json.eventType }}",
+              "operation": "equals",
+              "value2": "payment.succeeded"
+            }
+          ]
+        }
+      },
+      "id": "check-event-type",
+      "name": "Check Event Type",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 1,
+      "position": [690, 300]
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "=SELECT \n  u.email as \"userEmail\",\n  u.name as \"userName\",\n  o.id as \"orderId\",\n  o.\"totalAmount\",\n  o.status\nFROM \"Order\" o\nJOIN \"User\" u ON o.\"userId\" = u.id\nWHERE o.id = '{{ $json.orderId }}'",
+        "options": {}
+      },
+      "id": "get-order-details-success",
+      "name": "Get Order Details",
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 1,
+      "position": [910, 200],
+      "credentials": {
+        "postgres": {
+          "id": "postgres-credentials",
+          "name": "PostgreSQL account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "fromEmail": "orders@ecommerce.local",
+        "toEmail": "={{ $json.userEmail }}",
+        "subject": "Order Confirmation - Thank you for your purchase!",
+        "text": "=Hello {{ $json.userName }},\n\nThank you for your order!\n\nOrder ID: {{ $json.orderId }}\nTotal Amount: ${{ $json.totalAmount }}\nStatus: {{ $json.status }}\n\nYou can track your order here:\nhttp://localhost:3000/orders/{{ $json.orderId }}\n\nThank you for shopping with us!\n\nBest regards,\nVirtual Try-On E-commerce Team",
+        "options": {}
+      },
+      "id": "send-success-email",
+      "name": "Send Order Confirmation",
+      "type": "n8n-nodes-base.emailSend",
+      "typeVersion": 2,
+      "position": [1130, 200],
+      "credentials": {
+        "smtp": {
+          "id": "mailhog-smtp",
+          "name": "Mailhog SMTP"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "=SELECT \n  u.email as \"userEmail\",\n  u.name as \"userName\",\n  o.id as \"orderId\",\n  o.\"totalAmount\"\nFROM \"Order\" o\nJOIN \"User\" u ON o.\"userId\" = u.id\nWHERE o.id = '{{ $('Extract Order Data').item.json.orderId }}'",
+        "options": {}
+      },
+      "id": "get-order-details-failed",
+      "name": "Get Order Details (Failed)",
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 1,
+      "position": [910, 400],
+      "credentials": {
+        "postgres": {
+          "id": "postgres-credentials",
+          "name": "PostgreSQL account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "fromEmail": "orders@ecommerce.local",
+        "toEmail": "={{ $json.userEmail }}",
+        "subject": "Payment Failed - Action Required",
+        "text": "=Hello {{ $json.userName }},\n\nWe're sorry, but your payment could not be processed.\n\nOrder ID: {{ $json.orderId }}\nAmount: ${{ $json.totalAmount }}\n\nReason: {{ $('Extract Order Data').item.json.errorMessage }}\n\nPlease update your payment method and try again:\nhttp://localhost:3000/orders/{{ $json.orderId }}/retry\n\nIf you need assistance, please contact our support team.\n\nBest regards,\nVirtual Try-On E-commerce Team",
+        "options": {}
+      },
+      "id": "send-failure-email",
+      "name": "Send Payment Failed Email",
+      "type": "n8n-nodes-base.emailSend",
+      "typeVersion": 2,
+      "position": [1130, 400],
+      "credentials": {
+        "smtp": {
+          "id": "mailhog-smtp",
+          "name": "Mailhog SMTP"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ { \"success\": true, \"message\": \"Notification sent\" } }}"
+      },
+      "id": "respond-webhook",
+      "name": "Respond to Webhook",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1,
+      "position": [1350, 300]
+    }
+  ],
+  "connections": {
+    "Order Webhook": {
+      "main": [
+        [
+          {
+            "node": "Extract Order Data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Extract Order Data": {
+      "main": [
+        [
+          {
+            "node": "Check Event Type",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Check Event Type": {
+      "main": [
+        [
+          {
+            "node": "Get Order Details",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Get Order Details (Failed)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Order Details": {
+      "main": [
+        [
+          {
+            "node": "Send Order Confirmation",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send Order Confirmation": {
+      "main": [
+        [
+          {
+            "node": "Respond to Webhook",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Order Details (Failed)": {
+      "main": [
+        [
+          {
+            "node": "Send Payment Failed Email",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send Payment Failed Email": {
+      "main": [
+        [
+          {
+            "node": "Respond to Webhook",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {},
+  "staticData": null,
+  "tags": [],
+  "triggerCount": 1,
+  "updatedAt": "2025-01-01T00:00:00.000Z",
+  "versionId": "1"
+}

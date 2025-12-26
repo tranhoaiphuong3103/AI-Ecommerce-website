@@ -1,6 +1,6 @@
-import { NextResponse } from 'next/server';
-import { createCheckoutSession } from '@/lib/stripe';
 import { prisma } from '@/lib/prisma';
+import { createCheckoutSession } from '@/lib/stripe';
+import { NextResponse } from 'next/server';
 
 export async function POST(request: Request) {
   try {
@@ -8,10 +8,7 @@ export async function POST(request: Request) {
     const { userId, items } = body;
 
     if (!userId || !items || !Array.isArray(items) || items.length === 0) {
-      return NextResponse.json(
-        { error: 'Invalid request data' },
-        { status: 400 }
-      );
+      return NextResponse.json({ error: 'Invalid request data' }, { status: 400 });
     }
 
     const productIds = items.map((item: { productId: string }) => item.productId);
@@ -41,10 +38,13 @@ export async function POST(request: Request) {
       };
     });
 
-    const totalAmount = items.reduce((sum: number, item: { productId: string; quantity: number }) => {
-      const product = products.find((p) => p.id === item.productId);
-      return sum + (product?.price || 0) * item.quantity;
-    }, 0);
+    const totalAmount = items.reduce(
+      (sum: number, item: { productId: string; quantity: number }) => {
+        const product = products.find((p) => p.id === item.productId);
+        return sum + (product?.price || 0) * item.quantity;
+      },
+      0,
+    );
 
     const order = await prisma.order.create({
       data: {
@@ -69,12 +69,9 @@ export async function POST(request: Request) {
     const successUrl = `${process.env.NEXT_PUBLIC_WEB_URL}/order/success?orderId=${order.id}`;
     const cancelUrl = `${process.env.NEXT_PUBLIC_WEB_URL}/cart`;
 
-    const session = await createCheckoutSession(
-      lineItems,
-      successUrl,
-      cancelUrl,
-      { orderId: order.id }
-    );
+    const session = await createCheckoutSession(lineItems, successUrl, cancelUrl, {
+      orderId: order.id,
+    });
 
     return NextResponse.json({
       sessionId: session.id,
@@ -82,9 +79,6 @@ export async function POST(request: Request) {
     });
   } catch (error) {
     console.error('Error creating checkout session:', error);
-    return NextResponse.json(
-      { error: 'Failed to create checkout session' },
-      { status: 500 }
-    );
+    return NextResponse.json({ error: 'Failed to create checkout session' }, { status: 500 });
   }
 }

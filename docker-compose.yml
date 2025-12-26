@@ -141,36 +141,9 @@ services:
       - postgres
       - redis
       - minio
-      - comfyui
     networks:
       - ecommerce-network
     restart: unless-stopped
-
-  # ComfyUI for Video Generation (GPU required for best performance)
-  comfyui:
-    build:
-      context: ./.docker/comfyui
-      dockerfile: Dockerfile
-    container_name: ecommerce-comfyui
-    ports:
-      - "8188:8188"
-    environment:
-      - NVIDIA_VISIBLE_DEVICES=all
-    volumes:
-      - comfyui-data:/app/models
-      - comfyui-output:/app/output
-      - comfyui-input:/app/input
-      - ./apps/n8n/comfyui-workflows:/app/workflows
-    networks:
-      - ecommerce-network
-    restart: unless-stopped
-    deploy:
-      resources:
-        reservations:
-          devices:
-            - driver: nvidia
-              count: 1
-              capabilities: [gpu]
 
   # Mailhog Email Testing
   mailhog:
@@ -209,6 +182,3 @@ volumes:
   redis-data:
   minio-data:
   n8n-data:
-  comfyui-data:
-  comfyui-output:
-  comfyui-input:

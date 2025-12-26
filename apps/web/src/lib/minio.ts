@@ -2,7 +2,7 @@ import { Client } from 'minio';
 
 const minioClient = new Client({
   endPoint: process.env.MINIO_ENDPOINT || 'localhost',
-  port: parseInt(process.env.MINIO_PORT || '9000'),
+  port: Number.parseInt(process.env.MINIO_PORT || '9000'),
   useSSL: process.env.MINIO_USE_SSL === 'true',
   accessKey: process.env.MINIO_ACCESS_KEY || 'minioadmin',
   secretKey: process.env.MINIO_SECRET_KEY || 'minioadmin',
@@ -18,7 +18,7 @@ export async function uploadFile(
   bucket: string,
   fileName: string,
   fileBuffer: Buffer,
-  metadata?: Record<string, string>
+  metadata?: Record<string, string>,
 ): Promise<string> {
   await minioClient.putObject(bucket, fileName, fileBuffer, fileBuffer.length, metadata);
   return `http://${process.env.MINIO_ENDPOINT}:${process.env.MINIO_PORT}/${bucket}/${fileName}`;

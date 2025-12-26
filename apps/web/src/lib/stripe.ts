@@ -19,7 +19,7 @@ export async function createCheckoutSession(
   lineItems: Stripe.Checkout.SessionCreateParams.LineItem[],
   successUrl: string,
   cancelUrl: string,
-  metadata?: Record<string, string>
+  metadata?: Record<string, string>,
 ) {
   return await stripe.checkout.sessions.create({
     payment_method_types: ['card'],

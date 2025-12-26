@@ -1,6 +1,6 @@
-import { NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import axios from 'axios';
+import { NextResponse } from 'next/server';
 
 export async function POST(request: Request) {
   try {
@@ -8,10 +8,7 @@ export async function POST(request: Request) {
     const { userId, productId, modelHeight, modelWeight } = body;
 
     if (!userId || !productId || !modelHeight || !modelWeight) {
-      return NextResponse.json(
-        { error: 'Missing required fields' },
-        { status: 400 }
-      );
+      return NextResponse.json({ error: 'Missing required fields' }, { status: 400 });
     }
 
     const product = await prisma.product.findUnique({
@@ -25,10 +22,7 @@ export async function POST(request: Request) {
     });
 
     if (!product) {
-      return NextResponse.json(
-        { error: 'Product not found' },
-        { status: 404 }
-      );
+      return NextResponse.json({ error: 'Product not found' }, { status: 404 });
     }
 
     const video = await prisma.generatedVideo.create({
@@ -60,10 +54,7 @@ export async function POST(request: Request) {
     });
   } catch (error) {
     console.error('Error generating video:', error);
-    return NextResponse.json(
-      { error: 'Failed to generate video' },
-      { status: 500 }
-    );
+    return NextResponse.json({ error: 'Failed to generate video' }, { status: 500 });
   }
 }
 
@@ -73,10 +64,7 @@ export async function GET(request: Request) {
     const videoId = searchParams.get('videoId');
 
     if (!videoId) {
-      return NextResponse.json(
-        { error: 'Video ID required' },
-        { status: 400 }
-      );
+      return NextResponse.json({ error: 'Video ID required' }, { status: 400 });
     }
 
     const video = await prisma.generatedVideo.findUnique({
@@ -91,18 +79,12 @@ export async function GET(request: Request) {
     });
 
     if (!video) {
-      return NextResponse.json(
-        { error: 'Video not found' },
-        { status: 404 }
-      );
+      return NextResponse.json({ error: 'Video not found' }, { status: 404 });
     }
 
     return NextResponse.json(video);
   } catch (error) {
     console.error('Error fetching video:', error);
-    return NextResponse.json(
-      { error: 'Failed to fetch video' },
-      { status: 500 }
-    );
+    return NextResponse.json({ error: 'Failed to fetch video' }, { status: 500 });
   }
 }

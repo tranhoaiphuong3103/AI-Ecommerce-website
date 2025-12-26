@@ -1,12 +1,12 @@
 # Virtual Try-On E-commerce Platform
 
-AI-powered e-commerce with virtual try-on video generation using ComfyUI and n8n automation.
+AI-powered e-commerce with virtual try-on video generation using Hugging Face Inference API and n8n automation.
 
 ## Tech Stack
 
 - **Frontend**: Next.js 14 + TypeScript + Tailwind CSS
 - **Database**: PostgreSQL + Prisma ORM
-- **AI Video**: ComfyUI + AnimateDiff (local, GPU-required)
+- **AI Video**: Hugging Face Inference API (IDM-VTON + Stable Video Diffusion)
 - **Automation**: n8n workflows
 - **Storage**: MinIO (S3-compatible)
 - **Cache**: Redis
@@ -18,24 +18,9 @@ AI-powered e-commerce with virtual try-on video generation using ComfyUI and n8n
 ## Prerequisites
 
 - Docker Desktop
-- NVIDIA GPU + CUDA (for video generation)
-- NVIDIA Container Toolkit
-- 16GB+ RAM
-- 50GB+ disk space
-
-### Install NVIDIA Container Toolkit
-
-```bash
-# Ubuntu/Debian
-distribution=$(. /etc/os-release;echo $ID$VERSION_ID)
-curl -s -L https://nvidia.github.io/nvidia-docker/gpgkey | sudo apt-key add -
-curl -s -L https://nvidia.github.io/nvidia-docker/$distribution/nvidia-docker.list | sudo tee /etc/apt/sources.list.d/nvidia-docker.list
-sudo apt-get update && sudo apt-get install -y nvidia-container-toolkit
-sudo systemctl restart docker
-
-# Verify
-docker run --rm --gpus all nvidia/cuda:11.8.0-base-ubuntu22.04 nvidia-smi
-```
+- 8GB+ RAM
+- 10GB+ disk space
+- Hugging Face API key (free at https://huggingface.co/settings/tokens)
 
 ## Quick Start
 
@@ -46,7 +31,9 @@ cd Ecommerce-website
 
 # 2. Setup environment
 cp .env.example .env
-# Edit .env and add Stripe keys from https://dashboard.stripe.com/test/apikeys
+# Edit .env and add:
+# - Stripe keys from https://dashboard.stripe.com/test/apikeys
+# - Hugging Face API key from https://huggingface.co/settings/tokens
 
 # 3. Start all services
 make start
@@ -63,33 +50,24 @@ npx prisma migrate dev --name init
 # n8n: http://localhost:5678 (admin/admin123)
 # MinIO: http://localhost:9001 (minioadmin/minioadmin)
 # Mailhog: http://localhost:8025
-# ComfyUI: http://localhost:8188
+# Nginx: http://localhost:8080
 ```
 
 ## n8n Setup
 
 1. Go to http://localhost:5678
 2. Login: `admin` / `admin123`
-3. Import workflow: `apps/n8n/workflows/video-generation-workflow.json`
+3. Import workflows:
+   - **Video Generation**: `apps/n8n/workflows/video-generation-workflow.json`
+     - Generates virtual try-on videos via Hugging Face
+     - Returns video URL immediately to app (no email)
+   - **Order Processing**: `apps/n8n/workflows/order-processing-workflow.json`
+     - Sends confirmation emails for successful payments
+     - Sends failure notifications for invalid cards/declined payments
 4. Configure credentials:
-   - **PostgreSQL**: Host=`postgres`, Port=`5432`, DB=`ecommerce`, User/Pass=`postgres`
-   - **SMTP**: Host=`mailhog`, Port=`1025`, No auth
-5. Activate workflow
-
-## Download AI Models
-
-```bash
-# Method 1: Manual download
-docker exec -it ecommerce-comfyui bash
-cd models/checkpoints
-wget https://huggingface.co/runwayml/stable-diffusion-v1-5/resolve/main/v1-5-pruned-emaonly.safetensors
-cd ../animatediff_models
-wget https://huggingface.co/guoyww/animatediff/resolve/main/mm_sd_v15_v2.ckpt
-exit
-
-# Method 2: Use ComfyUI Manager (recommended)
-# Visit http://localhost:8188 and install models via GUI
-```
+   - **PostgreSQL**: Host=`ecommerce-postgres-temp`, Port=`5432`, DB=`ecommerce`, User/Pass=`postgres`
+   - **SMTP**: Host=`ecommerce-mailhog`, Port=`1025`, No auth
+5. Activate both workflows
 
 ## Project Structure
 
@@ -141,10 +119,14 @@ See `apps/n8n/workflows/README.md` for details.
 
 ## Troubleshooting
 
-**ComfyUI No GPU**
+**Hugging Face API Errors**
 ```bash
-docker run --rm --gpus all nvidia/cuda:11.8.0-base-ubuntu22.04 nvidia-smi
-# If fails, reinstall nvidia-container-toolkit
+# Check if API key is set correctly
+echo $HUGGINGFACE_API_KEY
+
+# Test API access
+curl https://huggingface.co/api/whoami-v2 \
+  -H "Authorization: Bearer $HUGGINGFACE_API_KEY"
 ```
 
 **Database Issues**
@@ -160,9 +142,10 @@ docker-compose down -v && docker-compose up -d postgres
 
 ## Important Notes
 
-### GPU Required
-- ComfyUI needs NVIDIA GPU for video generation
-- Without GPU: Use cloud APIs (Runway/Luma) or simple FFmpeg animations
+### No GPU Required
+- Hugging Face Inference API runs in the cloud
+- No local GPU needed - works on any machine
+- Free tier available with rate limits
 
 ### Default Credentials (Change in Production!)
 - n8n: `admin` / `admin123`
@@ -173,6 +156,7 @@ docker-compose down -v && docker-compose up -d postgres
 Key vars in `.env`:
 ```env
 DATABASE_URL=postgresql://postgres:postgres@localhost:5432/ecommerce
+HUGGINGFACE_API_KEY=hf_...
 STRIPE_PUBLIC_KEY=pk_test_...
 STRIPE_SECRET_KEY=sk_test_...
 N8N_WEBHOOK_URL=http://localhost:8080/webhook/generate-video
@@ -194,4 +178,4 @@ MIT License
 
 ---
 
-**Built with Next.js, n8n, and ComfyUI**
+**Built with Next.js, n8n, and Hugging Face**
