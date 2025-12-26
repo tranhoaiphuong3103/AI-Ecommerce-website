@@ -23,7 +23,7 @@ async function main() {
         name: 'T-Shirts',
         slug: 't-shirts',
         description: 'Classic and modern t-shirts for everyday wear',
-        imageUrl: 'https://placehold.co/800x600/e0e7ff/6366f1?text=T-Shirts',
+        imageUrl: 'https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?q=80&w=800&fit=crop',
       },
     }),
     prisma.category.create({
@@ -31,7 +31,7 @@ async function main() {
         name: 'Hoodies',
         slug: 'hoodies',
         description: 'Comfortable hoodies and sweatshirts',
-        imageUrl: 'https://placehold.co/800x600/f3e8ff/a855f7?text=Hoodies',
+        imageUrl: 'https://images.unsplash.com/photo-1556821840-3a63f95609a7?q=80&w=800&fit=crop',
       },
     }),
     prisma.category.create({
@@ -39,7 +39,7 @@ async function main() {
         name: 'Dresses',
         slug: 'dresses',
         description: 'Elegant and casual dresses for all occasions',
-        imageUrl: 'https://placehold.co/800x600/fce7f3/ec4899?text=Dresses',
+        imageUrl: 'https://images.unsplash.com/photo-1595777457583-95e059d581b8?q=80&w=800&fit=crop',
       },
     }),
     prisma.category.create({
@@ -47,7 +47,7 @@ async function main() {
         name: 'Pants',
         slug: 'pants',
         description: 'Comfortable pants and trousers',
-        imageUrl: 'https://placehold.co/800x600/fef3c7/f59e0b?text=Pants',
+        imageUrl: 'https://images.unsplash.com/photo-1624378439575-d8705ad7ae80?q=80&w=800&fit=crop',
       },
     }),
     prisma.category.create({
@@ -55,7 +55,7 @@ async function main() {
         name: 'Jackets',
         slug: 'jackets',
         description: 'Stylish jackets for any weather',
-        imageUrl: 'https://placehold.co/800x600/d1fae5/10b981?text=Jackets',
+        imageUrl: 'https://images.unsplash.com/photo-1551028719-00167b16eac5?q=80&w=800&fit=crop',
       },
     }),
     prisma.category.create({
@@ -63,7 +63,7 @@ async function main() {
         name: 'Sportswear',
         slug: 'sportswear',
         description: 'Athletic wear for active lifestyles',
-        imageUrl: 'https://placehold.co/800x600/fee2e2/ef4444?text=Sportswear',
+        imageUrl: 'https://images.unsplash.com/photo-1517836357463-d25dfeac3438?q=80&w=800&fit=crop',
       },
     }),
   ]);
@@ -81,19 +81,19 @@ async function main() {
       category: categories[0],
       images: [
         {
-          url: 'https://placehold.co/800x800/e0e7ff/6366f1?text=Classic+T-Shirt',
+          url: 'https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?q=80&w=800&fit=crop',
           alt: 'Classic Cotton T-Shirt - Front View',
           isPrimary: true,
           order: 1,
         },
         {
-          url: 'https://placehold.co/800x800/ddd6fe/8b5cf6?text=Back+View',
+          url: 'https://images.unsplash.com/photo-1583743814966-8936f5b7be1a?q=80&w=800&fit=crop',
           alt: 'Classic Cotton T-Shirt - Back View',
           isPrimary: false,
           order: 2,
         },
         {
-          url: 'https://placehold.co/800x800/cffafe/06b6d4?text=Side+View',
+          url: 'https://images.unsplash.com/photo-1618354691373-d851c5c3a990?q=80&w=800&fit=crop',
           alt: 'Classic Cotton T-Shirt - Side View',
           isPrimary: false,
           order: 3,
@@ -121,19 +121,19 @@ async function main() {
       category: categories[1],
       images: [
         {
-          url: 'https://placehold.co/800x800/f3e8ff/a855f7?text=Urban+Hoodie',
+          url: 'https://images.unsplash.com/photo-1556821840-3a63f95609a7?q=80&w=800&fit=crop',
           alt: 'Urban Streetwear Hoodie - Front',
           isPrimary: true,
           order: 1,
         },
         {
-          url: 'https://placehold.co/800x800/e0e7ff/6366f1?text=Side+View',
+          url: 'https://images.unsplash.com/photo-1620799140188-3b2a7c2e0e27?q=80&w=800&fit=crop',
           alt: 'Urban Streetwear Hoodie - Side',
           isPrimary: false,
           order: 2,
         },
         {
-          url: 'https://placehold.co/800x800/cffafe/06b6d4?text=Detail',
+          url: 'https://images.unsplash.com/photo-1620799139834-6b8f844fbe61?q=80&w=800&fit=crop',
           alt: 'Urban Streetwear Hoodie - Detail',
           isPrimary: false,
           order: 3,
@@ -159,19 +159,19 @@ async function main() {
       category: categories[2],
       images: [
         {
-          url: 'https://placehold.co/800x800/fce7f3/ec4899?text=Summer+Dress',
+          url: 'https://images.unsplash.com/photo-1595777457583-95e059d581b8?q=80&w=800&fit=crop',
           alt: 'Summer Floral Dress - Full',
           isPrimary: true,
           order: 1,
         },
         {
-          url: 'https://placehold.co/800x800/fbcfe8/db2777?text=Detail',
+          url: 'https://images.unsplash.com/photo-1572804013309-59a88b7e92f1?q=80&w=800&fit=crop',
           alt: 'Summer Floral Dress - Detail',
           isPrimary: false,
           order: 2,
         },
         {
-          url: 'https://placehold.co/800x800/fce7f3/f472b6?text=Side+View',
+          url: 'https://images.unsplash.com/photo-1612423284934-2850a4ea6b0f?q=80&w=800&fit=crop',
           alt: 'Summer Floral Dress - Side',
           isPrimary: false,
           order: 3,
@@ -194,13 +194,13 @@ async function main() {
       category: categories[3],
       images: [
         {
-          url: 'https://placehold.co/800x800/fef3c7/f59e0b?text=Chino+Pants',
+          url: 'https://images.unsplash.com/photo-1624378439575-d8705ad7ae80?q=80&w=800&fit=crop',
           alt: 'Slim Fit Chino Pants - Front',
           isPrimary: true,
           order: 1,
         },
         {
-          url: 'https://placehold.co/800x800/fde68a/eab308?text=Detail',
+          url: 'https://images.unsplash.com/photo-1473966968600-fa801b869a1a?q=80&w=800&fit=crop',
           alt: 'Slim Fit Chino Pants - Detail',
           isPrimary: false,
           order: 2,
@@ -228,19 +228,19 @@ async function main() {
       category: categories[4],
       images: [
         {
-          url: 'https://placehold.co/800x800/d1fae5/10b981?text=Performance+Jacket',
+          url: 'https://images.unsplash.com/photo-1551028719-00167b16eac5?q=80&w=800&fit=crop',
           alt: 'All-Weather Performance Jacket - Front',
           isPrimary: true,
           order: 1,
         },
         {
-          url: 'https://placehold.co/800x800/a7f3d0/059669?text=Side+View',
+          url: 'https://images.unsplash.com/photo-1591047139829-d91aecb6caea?q=80&w=800&fit=crop',
           alt: 'All-Weather Performance Jacket - Side',
           isPrimary: false,
           order: 2,
         },
         {
-          url: 'https://placehold.co/800x800/6ee7b7/047857?text=Detail',
+          url: 'https://images.unsplash.com/photo-1544022613-e87ca75a784a?q=80&w=800&fit=crop',
           alt: 'All-Weather Performance Jacket - Detail',
           isPrimary: false,
           order: 3,
@@ -266,13 +266,13 @@ async function main() {
       category: categories[5],
       images: [
         {
-          url: 'https://placehold.co/800x800/fee2e2/ef4444?text=Athletic+Set',
+          url: 'https://images.unsplash.com/photo-1517836357463-d25dfeac3438?q=80&w=800&fit=crop',
           alt: 'Pro Athletic Training Set - Full',
           isPrimary: true,
           order: 1,
         },
         {
-          url: 'https://placehold.co/800x800/fecaca/dc2626?text=Detail',
+          url: 'https://images.unsplash.com/photo-1623874514711-0f321325f318?q=80&w=800&fit=crop',
           alt: 'Pro Athletic Training Set - Detail',
           isPrimary: false,
           order: 2,
@@ -298,13 +298,13 @@ async function main() {
       category: categories[0],
       images: [
         {
-          url: 'https://placehold.co/800x800/e5e7eb/6b7280?text=Vintage+Tee',
+          url: 'https://images.unsplash.com/photo-1503341455253-b2e723bb3dbb?q=80&w=800&fit=crop',
           alt: 'Vintage Graphic Tee - Front',
           isPrimary: true,
           order: 1,
         },
         {
-          url: 'https://placehold.co/800x800/d1d5db/374151?text=Graphic+Detail',
+          url: 'https://images.unsplash.com/photo-1576566588028-4147f3842f27?q=80&w=800&fit=crop',
           alt: 'Vintage Graphic Tee - Detail',
           isPrimary: false,
           order: 2,
@@ -326,13 +326,13 @@ async function main() {
       category: categories[1],
       images: [
         {
-          url: 'https://placehold.co/800x800/f5f3ff/8b5cf6?text=Comfort+Hoodie',
+          url: 'https://images.unsplash.com/photo-1620799140234-025b89c49c3e?q=80&w=800&fit=crop',
           alt: 'Oversized Comfort Hoodie - Front',
           isPrimary: true,
           order: 1,
         },
         {
-          url: 'https://placehold.co/800x800/ede9fe/7c3aed?text=Side+View',
+          url: 'https://images.unsplash.com/photo-1620799140195-e5e7944d1116?q=80&w=800&fit=crop',
           alt: 'Oversized Comfort Hoodie - Side',
           isPrimary: false,
           order: 2,
@@ -358,13 +358,13 @@ async function main() {
       category: categories[2],
       images: [
         {
-          url: 'https://placehold.co/800x800/dbeafe/3b82f6?text=Evening+Dress',
+          url: 'https://images.unsplash.com/photo-1566174053879-31528523f8ae?q=80&w=800&fit=crop',
           alt: 'Elegant Evening Dress - Full',
           isPrimary: true,
           order: 1,
         },
         {
-          url: 'https://placehold.co/800x800/bfdbfe/2563eb?text=Detail',
+          url: 'https://images.unsplash.com/photo-1585487000160-6ebcfceb0d03?q=80&w=800&fit=crop',
           alt: 'Elegant Evening Dress - Detail',
           isPrimary: false,
           order: 2,
@@ -390,13 +390,13 @@ async function main() {
       category: categories[3],
       images: [
         {
-          url: 'https://placehold.co/800x800/dcfce7/22c55e?text=Cargo+Pants',
+          url: 'https://images.unsplash.com/photo-1525450824786-227cbef70703?q=80&w=800&fit=crop',
           alt: 'Cargo Utility Pants - Front',
           isPrimary: true,
           order: 1,
         },
         {
-          url: 'https://placehold.co/800x800/bbf7d0/16a34a?text=Detail',
+          url: 'https://images.unsplash.com/photo-1506629082955-511b1aa562c8?q=80&w=800&fit=crop',
           alt: 'Cargo Utility Pants - Detail',
           isPrimary: false,
           order: 2,
