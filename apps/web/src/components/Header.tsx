@@ -1,5 +1,6 @@
 'use client';
 
+import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 
@@ -40,7 +41,7 @@ export default function Header() {
     <header className="sticky top-0 z-50 backdrop-blur-xl bg-white/70 border-b border-purple-100/50 shadow-lg shadow-purple-500/5">
       <div className="max-w-7xl mx-auto px-4 py-4">
         <div className="flex items-center justify-between">
-          <div className="flex items-center space-x-3">
+          <Link href="/" className="flex items-center space-x-3">
             <div className="relative">
               <div className="absolute inset-0 bg-gradient-to-r from-purple-600 to-cyan-600 rounded-lg blur opacity-75 animate-pulse" />
               <div className="relative bg-gradient-to-r from-purple-600 via-blue-600 to-cyan-600 p-2 rounded-lg">
@@ -63,29 +64,29 @@ export default function Header() {
               <h1 className="text-xl font-bold bg-gradient-to-r from-purple-600 via-blue-600 to-cyan-600 bg-clip-text text-transparent">
                 VirtualTry
               </h1>
-              <p className="text-xs text-purple-600/70 font-medium">AI-Powered Shopping</p>
+              <p className="text-xs text-purple-600/70 font-medium">AI-Powered Shop</p>
             </div>
-          </div>
+          </Link>
 
           <nav className="hidden md:flex items-center space-x-8">
-            <a
-              href="#"
+            <Link
+              href="/products"
               className="text-sm font-medium text-gray-700 hover:text-purple-600 transition-colors"
             >
               Products
-            </a>
-            <a
-              href="#"
+            </Link>
+            <Link
+              href="/#how-it-works"
               className="text-sm font-medium text-gray-700 hover:text-purple-600 transition-colors"
             >
               How It Works
-            </a>
-            <a
-              href="#"
+            </Link>
+            <Link
+              href="/#about"
               className="text-sm font-medium text-gray-700 hover:text-purple-600 transition-colors"
             >
               About
-            </a>
+            </Link>
 
             {!isLoading &&
               (user ? (
