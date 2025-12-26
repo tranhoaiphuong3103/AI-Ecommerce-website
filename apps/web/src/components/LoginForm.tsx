@@ -28,7 +28,8 @@ export default function LoginForm() {
       }
 
       localStorage.setItem('token', data.token);
-      window.location.href = '/products';
+      localStorage.setItem('user', JSON.stringify(data.user));
+      window.location.href = '/';
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Something went wrong');
     } finally {

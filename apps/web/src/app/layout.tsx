@@ -1,6 +1,7 @@
 import type { Metadata } from 'next';
 import './globals.css';
 import AuthGuard from '@/components/AuthGuard';
+import Header from '@/components/Header';
 
 export const metadata: Metadata = {
   title: 'Virtual Try-On - AI-Powered Shopping',
@@ -22,66 +23,7 @@ export default function RootLayout({
           <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_80%,rgba(6,182,212,0.1),transparent_50%)]" />
         </div>
 
-        {/* Header */}
-        <header className="sticky top-0 z-50 backdrop-blur-xl bg-white/70 border-b border-purple-100/50 shadow-lg shadow-purple-500/5">
-          <div className="max-w-7xl mx-auto px-4 py-4">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center space-x-3">
-                <div className="relative">
-                  <div className="absolute inset-0 bg-gradient-to-r from-purple-600 to-cyan-600 rounded-lg blur opacity-75 animate-pulse" />
-                  <div className="relative bg-gradient-to-r from-purple-600 via-blue-600 to-cyan-600 p-2 rounded-lg">
-                    <svg
-                      className="w-6 h-6 text-white"
-                      fill="none"
-                      stroke="currentColor"
-                      viewBox="0 0 24 24"
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth={2}
-                        d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"
-                      />
-                    </svg>
-                  </div>
-                </div>
-                <div>
-                  <h1 className="text-xl font-bold bg-gradient-to-r from-purple-600 via-blue-600 to-cyan-600 bg-clip-text text-transparent">
-                    VirtualTry
-                  </h1>
-                  <p className="text-xs text-purple-600/70 font-medium">AI-Powered Shopping</p>
-                </div>
-              </div>
-
-              <nav className="hidden md:flex items-center space-x-8">
-                <a
-                  href="#"
-                  className="text-sm font-medium text-gray-700 hover:text-purple-600 transition-colors"
-                >
-                  Products
-                </a>
-                <a
-                  href="#"
-                  className="text-sm font-medium text-gray-700 hover:text-purple-600 transition-colors"
-                >
-                  How It Works
-                </a>
-                <a
-                  href="#"
-                  className="text-sm font-medium text-gray-700 hover:text-purple-600 transition-colors"
-                >
-                  About
-                </a>
-                <button
-                  type="button"
-                  className="px-6 py-2 bg-gradient-to-r from-purple-600 to-cyan-600 text-white rounded-full font-semibold text-sm hover:shadow-lg hover:shadow-purple-500/50 transition-all duration-300 hover:scale-105"
-                >
-                  Sign In
-                </button>
-              </nav>
-            </div>
-          </div>
-        </header>
+        <Header />
 
         {/* Main content */}
         <AuthGuard>
