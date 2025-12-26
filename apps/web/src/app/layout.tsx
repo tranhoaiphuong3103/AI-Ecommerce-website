@@ -1,5 +1,6 @@
 import type { Metadata } from 'next';
 import './globals.css';
+import AuthGuard from '@/components/AuthGuard';
 
 export const metadata: Metadata = {
   title: 'Virtual Try-On - AI-Powered Shopping',
@@ -83,7 +84,9 @@ export default function RootLayout({
         </header>
 
         {/* Main content */}
-        <main>{children}</main>
+        <AuthGuard>
+          <main>{children}</main>
+        </AuthGuard>
 
         {/* Footer */}
         <footer className="mt-20 border-t border-purple-100/50 bg-white/50 backdrop-blur-sm">

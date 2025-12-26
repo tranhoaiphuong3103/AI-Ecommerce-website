@@ -18,6 +18,8 @@ model User {
   measurements UserMeasurements?
   orders       Order[]
   videos       GeneratedVideo[]
+  outfits      Outfit[]
+  cartItems    CartItem[]
 }
 
 model UserMeasurements {
@@ -62,6 +64,8 @@ model Product {
   variants    ProductVariant[]
   videos      GeneratedVideo[]
   orderItems  OrderItem[]
+  cartItems   CartItem[]
+  outfitItems OutfitItem[]
 
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
@@ -95,7 +99,9 @@ model ProductVariant {
   sku        String   @unique
   stock      Int      @default(0)
 
-  orderItems OrderItem[]
+  orderItems  OrderItem[]
+  cartItems   CartItem[]
+  outfitItems OutfitItem[]
 
   createdAt  DateTime @default(now())
   updatedAt  DateTime @updatedAt
@@ -187,4 +193,79 @@ model OrderItem {
 
   @@index([orderId])
   @@index([productId])
+}
+
+model CartItem {
+  id        String   @id @default(uuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  productId String
+  product   Product  @relation(fields: [productId], references: [id])
+
+  variantId String?
+  variant   ProductVariant? @relation(fields: [variantId], references: [id])
+
+  quantity  Int      @default(1)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([userId])
+  @@index([productId])
+}
+
+model Outfit {
+  id          String   @id @default(uuid())
+  userId      String
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  name        String
+  description String?
+
+  items       OutfitItem[]
+  videos      OutfitVideo[]
+
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@index([userId])
+}
+
+model OutfitItem {
+  id        String  @id @default(uuid())
+  outfitId  String
+  outfit    Outfit  @relation(fields: [outfitId], references: [id], onDelete: Cascade)
+
+  productId String
+  product   Product @relation(fields: [productId], references: [id])
+
+  variantId String?
+  variant   ProductVariant? @relation(fields: [variantId], references: [id])
+
+  order     Int     @default(0)
+
+  createdAt DateTime @default(now())
+
+  @@index([outfitId])
+  @@index([productId])
+}
+
+model OutfitVideo {
+  id           String      @id @default(uuid())
+  outfitId     String
+  outfit       Outfit      @relation(fields: [outfitId], references: [id], onDelete: Cascade)
+
+  videoUrl     String
+  thumbnailUrl String?
+  status       VideoStatus @default(PENDING)
+
+  modelHeight  Float
+  modelWeight  Float
+
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  @@index([outfitId])
+  @@index([status])
 }
