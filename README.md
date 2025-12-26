@@ -26,7 +26,7 @@ AI-powered e-commerce with virtual try-on video generation using Hugging Face In
 
 ```bash
 # 1. Clone repo
-git clone https://github.com/hoaiphuongtr/Ecommerce-website.git
+git clone https://github.com/hoaiphuongtr/AI-Ecommerce-website.git
 cd Ecommerce-website
 
 # 2. Setup environment
