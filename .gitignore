@@ -9,6 +9,7 @@ yarn-error.log*
 out/
 build/
 dist/
+next-env.d.ts
 
 # Environment variables
 .env
@@ -26,6 +27,7 @@ redis-data/
 minio-data/
 n8n-data/
 comfyui-data/
+docker-compose.simple.yml
 
 # IDE
 .vscode/
