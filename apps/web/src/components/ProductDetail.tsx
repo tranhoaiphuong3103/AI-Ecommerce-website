@@ -46,9 +46,7 @@ export default function ProductDetail({ product }: ProductDetailProps) {
   const [selectedColor, setSelectedColor] = useState<string | null>(primaryColor);
   const [selectedVariant, setSelectedVariant] = useState<ProductVariant | null>(() => {
     if (primaryColor) {
-      return (
-        product.variants.find((v) => v.color === primaryColor) || product.variants[0] || null
-      );
+      return product.variants.find((v) => v.color === primaryColor) || product.variants[0] || null;
     }
     return product.variants[0] || null;
   });

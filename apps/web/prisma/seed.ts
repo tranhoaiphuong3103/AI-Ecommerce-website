@@ -58,6 +58,22 @@ async function main() {
         imageUrl: 'https://images.unsplash.com/photo-1542291026-7eec264c27ff?q=80&w=800&fit=crop',
       },
     }),
+    prisma.category.create({
+      data: {
+        name: 'Pants',
+        slug: 'pants',
+        description: 'High-quality pants',
+        imageUrl: 'https://images.unsplash.com/photo-1542291026-7eec264c27ff?q=80&w=800&fit=crop',
+      },
+    }),
+    prisma.category.create({
+      data: {
+        name: 'Jersey',
+        slug: 'jersey',
+        description: 'Authentic and elite performance jersey',
+        imageUrl: 'https://images.unsplash.com/photo-1542291026-7eec264c27ff?q=80&w=800&fit=crop',
+      },
+    }),
   ]);
   const productsData = [
     {
@@ -122,6 +138,28 @@ async function main() {
         { size: 'M', color: 'Red', stock: 20, sku: 'PUFF-BK-M' },
         { size: 'L', color: 'Red', stock: 25, sku: 'PUFF-BK-L' },
         { size: 'XL', color: 'Red', stock: 15, sku: 'PUFF-BK-XL' },
+      ],
+    },
+    {
+      name: 'FUTURE ICONS WOVEN THREE STRIPE T SHIRT',
+      slug: 'future-icons-woven-three-stripe-t-shirt',
+      description:
+        'Versatile performance jacket designed for all weather conditions. Water-resistant outer shell with breathable lining. Features multiple pockets and adjustable hood for maximum functionality.',
+      price: 39.94,
+      category: categories[3],
+      images: [
+        {
+          url: 'https://assets.adidas.com/images/h_2000,f_auto,q_auto,fl_lossy,c_fill,g_auto/82b8aeb3a07540d0af33f8cd5a075612_9366/FUTURE_ICONS_WOVEN_THREE_STRIPE_T_SHIRT_Black_JZ9289_01_laydown.jpg',
+          alt: 'FUTURE ICONS WOVEN THREE STRIPE T SHIRT - Front',
+          isPrimary: true,
+          order: 1,
+        },
+      ],
+      variants: [
+        { size: 'S', color: 'Black', stock: 15, sku: 'FUT-WOV-S' },
+        { size: 'M', color: 'Black', stock: 20, sku: 'FUT-WOV-M' },
+        { size: 'L', color: 'Black', stock: 25, sku: 'FUT-WOV-L' },
+        { size: 'XL', color: 'Black', stock: 15, sku: 'FUT-WOV-XL' },
       ],
     },
     {
@@ -351,6 +389,128 @@ async function main() {
         { size: 'US 10', color: 'Black', stock: 30, sku: 'F50-BK-10' },
         { size: 'US 11', color: 'Black', stock: 25, sku: 'F50-BK-11' },
         { size: 'US 12', color: 'Black', stock: 15, sku: 'F50-BK-12' },
+      ],
+    },
+    {
+      name: 'Argentina 26 Home Authentic Jersey',
+      slug: 'argentina-26-home-authentic-jersey',
+      description: `The Argentina 26 Home Authentic Jersey is more than just a piece of clothing; it's a celebration of the nation’s football legacy. Wherever you wear this jersey with its prestigious third star, it embodies the spirit of champions.
+
+Designed for action, the jersey features Climacool+ technology. ADVANCED COOLING. Superior engineering and advanced materials unite for a cool, dry and distraction-free performance.
+
+The special collar construction adds a classic touch, while body mapping creates a tailored, locked-in fit. The transfer knit jacquard fabric and Performance materials help to transfer heat through the garment and provide ventilation.
+
+With its bold 3-Stripes and team crest, this adidas jersey is a symbol of pride and excellence. Whether you're on the pitch or cheering from the stands, it expresses your passion for the Argentinian national team.`,
+      price: 114.1,
+      category: categories[6],
+      images: [
+        {
+          url: 'https://assets.adidas.com/images/h_2000,f_auto,q_auto,fl_lossy,c_fill,g_auto/c80a44b3f32149d1b756429003181b62_9366/Argentina_26_Home_Authentic_Jersey_White_JM5897_HM5.jpg',
+          alt: 'Icey Blue - Front View',
+          isPrimary: true,
+          order: 1,
+        },
+        {
+          url: 'https://assets.adidas.com/images/h_2000,f_auto,q_auto,fl_lossy,c_fill,g_auto/715cbc9455fe4e5bba1cf71dff18cb9f_9366/Argentina_26_Home_Authentic_Jersey_White_JM5897_HM6.jpg',
+          alt: 'Icey Blue - Back View',
+          isPrimary: false,
+          order: 2,
+        },
+        {
+          url: 'https://assets.adidas.com/images/h_2000,f_auto,q_auto,fl_lossy,c_fill,g_auto/18fcebda447f4728a0b6e2ec796ca48c_9366/Argentina_26_Home_Authentic_Jersey_White_JM5897_HM4.jpg',
+          alt: 'Icey Blue - Logo View',
+          isPrimary: false,
+          order: 3,
+        },
+        {
+          url: 'https://assets.adidas.com/images/h_2000,f_auto,q_auto,fl_lossy,c_fill,g_auto/941d215ecaee4141b923ea509d1802a3_9366/Argentina_26_Home_Authentic_Jersey_White_JM5897_HM12.jpg',
+          alt: 'Icey Blue - Badge View',
+          isPrimary: false,
+          order: 4,
+        },
+      ],
+      variants: [
+        { size: 'XS', color: 'White', stock: 15, sku: 'ARG-JEY-XS' },
+        { size: 'S', color: 'White', stock: 25, sku: 'ARG-JEY-S' },
+        { size: 'M', color: 'White', stock: 30, sku: 'ARG-JEY-M' },
+        { size: 'L', color: 'White', stock: 25, sku: 'ARG-JEY-L' },
+        { size: 'XL', color: 'White', stock: 20, sku: 'ARG-JEY-XL' },
+        { size: '2XL', color: 'White', stock: 20, sku: 'ARG-JEY-2XL' },
+      ],
+    },
+    {
+      name: 'Manchester United 25/26 Home Jersey',
+      slug: 'manchester-united-25-26-home-jersey',
+      description: `Few sporting stages can match the drama Manchester United's iconic home ground has generated over the years. So this adidas jersey pays tribute to the stadium in which it will be starring in 25/26 with a "Theatre of Dreams" sign-off and abstract Old Trafford-inspired graphics on the sleeves. Built for comfortable football fandom, it also features moisture-managing AEROREADY and a woven club badge.`,
+      price: 114.1,
+      category: categories[6],
+      images: [
+        {
+          url: 'https://assets.adidas.com/images/h_2000,f_auto,q_auto,fl_lossy,c_fill,g_auto/341ec36583354390854e7ad4fd2a02dd_9366/Manchester_United_25-26_Home_Jersey_Red_JI7428_01_laydown.jpg',
+          alt: 'Mufc Red - Front View',
+          isPrimary: true,
+          order: 1,
+        },
+        {
+          url: 'https://assets.adidas.com/images/h_2000,f_auto,q_auto,fl_lossy,c_fill,g_auto/9c2483f0d6df44f194ea9d1ae06f611a_9366/Manchester_United_25-26_Home_Jersey_Red_JI7428_02_laydown.jpg',
+          alt: 'Mufc Red - Back View',
+          isPrimary: false,
+          order: 2,
+        },
+      ],
+      variants: [
+        { size: 'XS', color: 'White', stock: 15, sku: 'MU-JEY-XS' },
+        { size: 'S', color: 'White', stock: 25, sku: 'MU-JEY-S' },
+        { size: 'M', color: 'White', stock: 30, sku: 'MU-JEY-M' },
+        { size: 'L', color: 'White', stock: 25, sku: 'MU-JEY-L' },
+        { size: 'XL', color: 'White', stock: 20, sku: 'MU-JEY-XL' },
+        { size: '2XL', color: 'White', stock: 20, sku: 'MU-JEY-2XL' },
+      ],
+    },
+    {
+      name: 'ALL SZN French Terry Regular Tapered Pants',
+      slug: 'all-szn-french-terry-regular-tapered-pants',
+      description: `Comfort that's in it for the long haul. These adidas pants are your go-to for lazy mornings, busy afternoons and everything in between. The soft cotton French terry fabric keeps you cosy whether you're lounging at home or running errands around town. The tapered cut with elastic cuffs is relaxed yet refined and finished with a drawcord waist for a customised fit. Pair these pants with a hoodie for a laid-back look or mix and match with your favourite tee. Whatever the mood, these pants have you covered.`,
+      price: 61.0,
+      category: categories[5],
+      images: [
+        {
+          url: 'https://assets.adidas.com/images/h_2000,f_auto,q_auto,fl_lossy,c_fill,g_auto/3503c1b18e9d4da1bf6843581cef1acc_9366/ALL_SZN_French_Terry_Regular_Tapered_Pants_Black_IV5216_01_laydown.jpg',
+          alt: 'Black - Side View',
+          isPrimary: true,
+          order: 1,
+        },
+        {
+          url: 'https://assets.adidas.com/images/h_2000,f_auto,q_auto,fl_lossy,c_fill,g_auto/42cb44f500e44f3d86d8cf506b958789_9366/ALL_SZN_French_Terry_Regular_Tapered_Pants_Grey_IY6558_01_laydown.jpg',
+          alt: 'Medium Grey Heather - Front View',
+          isPrimary: false,
+          order: 2,
+        },
+        {
+          url: 'https://assets.adidas.com/images/h_2000,f_auto,q_auto,fl_lossy,c_fill,g_auto/23b7e735d4f34a1c82cf08409125a7f0_9366/ALL_SZN_French_Terry_Regular_Tapered_Pants_Purple_JX5127_01_laydown.jpg',
+          alt: 'Preloved Violet - Front View',
+          isPrimary: false,
+          order: 4,
+        },
+      ],
+      variants: [
+        { size: 'US 7', color: 'Medium Grey Heather', stock: 12, sku: 'SZN-FRA-GR-07' },
+        { size: 'US 8', color: 'Medium Grey Heather', stock: 20, sku: 'SZN-FRA-GR-08' },
+        { size: 'US 9', color: 'Medium Grey Heather', stock: 25, sku: 'SZN-FRA-GR-09' },
+        { size: 'US 10', color: 'Medium Grey Heather', stock: 30, sku: 'SZN-FRA-GR-10' },
+        { size: 'US 11', color: 'Medium Grey Heather', stock: 25, sku: 'SZN-FRA-GR-11' },
+        { size: 'US 12', color: 'Medium Grey Heather', stock: 15, sku: 'SZN-FRA-GR-12' },
+        { size: 'US 7', color: 'Black', stock: 12, sku: 'SZN-FRA-BL-07' },
+        { size: 'US 8', color: 'Black', stock: 20, sku: 'SZN-FRA-BL-08' },
+        { size: 'US 9', color: 'Black', stock: 25, sku: 'SZN-FRA-BL-09' },
+        { size: 'US 10', color: 'Black', stock: 30, sku: 'SZN-FRA-BL-10' },
+        { size: 'US 11', color: 'Black', stock: 25, sku: 'SZN-FRA-BL-11' },
+        { size: 'US 12', color: 'Black', stock: 15, sku: 'SZN-FRA-BL-12' },
+        { size: 'US 7', color: 'Preloved Violet', stock: 15, sku: 'SZN-FRA-PV-07' },
+        { size: 'US 8', color: 'Preloved Violet', stock: 15, sku: 'SZN-FRA-PV-08' },
+        { size: 'US 10', color: 'Preloved Violet', stock: 15, sku: 'SZN-FRA-PV-10' },
+        { size: 'US 11', color: 'Preloved Violet', stock: 15, sku: 'SZN-FRA-PV-11' },
+        { size: 'US 12', color: 'Preloved Violet', stock: 15, sku: 'SZN-FRA-PV-12' },
       ],
     },
   ];
