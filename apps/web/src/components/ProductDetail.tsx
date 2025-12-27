@@ -45,12 +45,21 @@ export default function ProductDetail({ product }: ProductDetailProps) {
   const [selectedVariant, setSelectedVariant] = useState<ProductVariant | null>(
     product.variants[0] || null,
   );
+  const [selectedColor, setSelectedColor] = useState<string | null>(
+    product.variants[0]?.color || null,
+  );
   const [quantity, setQuantity] = useState(1);
 
   const availableSizes = Array.from(new Set(product.variants.map((v) => v.size)));
   const availableColors = Array.from(
     new Set(product.variants.map((v) => v.color).filter((c): c is string => c !== null)),
   );
+
+  const filteredImages = selectedColor
+    ? product.images.filter((img) => img.alt?.startsWith(selectedColor))
+    : product.images;
+
+  const displayImages = filteredImages.length > 0 ? filteredImages : product.images;
 
   const handleSizeChange = (size: string) => {
     const variant = product.variants.find(
@@ -67,6 +76,12 @@ export default function ProductDetail({ product }: ProductDetailProps) {
     );
     if (variant) {
       setSelectedVariant(variant);
+      setSelectedColor(color);
+
+      const colorImages = product.images.filter((img) => img.alt?.startsWith(color));
+      if (colorImages.length > 0) {
+        setSelectedImage(colorImages[0]);
+      }
     }
   };
 
@@ -146,9 +161,9 @@ export default function ProductDetail({ product }: ProductDetailProps) {
             </div>
 
             {/* Thumbnail Gallery */}
-            {product.images.length > 1 && (
+            {displayImages.length > 1 && (
               <div className="grid grid-cols-4 gap-3">
-                {product.images.map((image) => (
+                {displayImages.map((image) => (
                   <button
                     key={image.id}
                     type="button"
