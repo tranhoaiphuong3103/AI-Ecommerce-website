@@ -576,7 +576,7 @@ export default function ProductDetail({ product }: ProductDetailProps) {
                 </div>
                 <div className="mt-6 text-center">
                   <p className="text-sm text-gray-600 mb-4">
-                    Here's how this product looks on a virtual model!
+                    Here&apos;s how this product looks on a virtual model!
                   </p>
                   <button
                     type="button"
