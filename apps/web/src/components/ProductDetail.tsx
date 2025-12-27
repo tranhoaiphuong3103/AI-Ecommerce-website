@@ -52,6 +52,9 @@ export default function ProductDetail({ product }: ProductDetailProps) {
   });
   const [quantity, setQuantity] = useState(1);
   const [isGeneratingTryOn, setIsGeneratingTryOn] = useState(false);
+  const [generatedVideoId, setGeneratedVideoId] = useState<string | null>(null);
+  const [generatedVideoUrl, setGeneratedVideoUrl] = useState<string | null>(null);
+  const [videoStatus, setVideoStatus] = useState<string | null>(null);
 
   const sortSizes = (sizes: string[]) => {
     return sizes.sort((a, b) => {
@@ -94,6 +97,35 @@ export default function ProductDetail({ product }: ProductDetailProps) {
       }
     }
   }, [selectedColor, product.images, selectedImage]);
+
+  useEffect(() => {
+    if (!generatedVideoId || videoStatus === 'COMPLETED' || videoStatus === 'FAILED') {
+      return;
+    }
+
+    const pollVideoStatus = async () => {
+      try {
+        const response = await fetch(`/api/videos/generate?videoId=${generatedVideoId}`);
+        const data = await response.json();
+
+        setVideoStatus(data.status);
+
+        if (data.status === 'COMPLETED') {
+          setGeneratedVideoUrl(data.videoUrl);
+          setIsGeneratingTryOn(false);
+        } else if (data.status === 'FAILED') {
+          setIsGeneratingTryOn(false);
+          alert('Video generation failed. Please try again.');
+        }
+      } catch (error) {
+        console.error('Error polling video status:', error);
+      }
+    };
+
+    const interval = setInterval(pollVideoStatus, 3000);
+
+    return () => clearInterval(interval);
+  }, [generatedVideoId, videoStatus]);
 
   const handleSizeChange = (size: string) => {
     const variant = product.variants.find(
@@ -165,13 +197,11 @@ export default function ProductDetail({ product }: ProductDetailProps) {
         throw new Error(data.error || 'Failed to generate try-on');
       }
 
-      alert(
-        `Try-on generation started! This may take a few minutes. You can check the status in your profile.`,
-      );
+      setGeneratedVideoId(data.videoId);
+      setVideoStatus(data.status);
     } catch (error) {
       console.error('Error generating try-on:', error);
       alert('Failed to start try-on generation. Please try again.');
-    } finally {
       setIsGeneratingTryOn(false);
     }
   };
@@ -494,6 +524,76 @@ export default function ProductDetail({ product }: ProductDetailProps) {
             </div>
           </div>
         </div>
+
+        {/* AI Try-On Result Section */}
+        {(isGeneratingTryOn || generatedVideoUrl) && (
+          <div className="mt-12 bg-gradient-to-br from-purple-50/50 via-blue-50/50 to-cyan-50/50 rounded-3xl p-8 border border-purple-100/50">
+            <h2 className="text-3xl font-bold mb-6 text-center">
+              <span className="bg-gradient-to-r from-purple-600 to-cyan-600 bg-clip-text text-transparent">
+                AI Try-On Result
+              </span>
+            </h2>
+
+            {isGeneratingTryOn && !generatedVideoUrl && (
+              <div className="text-center py-12">
+                <svg
+                  className="w-16 h-16 animate-spin mx-auto mb-4 text-purple-600"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                >
+                  <circle
+                    className="opacity-25"
+                    cx="12"
+                    cy="12"
+                    r="10"
+                    stroke="currentColor"
+                    strokeWidth="4"
+                  />
+                  <path
+                    className="opacity-75"
+                    fill="currentColor"
+                    d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                  />
+                </svg>
+                <p className="text-lg font-semibold text-gray-700 mb-2">
+                  Generating your AI try-on...
+                </p>
+                <p className="text-sm text-gray-600">
+                  This usually takes 30-60 seconds. Please wait.
+                </p>
+                <p className="text-xs text-gray-500 mt-2">Status: {videoStatus || 'PENDING'}</p>
+              </div>
+            )}
+
+            {generatedVideoUrl && (
+              <div className="max-w-2xl mx-auto">
+                <div className="relative aspect-square bg-white rounded-2xl overflow-hidden shadow-2xl shadow-purple-500/20">
+                  <img
+                    src={generatedVideoUrl}
+                    alt="AI Try-On Result"
+                    className="w-full h-full object-contain"
+                  />
+                </div>
+                <div className="mt-6 text-center">
+                  <p className="text-sm text-gray-600 mb-4">
+                    Here's how this product looks on a virtual model!
+                  </p>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setGeneratedVideoUrl(null);
+                      setGeneratedVideoId(null);
+                      setVideoStatus(null);
+                    }}
+                    className="px-6 py-2 bg-white border-2 border-purple-600 text-purple-600 rounded-full font-semibold text-sm hover:bg-purple-50 transition-all"
+                  >
+                    Try Again
+                  </button>
+                </div>
+              </div>
+            )}
+          </div>
+        )}
       </div>
     </div>
   );
