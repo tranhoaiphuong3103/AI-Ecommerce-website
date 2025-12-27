@@ -4,7 +4,7 @@ import AuthGuard from '@/components/AuthGuard';
 import Header from '@/components/Header';
 
 export const metadata: Metadata = {
-  title: 'Virtual Try-On - AI-Powered Shopping',
+  title: 'Virtual Try-On - AI-Powered Shop',
   description: 'Experience the future of online shopping with AI-powered virtual try-on technology',
 };
 
