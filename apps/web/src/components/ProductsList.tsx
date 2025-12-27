@@ -159,14 +159,12 @@ export default function ProductsList({ initialProducts, categories }: ProductsLi
 
                   {/* Product Info */}
                   <div className="p-5 flex flex-col flex-1">
-                    <h3 className="font-bold text-lg text-gray-900 mb-2 line-clamp-2 group-hover:text-purple-600 transition-colors">
+                    <h3 className="font-bold text-lg text-gray-900 mb-2 line-clamp-2 group-hover:text-purple-600 transition-colors h-14">
                       {product.name}
                     </h3>
-                    {product.description && (
-                      <p className="text-sm text-gray-600 mb-3 line-clamp-2">
-                        {product.description}
-                      </p>
-                    )}
+                    <p className="text-sm text-gray-600 mb-3 line-clamp-2 h-10">
+                      {product.description || '\u00A0'}
+                    </p>
                     <div className="flex items-center justify-between mt-auto">
                       <span className="text-2xl font-bold bg-gradient-to-r from-purple-600 to-cyan-600 bg-clip-text text-transparent">
                         ${product.price.toFixed(2)}
