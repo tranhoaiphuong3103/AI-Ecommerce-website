@@ -51,6 +51,7 @@ export default function ProductDetail({ product }: ProductDetailProps) {
     return product.variants[0] || null;
   });
   const [quantity, setQuantity] = useState(1);
+  const [isGeneratingTryOn, setIsGeneratingTryOn] = useState(false);
 
   const sortSizes = (sizes: string[]) => {
     return sizes.sort((a, b) => {
@@ -127,9 +128,52 @@ export default function ProductDetail({ product }: ProductDetailProps) {
     alert('Product added to cart!');
   };
 
-  const handleTryOn = () => {
-    console.log('Try on:', { productId: product.id, variantId: selectedVariant?.id });
-    alert('Try-on feature coming soon!');
+  const handleTryOn = async () => {
+    const user = localStorage.getItem('user');
+    if (!user) {
+      alert('Please sign in to use the try-on feature');
+      return;
+    }
+
+    const userData = JSON.parse(user);
+    const userId = userData.id;
+
+    if (!userId) {
+      alert('Please sign in to use the try-on feature');
+      return;
+    }
+
+    setIsGeneratingTryOn(true);
+
+    try {
+      const response = await fetch('/api/videos/generate', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          userId,
+          productId: product.id,
+          modelHeight: 170,
+          modelWeight: 65,
+        }),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.error || 'Failed to generate try-on');
+      }
+
+      alert(
+        `Try-on generation started! This may take a few minutes. You can check the status in your profile.`,
+      );
+    } catch (error) {
+      console.error('Error generating try-on:', error);
+      alert('Failed to start try-on generation. Please try again.');
+    } finally {
+      setIsGeneratingTryOn(false);
+    }
   };
 
   return (
@@ -377,17 +421,41 @@ export default function ProductDetail({ product }: ProductDetailProps) {
               <button
                 type="button"
                 onClick={handleTryOn}
-                className="w-full py-4 bg-gradient-to-r from-cyan-600 to-blue-600 text-white rounded-xl font-bold text-lg hover:shadow-2xl hover:shadow-cyan-500/50 transition-all duration-300 hover:scale-105 flex items-center justify-center space-x-2"
+                disabled={isGeneratingTryOn}
+                className="w-full py-4 bg-gradient-to-r from-cyan-600 to-blue-600 text-white rounded-xl font-bold text-lg hover:shadow-2xl hover:shadow-cyan-500/50 transition-all duration-300 hover:scale-105 flex items-center justify-center space-x-2 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100"
               >
-                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"
-                  />
-                </svg>
-                <span>Try On This Item</span>
+                {isGeneratingTryOn ? (
+                  <>
+                    <svg className="w-6 h-6 animate-spin" fill="none" viewBox="0 0 24 24">
+                      <circle
+                        className="opacity-25"
+                        cx="12"
+                        cy="12"
+                        r="10"
+                        stroke="currentColor"
+                        strokeWidth="4"
+                      />
+                      <path
+                        className="opacity-75"
+                        fill="currentColor"
+                        d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                      />
+                    </svg>
+                    <span>Generating...</span>
+                  </>
+                ) : (
+                  <>
+                    <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"
+                      />
+                    </svg>
+                    <span>Try On This Item</span>
+                  </>
+                )}
               </button>
 
               <button
