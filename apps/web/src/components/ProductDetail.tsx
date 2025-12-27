@@ -1,7 +1,7 @@
 'use client';
 
 import Link from 'next/link';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 
 interface ProductImage {
   id: string;
@@ -60,6 +60,15 @@ export default function ProductDetail({ product }: ProductDetailProps) {
     : product.images;
 
   const displayImages = filteredImages.length > 0 ? filteredImages : product.images;
+
+  useEffect(() => {
+    if (selectedColor) {
+      const colorImages = product.images.filter((img) => img.alt?.startsWith(selectedColor));
+      if (colorImages.length > 0 && !colorImages.find((img) => img.id === selectedImage?.id)) {
+        setSelectedImage(colorImages[0]);
+      }
+    }
+  }, [selectedColor, product.images, selectedImage]);
 
   const handleSizeChange = (size: string) => {
     const variant = product.variants.find(
@@ -325,7 +334,7 @@ export default function ProductDetail({ product }: ProductDetailProps) {
                   max={selectedVariant?.stock || 99}
                   value={quantity}
                   onChange={(e) => setQuantity(Math.max(1, Number.parseInt(e.target.value) || 1))}
-                  className="w-20 h-12 text-center rounded-xl border-2 border-purple-100 focus:border-purple-600 focus:outline-none text-gray-900 font-semibold"
+                  className="w-20 h-12 text-center rounded-xl border-2 border-purple-100 focus:border-purple-600 focus:outline-none text-gray-900 font-semibold leading-[3rem]"
                 />
                 <button
                   type="button"

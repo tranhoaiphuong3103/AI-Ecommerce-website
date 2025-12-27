@@ -4,8 +4,6 @@ const prisma = new PrismaClient();
 
 async function main() {
   console.log('🌱 Starting seed...');
-
-  // Clear existing data
   console.log('🗑️  Cleaning database...');
   await prisma.cartItem.deleteMany();
   await prisma.orderItem.deleteMany();
@@ -15,7 +13,6 @@ async function main() {
   await prisma.product.deleteMany();
   await prisma.category.deleteMany();
 
-  // Create Categories
   console.log('📁 Creating categories...');
   const categories = await Promise.all([
     prisma.category.create({
@@ -23,7 +20,8 @@ async function main() {
         name: 'T-Shirts',
         slug: 't-shirts',
         description: 'Classic and modern t-shirts for everyday wear',
-        imageUrl: 'https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?q=80&w=800&fit=crop',
+        imageUrl:
+          'https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?q=80&w=800&fit=crop',
       },
     }),
     prisma.category.create({
@@ -31,23 +29,8 @@ async function main() {
         name: 'Sweatshirt',
         slug: 'sweatshirt',
         description: 'Comfortable sweatshirts',
-        imageUrl: 'https://assets.adidas.com/images/h_2000,f_auto,q_auto,fl_lossy,c_fill,g_auto/97a0eecf59814157a979c89f28d26339_9366/Ao_Sweatshirt_Phong_Cach_DJap_Xe_Co_DJien_Mau_vang_JW0147_01_laydown.jpg',
-      },
-    }),
-    prisma.category.create({
-      data: {
-        name: 'Dresses',
-        slug: 'dresses',
-        description: 'Elegant and casual dresses for all occasions',
-        imageUrl: 'https://images.unsplash.com/photo-1595777457583-95e059d581b8?q=80&w=800&fit=crop',
-      },
-    }),
-    prisma.category.create({
-      data: {
-        name: 'Pants',
-        slug: 'pants',
-        description: 'Comfortable pants and trousers',
-        imageUrl: 'https://images.unsplash.com/photo-1624378439575-d8705ad7ae80?q=80&w=800&fit=crop',
+        imageUrl:
+          'https://assets.adidas.com/images/h_2000,f_auto,q_auto,fl_lossy,c_fill,g_auto/97a0eecf59814157a979c89f28d26339_9366/Ao_Sweatshirt_Phong_Cach_DJap_Xe_Co_DJien_Mau_vang_JW0147_01_laydown.jpg',
       },
     }),
     prisma.category.create({
@@ -63,7 +46,8 @@ async function main() {
         name: 'Sportswear',
         slug: 'sportswear',
         description: 'Athletic wear for active lifestyles',
-        imageUrl: 'https://images.unsplash.com/photo-1517836357463-d25dfeac3438?q=80&w=800&fit=crop',
+        imageUrl:
+          'https://images.unsplash.com/photo-1517836357463-d25dfeac3438?q=80&w=800&fit=crop',
       },
     }),
     prisma.category.create({
@@ -75,10 +59,6 @@ async function main() {
       },
     }),
   ]);
-
-  console.log(`✅ Created ${categories.length} categories`);
-
-  // Product data
   const productsData = [
     {
       name: 'Classic Cotton T-Shirt',
@@ -90,19 +70,19 @@ async function main() {
       images: [
         {
           url: 'https://cdn.shopify.com/s/files/1/0123/5065/2473/files/BM11049.549WHT_FIELD-SPECCOTTONHEAVYTEE.jpg?v=1700168512&format=webp&width=1800&height=1800',
-          alt: 'Classic Cotton T-Shirt - Front View',
+          alt: 'White - Front View',
           isPrimary: true,
           order: 1,
         },
         {
           url: 'https://cdn.shopify.com/s/files/1/0123/5065/2473/files/BM11049.549BLK_FIELD-SPECCOTTONHEAVYTEE_605aa1f2-ff8a-4dcd-bf71-90a2d0212443.jpg?v=1695841871&format=webp&width=1800&height=1800',
-          alt: 'Classic Cotton T-Shirt - Back View',
+          alt: 'Black - Front View',
           isPrimary: false,
           order: 2,
         },
         {
           url: 'https://cdn.shopify.com/s/files/1/0123/5065/2473/files/BM11049.583_Field-Spec-Cotton-Heavy-Tee_SPECKLE-GREY.jpg?v=1740423798&format=webp&width=1800&height=1800',
-          alt: 'Classic Cotton T-Shirt - Side View',
+          alt: 'Grey - Front View',
           isPrimary: false,
           order: 3,
         },
@@ -123,180 +103,25 @@ async function main() {
       ],
     },
     {
-      name: 'Urban Streetwear Hoodie',
-      slug: 'urban-streetwear-hoodie',
-      description:
-        'Stay warm and stylish with this premium urban hoodie. Features a relaxed fit, adjustable drawstring hood, and kangaroo pocket. Made from soft cotton blend for maximum comfort.',
-      price: 79.99,
-      category: categories[1],
-      images: [
-        {
-          url: 'https://images.unsplash.com/photo-1556821840-3a63f95609a7?q=80&w=800&fit=crop',
-          alt: 'Urban Streetwear Hoodie - Front',
-          isPrimary: true,
-          order: 1,
-        },
-        {
-          url: 'https://images.unsplash.com/photo-1620799140188-3b2a7c2e0e27?q=80&w=800&fit=crop',
-          alt: 'Urban Streetwear Hoodie - Side',
-          isPrimary: false,
-          order: 2,
-        },
-        {
-          url: 'https://images.unsplash.com/photo-1620799139834-6b8f844fbe61?q=80&w=800&fit=crop',
-          alt: 'Urban Streetwear Hoodie - Detail',
-          isPrimary: false,
-          order: 3,
-        },
-      ],
-      variants: [
-        { size: 'S', color: 'Gray', stock: 20, sku: 'USH-GR-S' },
-        { size: 'M', color: 'Gray', stock: 25, sku: 'USH-GR-M' },
-        { size: 'L', color: 'Gray', stock: 30, sku: 'USH-GR-L' },
-        { size: 'XL', color: 'Gray', stock: 20, sku: 'USH-GR-XL' },
-        { size: 'S', color: 'Navy', stock: 18, sku: 'USH-NV-S' },
-        { size: 'M', color: 'Navy', stock: 22, sku: 'USH-NV-M' },
-        { size: 'L', color: 'Navy', stock: 25, sku: 'USH-NV-L' },
-        { size: 'XL', color: 'Navy', stock: 15, sku: 'USH-NV-XL' },
-      ],
-    },
-    {
-      name: 'Summer Floral Dress',
-      slug: 'summer-floral-dress',
-      description:
-        'Beautiful floral print dress perfect for summer days. Features a flattering A-line silhouette, comfortable fit, and vibrant colors. Made from lightweight, breathable fabric.',
-      price: 89.99,
-      category: categories[2],
-      images: [
-        {
-          url: 'https://images.unsplash.com/photo-1595777457583-95e059d581b8?q=80&w=800&fit=crop',
-          alt: 'Summer Floral Dress - Full',
-          isPrimary: true,
-          order: 1,
-        },
-        {
-          url: 'https://images.unsplash.com/photo-1572804013309-59a88b7e92f1?q=80&w=800&fit=crop',
-          alt: 'Summer Floral Dress - Detail',
-          isPrimary: false,
-          order: 2,
-        },
-        {
-          url: 'https://images.unsplash.com/photo-1612423284934-2850a4ea6b0f?q=80&w=800&fit=crop',
-          alt: 'Summer Floral Dress - Side',
-          isPrimary: false,
-          order: 3,
-        },
-      ],
-      variants: [
-        { size: 'XS', color: 'Floral Pink', stock: 12, sku: 'SFD-FP-XS' },
-        { size: 'S', color: 'Floral Pink', stock: 18, sku: 'SFD-FP-S' },
-        { size: 'M', color: 'Floral Pink', stock: 20, sku: 'SFD-FP-M' },
-        { size: 'L', color: 'Floral Pink', stock: 15, sku: 'SFD-FP-L' },
-        { size: 'XL', color: 'Floral Pink', stock: 10, sku: 'SFD-FP-XL' },
-      ],
-    },
-    {
-      name: 'Slim Fit Chino Pants',
-      slug: 'slim-fit-chino-pants',
-      description:
-        'Modern slim-fit chino pants for a sharp, professional look. Crafted from premium stretch cotton for comfort and mobility. Features classic styling with modern cuts.',
-      price: 69.99,
-      category: categories[3],
-      images: [
-        {
-          url: 'https://images.unsplash.com/photo-1624378439575-d8705ad7ae80?q=80&w=800&fit=crop',
-          alt: 'Slim Fit Chino Pants - Front',
-          isPrimary: true,
-          order: 1,
-        },
-        {
-          url: 'https://images.unsplash.com/photo-1473966968600-fa801b869a1a?q=80&w=800&fit=crop',
-          alt: 'Slim Fit Chino Pants - Detail',
-          isPrimary: false,
-          order: 2,
-        },
-      ],
-      variants: [
-        { size: '28', color: 'Khaki', stock: 15, sku: 'SFC-KH-28' },
-        { size: '30', color: 'Khaki', stock: 25, sku: 'SFC-KH-30' },
-        { size: '32', color: 'Khaki', stock: 30, sku: 'SFC-KH-32' },
-        { size: '34', color: 'Khaki', stock: 25, sku: 'SFC-KH-34' },
-        { size: '36', color: 'Khaki', stock: 20, sku: 'SFC-KH-36' },
-        { size: '28', color: 'Navy', stock: 15, sku: 'SFC-NV-28' },
-        { size: '30', color: 'Navy', stock: 25, sku: 'SFC-NV-30' },
-        { size: '32', color: 'Navy', stock: 30, sku: 'SFC-NV-32' },
-        { size: '34', color: 'Navy', stock: 25, sku: 'SFC-NV-34' },
-        { size: '36', color: 'Navy', stock: 20, sku: 'SFC-NV-36' },
-      ],
-    },
-    {
-      name: 'All-Weather Performance Jacket',
-      slug: 'all-weather-performance-jacket',
+      name: 'PUFFTECH Quilted Jacket | With Hood',
+      slug: 'quilted-hood-jacket',
       description:
         'Versatile performance jacket designed for all weather conditions. Water-resistant outer shell with breathable lining. Features multiple pockets and adjustable hood for maximum functionality.',
       price: 129.99,
-      category: categories[4],
+      category: categories[2],
       images: [
         {
-          url: 'https://images.unsplash.com/photo-1551028719-00167b16eac5?q=80&w=800&fit=crop',
+          url: 'https://image.uniqlo.com/UQ/ST3/AsianCommon/imagesgoods/469871/sub/goods_469871_sub14_3x4.jpg?width=423',
           alt: 'All-Weather Performance Jacket - Front',
           isPrimary: true,
           order: 1,
         },
-        {
-          url: 'https://images.unsplash.com/photo-1591047139829-d91aecb6caea?q=80&w=800&fit=crop',
-          alt: 'All-Weather Performance Jacket - Side',
-          isPrimary: false,
-          order: 2,
-        },
-        {
-          url: 'https://images.unsplash.com/photo-1544022613-e87ca75a784a?q=80&w=800&fit=crop',
-          alt: 'All-Weather Performance Jacket - Detail',
-          isPrimary: false,
-          order: 3,
-        },
       ],
       variants: [
-        { size: 'S', color: 'Black', stock: 15, sku: 'AWP-BK-S' },
-        { size: 'M', color: 'Black', stock: 20, sku: 'AWP-BK-M' },
-        { size: 'L', color: 'Black', stock: 25, sku: 'AWP-BK-L' },
-        { size: 'XL', color: 'Black', stock: 15, sku: 'AWP-BK-XL' },
-        { size: 'S', color: 'Olive', stock: 12, sku: 'AWP-OL-S' },
-        { size: 'M', color: 'Olive', stock: 18, sku: 'AWP-OL-M' },
-        { size: 'L', color: 'Olive', stock: 20, sku: 'AWP-OL-L' },
-        { size: 'XL', color: 'Olive', stock: 12, sku: 'AWP-OL-XL' },
-      ],
-    },
-    {
-      name: 'Pro Athletic Training Set',
-      slug: 'pro-athletic-training-set',
-      description:
-        'Complete athletic training set with moisture-wicking technology. Includes performance top and matching shorts. Designed for intense workouts with stretch fabric and ventilation zones.',
-      price: 99.99,
-      category: categories[5],
-      images: [
-        {
-          url: 'https://images.unsplash.com/photo-1517836357463-d25dfeac3438?q=80&w=800&fit=crop',
-          alt: 'Pro Athletic Training Set - Full',
-          isPrimary: true,
-          order: 1,
-        },
-        {
-          url: 'https://images.unsplash.com/photo-1623874514711-0f321325f318?q=80&w=800&fit=crop',
-          alt: 'Pro Athletic Training Set - Detail',
-          isPrimary: false,
-          order: 2,
-        },
-      ],
-      variants: [
-        { size: 'S', color: 'Black/Red', stock: 20, sku: 'PAT-BR-S' },
-        { size: 'M', color: 'Black/Red', stock: 25, sku: 'PAT-BR-M' },
-        { size: 'L', color: 'Black/Red', stock: 30, sku: 'PAT-BR-L' },
-        { size: 'XL', color: 'Black/Red', stock: 20, sku: 'PAT-BR-XL' },
-        { size: 'S', color: 'Navy/White', stock: 18, sku: 'PAT-NW-S' },
-        { size: 'M', color: 'Navy/White', stock: 22, sku: 'PAT-NW-M' },
-        { size: 'L', color: 'Navy/White', stock: 28, sku: 'PAT-NW-L' },
-        { size: 'XL', color: 'Navy/White', stock: 18, sku: 'PAT-NW-XL' },
+        { size: 'S', color: 'Red', stock: 15, sku: 'PUFF-BK-S' },
+        { size: 'M', color: 'Red', stock: 20, sku: 'PUFF-BK-M' },
+        { size: 'L', color: 'Red', stock: 25, sku: 'PUFF-BK-L' },
+        { size: 'XL', color: 'Red', stock: 15, sku: 'PUFF-BK-XL' },
       ],
     },
     {
@@ -334,14 +159,19 @@ async function main() {
     {
       name: 'Archive Cycling Sweatshirt',
       slug: 'archive-cycling-sweatshirt',
-      description:
-        `This adidas sweatshirt is a must-have addition to your wardrobe. Whether you're heading out for the day or curling up on the couch, its soft French terry build keeps you in comfort. It has a loose, oversized shape, with bold colourblocking and bold graphics inspired by vintage cycling.`,
+      description: `This adidas sweatshirt is a must-have addition to your wardrobe. Whether you're heading out for the day or curling up on the couch, its soft French terry build keeps you in comfort. It has a loose, oversized shape, with bold colourblocking and bold graphics inspired by vintage cycling.`,
       price: 148.33,
       category: categories[1],
       images: [
         {
           url: 'https://assets.adidas.com/images/h_2000,f_auto,q_auto,fl_lossy,c_fill,g_auto/97a0eecf59814157a979c89f28d26339_9366/Ao_Sweatshirt_Phong_Cach_DJap_Xe_Co_DJien_Mau_vang_JW0147_01_laydown.jpg',
           alt: 'Oversized Comfort Hoodie - Front',
+          isPrimary: true,
+          order: 1,
+        },
+        {
+          url: 'https://assets.adidas.com/images/c_crop,f_auto,fl_lossy,g_north,h_840,q_auto,y_40/h_2000/97a0eecf59814157a979c89f28d26339_9366/Archive_Cycling_Sweatshirt_Yellow_JW0147_01_laydown.jpg',
+          alt: 'Oversized Comfort Hoodie - Detail',
           isPrimary: true,
           order: 1,
         },
@@ -352,44 +182,11 @@ async function main() {
       ],
     },
     {
-      name: 'Elegant Evening Dress',
-      slug: 'elegant-evening-dress',
-      description:
-        'Sophisticated evening dress with timeless elegance. Features a flattering silhouette, quality construction, and luxurious fabric. Perfect for special occasions and formal events.',
-      price: 149.99,
-      category: categories[2],
-      images: [
-        {
-          url: 'https://images.unsplash.com/photo-1566174053879-31528523f8ae?q=80&w=800&fit=crop',
-          alt: 'Elegant Evening Dress - Full',
-          isPrimary: true,
-          order: 1,
-        },
-        {
-          url: 'https://images.unsplash.com/photo-1585487000160-6ebcfceb0d03?q=80&w=800&fit=crop',
-          alt: 'Elegant Evening Dress - Detail',
-          isPrimary: false,
-          order: 2,
-        },
-      ],
-      variants: [
-        { size: 'XS', color: 'Navy', stock: 10, sku: 'EED-NV-XS' },
-        { size: 'S', color: 'Navy', stock: 15, sku: 'EED-NV-S' },
-        { size: 'M', color: 'Navy', stock: 18, sku: 'EED-NV-M' },
-        { size: 'L', color: 'Navy', stock: 12, sku: 'EED-NV-L' },
-        { size: 'XS', color: 'Burgundy', stock: 10, sku: 'EED-BU-XS' },
-        { size: 'S', color: 'Burgundy', stock: 15, sku: 'EED-BU-S' },
-        { size: 'M', color: 'Burgundy', stock: 18, sku: 'EED-BU-M' },
-        { size: 'L', color: 'Burgundy', stock: 12, sku: 'EED-BU-L' },
-      ],
-    },
-    {
       name: 'Samba OG Shoes',
       slug: 'samba-og-shoes',
-      description:
-        `Born on the pitch, the Samba is a timeless icon of street style. This silhouette stays true to its legacy with a tasteful, low-profile, soft leather upper, suede overlays and gum sole, making it a staple in everyone's closet - on and off the pitch.`,
+      description: `Born on the pitch, the Samba is a timeless icon of street style. This silhouette stays true to its legacy with a tasteful, low-profile, soft leather upper, suede overlays and gum sole, making it a staple in everyone's closet - on and off the pitch.`,
       price: 100.0,
-      category: categories[6],
+      category: categories[4],
       images: [
         {
           url: 'https://assets.adidas.com/images/h_2000,f_auto,q_auto,fl_lossy,c_fill,g_auto/3bbecbdf584e40398446a8bf0117cf62_9366/Samba_OG_Shoes_White_B75806_01_00_standard.jpg',
@@ -398,16 +195,34 @@ async function main() {
           order: 1,
         },
         {
+          url: 'https://assets.adidas.com/images/h_2000,f_auto,q_auto,fl_lossy,c_fill,g_auto/b067d21288bc43ec8298a8bf01180400_9366/Samba_OG_Shoes_White_B75806_04_standard.jpg',
+          alt: 'Cloud White - Front View',
+          isPrimary: true,
+          order: 2,
+        },
+        {
           url: 'https://assets.adidas.com/images/h_2000,f_auto,q_auto,fl_lossy,c_fill,g_auto/4c70105150234ac4b948a8bf01187e0c_9366/Samba_OG_Shoes_Black_B75807_01_standard.jpg',
           alt: 'Core Black - Side View',
           isPrimary: false,
-          order: 2,
+          order: 3,
+        },
+        {
+          url: 'https://assets.adidas.com/images/h_2000,f_auto,q_auto,fl_lossy,c_fill,g_auto/a766df52607e42858ddba8bf0118c6cb_9366/Samba_OG_Shoes_Black_B75807_04_standard.jpg',
+          alt: 'Core Black - Front View',
+          isPrimary: false,
+          order: 4,
         },
         {
           url: 'https://assets.adidas.com/images/h_2000,f_auto,q_auto,fl_lossy,c_fill,g_auto/7b283df1eb6c4c9ab4a3afb200f9876a_9366/Samba_OG_Shoes_White_IG1025_01_00_standard.jpg',
           alt: 'Wonder White - Side View',
           isPrimary: false,
-          order: 3,
+          order: 5,
+        },
+        {
+          url: 'https://assets.adidas.com/images/h_2000,f_auto,q_auto,fl_lossy,c_fill,g_auto/3d22ad048e2d41e4ab61afb200f9b333_9366/Samba_OG_Shoes_White_IG1025_04_standard.jpg',
+          alt: 'Wonder White - Front View',
+          isPrimary: false,
+          order: 6,
         },
       ],
       variants: [
@@ -434,10 +249,9 @@ async function main() {
     {
       name: `Nike Air Force 1 '07 LV8`,
       slug: 'air-force-1-07-lv8-shoes',
-      description:
-        `Comfortable, durable and timeless—it's number one for a reason. The suede edition pairs metallic accents with a stacked Swoosh logo for style that tracks whether you're on court or on the go.`,
+      description: `Comfortable, durable and timeless—it's number one for a reason. The suede edition pairs metallic accents with a stacked Swoosh logo for style that tracks whether you're on court or on the go.`,
       price: 135.0,
-      category: categories[6],
+      category: categories[4],
       images: [
         {
           url: 'https://static.nike.com/a/images/t_web_pdp_535_v2/f_auto/ab49cd62-e261-4dee-8511-242148604889/AIR+FORCE+1+%2707+LV8.png',
@@ -446,22 +260,34 @@ async function main() {
           order: 1,
         },
         {
-          url: 'https://static.nike.com/a/images/t_web_pdp_535_v2/f_auto/cf3bbe46-da7a-4c83-8d6a-24c8a40b1773/AIR+FORCE+1+%2707+LV8.png',
+          url: 'https://static.nike.com/a/images/t_web_pdp_535_v2/f_auto/e0a06185-1311-414b-84ad-4339070a5e72/AIR+FORCE+1+%2707+LV8.png',
           alt: 'Desert Ochre - Front View',
           isPrimary: false,
           order: 2,
         },
         {
-          url: 'https://static.nike.com/a/images/t_PDP_1728_v1/f_auto,q_auto:eco/0bb49c64-6fe5-4fe0-af40-fe1a3ee37d74/AIR+FORCE+1+%2707.png',
-          alt: 'Light Smoke Grey - Side View',
+          url: 'https://static.nike.com/a/images/t_web_pdp_535_v2/f_auto/a6bd4b85-8582-48a2-ae44-21e6025f5f0d/AIR+FORCE+1+%2707+LV8.png',
+          alt: 'Desert Ochre - Back View',
           isPrimary: false,
           order: 3,
         },
         {
-          url: 'https://static.nike.com/a/images/t_PDP_1728_v1/f_auto,q_auto:eco/67f59c02-6c0b-49ba-b1de-ccc14d1e1a99/AIR+FORCE+1+%2707.png',
-          alt: 'Light Smoke Grey - Front View',
+          url: 'https://static.nike.com/a/images/t_web_pdp_535_v2/f_auto/cf3bbe46-da7a-4c83-8d6a-24c8a40b1773/AIR+FORCE+1+%2707+LV8.png',
+          alt: 'Light Smoke Grey - Side View',
           isPrimary: false,
           order: 4,
+        },
+        {
+          url: 'https://static.nike.com/a/images/t_web_pdp_535_v2/f_auto/d55f8b00-f761-484e-9974-4acfd428678f/AIR+FORCE+1+%2707+LV8.png',
+          alt: 'Light Smoke Grey - Front View',
+          isPrimary: false,
+          order: 5,
+        },
+        {
+          url: 'https://static.nike.com/a/images/t_web_pdp_535_v2/f_auto/32c40bed-def4-4eb0-a32a-d2508c5c8ef7/AIR+FORCE+1+%2707+LV8.png',
+          alt: 'Light Smoke Grey - Back View',
+          isPrimary: false,
+          order: 6,
         },
       ],
       variants: [
@@ -483,18 +309,18 @@ async function main() {
       name: 'F50 Club Turf Boots',
       slug: 'f50-club-turf-boots',
       description:
-        `Free the fast with the adidas F50. Created to unlock the full potential of your acceleration, movement and speed. These adidas Club football boots keep you comfortable with a textured Fiberskin upper and perforated tongue. Underneath, a lug rubber outsole ensures you stay ahead of the competition on artificial turf courts`,
+        'Free the fast with the adidas F50. Created to unlock the full potential of your acceleration, movement and speed. These adidas Club football boots keep you comfortable with a textured Fiberskin upper and perforated tongue. Underneath, a lug rubber outsole ensures you stay ahead of the competition on artificial turf courts',
       price: 61.0,
-      category: categories[6],
+      category: categories[4],
       images: [
         {
-          url: 'https://assets.adidas.com/images/h_2000,f_auto,q_auto,fl_lossy,c_fill,g_auto/9e8626b5baef4ce9bea9e2b9428dc123_9366/F50_Club_Turf_Boots_White_IF1348_01_standard_hover.jpg',
+          url: 'https://assets.adidas.com/images/h_2000,f_auto,q_auto,fl_lossy,c_fill,g_auto/6ad48909f8574459b8bf560303ccbd48_9366/F50_Club_Turf_Boots_White_IF1348_22_model.jpg',
           alt: 'Blue - Side View',
           isPrimary: true,
           order: 1,
         },
         {
-          url: 'https://assets.adidas.com/images/h_2000,f_auto,q_auto,fl_lossy,c_fill,g_auto/e0843e6d7e714f948c22add400f4f5f3_9366/F50_Club_Turf_Boots_White_IF1348_02_standard_hover.jpg',
+          url: 'https://assets.adidas.com/images/h_2000,f_auto,q_auto,fl_lossy,c_fill,g_auto/9c0e1069370d4cc2958e5fe3f17509d3_9366/F50_Club_Turf_Boots_White_IF1348_02_standard.jpg',
           alt: 'Blue - Front View',
           isPrimary: false,
           order: 2,
@@ -506,7 +332,7 @@ async function main() {
           order: 3,
         },
         {
-          url: 'https://assets.adidas.com/images/h_2000,f_auto,q_auto,fl_lossy,c_fill,g_auto/9f5cfab4740f4e22915badd40102c6a3_9366/F50_Club_Turf_Boots_Black_JI0025_01_standard.jpg',
+          url: 'https://assets.adidas.com/images/h_2000,f_auto,q_auto,fl_lossy,c_fill,g_auto/047cd04d5040452086c569d1ccd8f055_9366/F50_Club_Turf_Boots_Black_JI0025_02_standard.jpg',
           alt: 'Black - Front View',
           isPrimary: false,
           order: 4,
@@ -529,7 +355,6 @@ async function main() {
     },
   ];
 
-  // Create products with images and variants
   console.log('🛍️  Creating products...');
   for (const productData of productsData) {
     const product = await prisma.product.create({
@@ -555,15 +380,6 @@ async function main() {
   }
 
   console.log('\n🎉 Seed completed successfully!');
-  console.log(`📊 Summary:`);
-  console.log(`   - ${categories.length} categories`);
-  console.log(`   - ${productsData.length} products`);
-  console.log(
-    `   - ${productsData.reduce((sum, p) => sum + p.images.length, 0)} product images`,
-  );
-  console.log(
-    `   - ${productsData.reduce((sum, p) => sum + p.variants.length, 0)} product variants`,
-  );
 }
 
 main()
