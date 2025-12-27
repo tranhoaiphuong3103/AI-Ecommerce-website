@@ -66,6 +66,14 @@ async function main() {
         imageUrl: 'https://images.unsplash.com/photo-1517836357463-d25dfeac3438?q=80&w=800&fit=crop',
       },
     }),
+    prisma.category.create({
+      data: {
+        name: 'Shoes',
+        slug: 'shoes',
+        description: 'Premium sneakers and athletic footwear',
+        imageUrl: 'https://images.unsplash.com/photo-1542291026-7eec264c27ff?q=80&w=800&fit=crop',
+      },
+    }),
   ]);
 
   console.log(`✅ Created ${categories.length} categories`);
@@ -382,37 +390,105 @@ async function main() {
       ],
     },
     {
-      name: 'Cargo Utility Pants',
-      slug: 'cargo-utility-pants',
+      name: 'Classic Leather Sneakers',
+      slug: 'classic-leather-sneakers-black-white',
       description:
-        'Functional cargo pants with modern styling. Features multiple utility pockets, durable fabric, and a comfortable fit. Perfect for both outdoor adventures and urban wear.',
-      price: 79.99,
-      category: categories[3],
+        'Born on the court, perfected on the streets. These classic sneakers feature premium leather construction, iconic three-stripe design, and a timeless silhouette. The low-profile design with suede overlays and gum rubber sole makes them a versatile essential for any wardrobe.',
+      price: 100.0,
+      category: categories[6],
       images: [
         {
-          url: 'https://images.unsplash.com/photo-1525450824786-227cbef70703?q=80&w=800&fit=crop',
-          alt: 'Cargo Utility Pants - Front',
+          url: 'https://images.unsplash.com/photo-1542291026-7eec264c27ff?q=80&w=800&fit=crop',
+          alt: 'Classic Leather Sneakers Black/White - Side View',
           isPrimary: true,
           order: 1,
         },
         {
-          url: 'https://images.unsplash.com/photo-1506629082955-511b1aa562c8?q=80&w=800&fit=crop',
-          alt: 'Cargo Utility Pants - Detail',
+          url: 'https://images.unsplash.com/photo-1595950653106-6c9ebd614d3a?q=80&w=800&fit=crop',
+          alt: 'Classic Leather Sneakers Black/White - Front View',
+          isPrimary: false,
+          order: 2,
+        },
+        {
+          url: 'https://images.unsplash.com/photo-1606107557195-0e29a4b5b4aa?q=80&w=800&fit=crop',
+          alt: 'Classic Leather Sneakers Black/White - Detail',
+          isPrimary: false,
+          order: 3,
+        },
+      ],
+      variants: [
+        { size: 'US 7', color: 'Black/White', stock: 15, sku: 'CLS-BW-07' },
+        { size: 'US 8', color: 'Black/White', stock: 25, sku: 'CLS-BW-08' },
+        { size: 'US 9', color: 'Black/White', stock: 30, sku: 'CLS-BW-09' },
+        { size: 'US 10', color: 'Black/White', stock: 35, sku: 'CLS-BW-10' },
+        { size: 'US 11', color: 'Black/White', stock: 30, sku: 'CLS-BW-11' },
+        { size: 'US 12', color: 'Black/White', stock: 20, sku: 'CLS-BW-12' },
+      ],
+    },
+    {
+      name: 'Classic Leather Sneakers',
+      slug: 'classic-leather-sneakers-white-green',
+      description:
+        'Born on the court, perfected on the streets. These classic sneakers feature premium leather construction, iconic three-stripe design, and a timeless silhouette. The low-profile design with suede overlays and gum rubber sole makes them a versatile essential for any wardrobe.',
+      price: 100.0,
+      category: categories[6],
+      images: [
+        {
+          url: 'https://images.unsplash.com/photo-1549298916-b41d501d3772?q=80&w=800&fit=crop',
+          alt: 'Classic Leather Sneakers White/Green - Side View',
+          isPrimary: true,
+          order: 1,
+        },
+        {
+          url: 'https://images.unsplash.com/photo-1600185365926-3a2ce3cdb9eb?q=80&w=800&fit=crop',
+          alt: 'Classic Leather Sneakers White/Green - Front View',
+          isPrimary: false,
+          order: 2,
+        },
+        {
+          url: 'https://images.unsplash.com/photo-1460353581641-37baddab0fa2?q=80&w=800&fit=crop',
+          alt: 'Classic Leather Sneakers White/Green - Detail',
+          isPrimary: false,
+          order: 3,
+        },
+      ],
+      variants: [
+        { size: 'US 7', color: 'White/Green', stock: 15, sku: 'CLS-WG-07' },
+        { size: 'US 8', color: 'White/Green', stock: 25, sku: 'CLS-WG-08' },
+        { size: 'US 9', color: 'White/Green', stock: 30, sku: 'CLS-WG-09' },
+        { size: 'US 10', color: 'White/Green', stock: 35, sku: 'CLS-WG-10' },
+        { size: 'US 11', color: 'White/Green', stock: 30, sku: 'CLS-WG-11' },
+        { size: 'US 12', color: 'White/Green', stock: 20, sku: 'CLS-WG-12' },
+      ],
+    },
+    {
+      name: 'Running Performance Shoes',
+      slug: 'running-performance-shoes-blue',
+      description:
+        'Engineered for runners who demand the best. These performance running shoes feature advanced cushioning technology, breathable mesh upper, and responsive sole for maximum energy return. Designed to help you go the distance in comfort.',
+      price: 120.0,
+      category: categories[6],
+      images: [
+        {
+          url: 'https://images.unsplash.com/photo-1539185441755-769473a23570?q=80&w=800&fit=crop',
+          alt: 'Running Performance Shoes Blue - Side View',
+          isPrimary: true,
+          order: 1,
+        },
+        {
+          url: 'https://images.unsplash.com/photo-1491553895911-0055eca6402d?q=80&w=800&fit=crop',
+          alt: 'Running Performance Shoes Blue - Top View',
           isPrimary: false,
           order: 2,
         },
       ],
       variants: [
-        { size: '28', color: 'Olive', stock: 15, sku: 'CUP-OL-28' },
-        { size: '30', color: 'Olive', stock: 22, sku: 'CUP-OL-30' },
-        { size: '32', color: 'Olive', stock: 28, sku: 'CUP-OL-32' },
-        { size: '34', color: 'Olive', stock: 25, sku: 'CUP-OL-34' },
-        { size: '36', color: 'Olive', stock: 18, sku: 'CUP-OL-36' },
-        { size: '28', color: 'Black', stock: 15, sku: 'CUP-BK-28' },
-        { size: '30', color: 'Black', stock: 22, sku: 'CUP-BK-30' },
-        { size: '32', color: 'Black', stock: 28, sku: 'CUP-BK-32' },
-        { size: '34', color: 'Black', stock: 25, sku: 'CUP-BK-34' },
-        { size: '36', color: 'Black', stock: 18, sku: 'CUP-BK-36' },
+        { size: 'US 7', color: 'Blue/White', stock: 12, sku: 'RPS-BW-07' },
+        { size: 'US 8', color: 'Blue/White', stock: 20, sku: 'RPS-BW-08' },
+        { size: 'US 9', color: 'Blue/White', stock: 25, sku: 'RPS-BW-09' },
+        { size: 'US 10', color: 'Blue/White', stock: 30, sku: 'RPS-BW-10' },
+        { size: 'US 11', color: 'Blue/White', stock: 25, sku: 'RPS-BW-11' },
+        { size: 'US 12', color: 'Blue/White', stock: 15, sku: 'RPS-BW-12' },
       ],
     },
   ];
