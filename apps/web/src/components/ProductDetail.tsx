@@ -50,7 +50,29 @@ export default function ProductDetail({ product }: ProductDetailProps) {
   );
   const [quantity, setQuantity] = useState(1);
 
-  const availableSizes = Array.from(new Set(product.variants.map((v) => v.size)));
+  const sortSizes = (sizes: string[]) => {
+    return sizes.sort((a, b) => {
+      const sizeOrder = ['XS', 'S', 'M', 'L', 'XL', '2XL', '3XL'];
+
+      const aIndex = sizeOrder.indexOf(a);
+      const bIndex = sizeOrder.indexOf(b);
+
+      if (aIndex !== -1 && bIndex !== -1) {
+        return aIndex - bIndex;
+      }
+
+      const aNum = Number.parseFloat(a.replace(/\D/g, ''));
+      const bNum = Number.parseFloat(b.replace(/\D/g, ''));
+
+      if (!Number.isNaN(aNum) && !Number.isNaN(bNum)) {
+        return aNum - bNum;
+      }
+
+      return a.localeCompare(b);
+    });
+  };
+
+  const availableSizes = sortSizes(Array.from(new Set(product.variants.map((v) => v.size))));
   const availableColors = Array.from(
     new Set(product.variants.map((v) => v.color).filter((c): c is string => c !== null)),
   );
@@ -225,22 +247,24 @@ export default function ProductDetail({ product }: ProductDetailProps) {
                 <div className="flex flex-wrap gap-2">
                   {availableSizes.map((size) => {
                     const isSelected = selectedVariant?.size === size;
-                    const isAvailable = product.variants.some(
-                      (v) => v.size === size && v.stock > 0,
-                    );
+                    const isAvailableForColor = selectedColor
+                      ? product.variants.some(
+                          (v) => v.size === size && v.color === selectedColor && v.stock > 0,
+                        )
+                      : product.variants.some((v) => v.size === size && v.stock > 0);
 
                     return (
                       <button
                         key={size}
                         type="button"
                         onClick={() => handleSizeChange(size)}
-                        disabled={!isAvailable}
+                        disabled={!isAvailableForColor}
                         className={`px-6 py-3 rounded-xl font-semibold text-sm transition-all ${
                           isSelected
                             ? 'bg-gradient-to-r from-purple-600 to-cyan-600 text-white shadow-lg shadow-purple-500/50'
-                            : isAvailable
+                            : isAvailableForColor
                               ? 'bg-white border-2 border-purple-100 text-gray-700 hover:border-purple-600'
-                              : 'bg-gray-100 text-gray-400 cursor-not-allowed'
+                              : 'bg-gray-100 text-gray-400 cursor-not-allowed opacity-50'
                         }`}
                       >
                         {size}
