@@ -122,7 +122,7 @@ export default function ProductsList({ initialProducts, categories }: ProductsLi
                 <Link
                   key={product.id}
                   href={`/products/${product.slug}`}
-                  className="group bg-white/80 backdrop-blur-xl rounded-2xl shadow-xl shadow-purple-500/10 border border-purple-100/50 overflow-hidden hover:shadow-2xl hover:shadow-purple-500/20 transition-all duration-300 hover:scale-105"
+                  className="group bg-white/80 backdrop-blur-xl rounded-2xl shadow-xl shadow-purple-500/10 border border-purple-100/50 overflow-hidden hover:shadow-2xl hover:shadow-purple-500/20 transition-all duration-300 hover:scale-105 flex flex-col"
                 >
                   {/* Product Image */}
                   <div className="relative h-64 bg-gradient-to-br from-purple-50 to-cyan-50 overflow-hidden">
@@ -158,7 +158,7 @@ export default function ProductsList({ initialProducts, categories }: ProductsLi
                   </div>
 
                   {/* Product Info */}
-                  <div className="p-5">
+                  <div className="p-5 flex flex-col flex-1">
                     <h3 className="font-bold text-lg text-gray-900 mb-2 line-clamp-2 group-hover:text-purple-600 transition-colors">
                       {product.name}
                     </h3>
@@ -167,7 +167,7 @@ export default function ProductsList({ initialProducts, categories }: ProductsLi
                         {product.description}
                       </p>
                     )}
-                    <div className="flex items-center justify-between">
+                    <div className="flex items-center justify-between mt-auto">
                       <span className="text-2xl font-bold bg-gradient-to-r from-purple-600 to-cyan-600 bg-clip-text text-transparent">
                         ${product.price.toFixed(2)}
                       </span>

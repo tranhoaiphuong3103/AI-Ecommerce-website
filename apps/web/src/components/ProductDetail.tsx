@@ -39,15 +39,19 @@ interface ProductDetailProps {
 }
 
 export default function ProductDetail({ product }: ProductDetailProps) {
-  const [selectedImage, setSelectedImage] = useState(
-    product.images.find((img) => img.isPrimary) || product.images[0],
-  );
-  const [selectedVariant, setSelectedVariant] = useState<ProductVariant | null>(
-    product.variants[0] || null,
-  );
-  const [selectedColor, setSelectedColor] = useState<string | null>(
-    product.variants[0]?.color || null,
-  );
+  const primaryImage = product.images.find((img) => img.isPrimary) || product.images[0];
+  const primaryColor = primaryImage?.alt?.split(' - ')[0] || null;
+
+  const [selectedImage, setSelectedImage] = useState(primaryImage);
+  const [selectedColor, setSelectedColor] = useState<string | null>(primaryColor);
+  const [selectedVariant, setSelectedVariant] = useState<ProductVariant | null>(() => {
+    if (primaryColor) {
+      return (
+        product.variants.find((v) => v.color === primaryColor) || product.variants[0] || null
+      );
+    }
+    return product.variants[0] || null;
+  });
   const [quantity, setQuantity] = useState(1);
 
   const sortSizes = (sizes: string[]) => {
