@@ -17,9 +17,13 @@ services:
       - MINIO_PORT=9000
       - MINIO_ACCESS_KEY=minioadmin
       - MINIO_SECRET_KEY=minioadmin
+      - MINIO_PUBLIC_URL=http://localhost:19000
+      - NEXT_PUBLIC_MINIO_URL=http://localhost:19000
       - STRIPE_PUBLIC_KEY=${STRIPE_PUBLIC_KEY}
       - STRIPE_SECRET_KEY=${STRIPE_SECRET_KEY}
       - NEXT_PUBLIC_API_URL=http://localhost:8080
+      - N8N_WEBHOOK_URL=http://n8n:5678/webhook/generate-video
+      - REPLICATE_API_TOKEN=${REPLICATE_API_TOKEN}
     volumes:
       - ./apps/web:/app
       - /app/node_modules
@@ -37,7 +41,7 @@ services:
     image: postgres:16-alpine
     container_name: ecommerce-postgres
     ports:
-      - "5432:5432"
+      - "15432:5432"
     environment:
       - POSTGRES_USER=postgres
       - POSTGRES_PASSWORD=postgres
@@ -59,7 +63,7 @@ services:
     image: redis:7-alpine
     container_name: ecommerce-redis
     ports:
-      - "6379:6379"
+      - "16379:6379"
     volumes:
       - redis-data:/data
     networks:
@@ -76,8 +80,8 @@ services:
     image: minio/minio:latest
     container_name: ecommerce-minio
     ports:
-      - "9000:9000"
-      - "9001:9001"
+      - "19000:9000"
+      - "19001:9001"
     environment:
       - MINIO_ROOT_USER=minioadmin
       - MINIO_ROOT_PASSWORD=minioadmin
@@ -110,6 +114,7 @@ services:
       /usr/bin/mc mb myminio/avatars --ignore-existing;
       /usr/bin/mc anonymous set download myminio/products;
       /usr/bin/mc anonymous set download myminio/videos;
+      /usr/bin/mc anonymous set download myminio/avatars;
       exit 0;
       "
 

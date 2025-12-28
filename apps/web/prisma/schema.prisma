@@ -4,7 +4,6 @@ generator client {
 
 datasource db {
   provider = "postgresql"
-  url      = env("DATABASE_URL")
 }
 
 model User {
@@ -33,6 +32,11 @@ model UserMeasurements {
   waist     Float?   // in cm
   hips      Float?   // in cm
   shoulder  Float?   // in cm
+
+  photoUrl  String?  // User's full-body photo for AI try-on
+  skinTone  String?  // e.g., fair, light, medium, tan, dark
+  hairColor String?  // e.g., black, brown, blonde, red, gray
+  gender    String?  // e.g., male, female, unisex
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt

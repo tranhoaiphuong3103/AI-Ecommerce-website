@@ -1,11 +1,11 @@
-import { generateTryOnVideo } from '@/lib/huggingface';
 import { prisma } from '@/lib/prisma';
+import { generateTryOnVideo } from '@/lib/replicate';
 import { NextResponse } from 'next/server';
 
 export async function POST(request: Request) {
   try {
     const body = await request.json();
-    const { videoId, productImageUrl, modelHeight, modelWeight } = body;
+    const { videoId, productImageUrl, modelHeight, modelWeight, productId } = body;
 
     if (!videoId || !productImageUrl) {
       return NextResponse.json({ error: 'Missing required fields' }, { status: 400 });
@@ -15,15 +15,47 @@ export async function POST(request: Request) {
       where: { id: videoId },
       data: { status: 'PROCESSING' },
     });
+    let productCategory = 'upperbody';
+    let productImages: Array<{ url: string; alt: string | null }> = [];
+    if (productId) {
+      const product = await prisma.product.findUnique({
+        where: { id: productId },
+        include: {
+          category: true,
+          images: {
+            select: {
+              url: true,
+              alt: true,
+            },
+          },
+        },
+      });
+      productCategory = product?.category?.name || 'upperbody';
+      productImages = product?.images || [];
+    }
+
+    const video = await prisma.generatedVideo.findUnique({
+      where: { id: videoId },
+      include: {
+        user: {
+          include: {
+            measurements: true,
+          },
+        },
+      },
+    });
 
     const personImageUrl =
-      'https://huggingface.co/datasets/yisol/IDM-VTON/resolve/main/human/00008_00.jpg';
+      video?.user?.measurements?.photoUrl ||
+      'https://images.unsplash.com/photo-1539571696357-5a69c17a67c6?w=400&h=600&fit=crop';
 
     const result = await generateTryOnVideo({
       personImage: personImageUrl,
       garmentImage: productImageUrl,
       modelHeight,
       modelWeight,
+      productCategory,
+      productImages,
     });
 
     if (result.status === 'failed') {
@@ -52,9 +84,7 @@ export async function POST(request: Request) {
       videoUrl: result.imageUrl,
       message: 'Video generation completed',
     });
-  } catch (error) {
-    console.error('Error processing video:', error);
-
+  } catch {
     const body = await request.json();
     if (body.videoId) {
       await prisma.generatedVideo.update({

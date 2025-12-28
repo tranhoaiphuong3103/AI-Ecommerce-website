@@ -16,8 +16,7 @@ export async function POST(request: Request) {
 
   try {
     event = stripe.webhooks.constructEvent(body, signature, process.env.STRIPE_WEBHOOK_SECRET!);
-  } catch (err) {
-    console.error('Webhook signature verification failed:', err);
+  } catch (_err) {
     return NextResponse.json({ error: 'Invalid signature' }, { status: 400 });
   }
 
@@ -45,24 +44,19 @@ export async function POST(request: Request) {
               userId: order.userId,
               eventType: 'payment.succeeded',
             })
-            .catch((err) => {
-              console.error('Failed to trigger n8n order notification:', err.message);
-            });
+            .catch((_err) => {});
         }
         break;
       }
 
       case 'payment_intent.succeeded': {
-        const paymentIntent = event.data.object as Stripe.PaymentIntent;
-        console.log('Payment succeeded:', paymentIntent.id);
+        const _paymentIntent = event.data.object as Stripe.PaymentIntent;
         break;
       }
 
       case 'payment_intent.payment_failed': {
         const paymentIntent = event.data.object as Stripe.PaymentIntent;
         const orderId = paymentIntent.metadata?.orderId;
-
-        console.error('Payment failed:', paymentIntent.id);
 
         if (orderId) {
           await prisma.order.update({
@@ -83,20 +77,16 @@ export async function POST(request: Request) {
               errorMessage:
                 paymentIntent.last_payment_error?.message || 'Payment verification failed',
             })
-            .catch((err) => {
-              console.error('Failed to trigger n8n order notification:', err.message);
-            });
+            .catch((_err) => {});
         }
         break;
       }
 
       default:
-        console.log(`Unhandled event type: ${event.type}`);
     }
 
     return NextResponse.json({ received: true });
-  } catch (error) {
-    console.error('Error processing webhook:', error);
+  } catch (_error) {
     return NextResponse.json({ error: 'Webhook processing failed' }, { status: 500 });
   }
 }

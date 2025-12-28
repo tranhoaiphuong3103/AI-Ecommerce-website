@@ -1,38 +1,9 @@
 'use client';
 
+import type { Product } from '@/types';
 import Link from 'next/link';
 import { useEffect, useState } from 'react';
-
-interface ProductImage {
-  id: string;
-  url: string;
-  alt: string | null;
-  isPrimary: boolean;
-  order: number;
-}
-
-interface ProductVariant {
-  id: string;
-  size: string;
-  color: string | null;
-  sku: string;
-  stock: number;
-}
-
-interface Product {
-  id: string;
-  name: string;
-  slug: string;
-  description: string | null;
-  price: number;
-  category: {
-    id: string;
-    name: string;
-    slug: string;
-  };
-  images: ProductImage[];
-  variants: ProductVariant[];
-}
+import BeforeAfterComparison from './BeforeAfterComparison';
 
 interface ProductDetailProps {
   product: Product;
@@ -51,6 +22,11 @@ export default function ProductDetail({ product }: ProductDetailProps) {
     return product.variants[0] || null;
   });
   const [quantity, setQuantity] = useState(1);
+  const [isGeneratingTryOn, setIsGeneratingTryOn] = useState(false);
+  const [generatedVideoId, setGeneratedVideoId] = useState<string | null>(null);
+  const [generatedVideoUrl, setGeneratedVideoUrl] = useState<string | null>(null);
+  const [videoStatus, setVideoStatus] = useState<string | null>(null);
+  const [userPhotoUrl, setUserPhotoUrl] = useState<string | null>(null);
 
   const sortSizes = (sizes: string[]) => {
     return sizes.sort((a, b) => {
@@ -94,6 +70,54 @@ export default function ProductDetail({ product }: ProductDetailProps) {
     }
   }, [selectedColor, product.images, selectedImage]);
 
+  useEffect(() => {
+    const fetchUserPhoto = async () => {
+      const user = localStorage.getItem('user');
+      if (!user) return;
+
+      const userData = JSON.parse(user);
+      const userId = userData.id;
+
+      try {
+        const response = await fetch(`/api/user/measurements?userId=${userId}`);
+        if (response.ok) {
+          const data = await response.json();
+          if (data.measurements?.photoUrl) {
+            setUserPhotoUrl(data.measurements.photoUrl);
+          }
+        }
+      } catch (_error) {}
+    };
+
+    fetchUserPhoto();
+  }, []);
+
+  useEffect(() => {
+    if (!generatedVideoId || videoStatus === 'COMPLETED' || videoStatus === 'FAILED') {
+      return;
+    }
+
+    const pollVideoStatus = async () => {
+      try {
+        const response = await fetch(`/api/videos/generate?videoId=${generatedVideoId}`);
+        const data = await response.json();
+
+        setVideoStatus(data.status);
+
+        if (data.status === 'COMPLETED') {
+          setGeneratedVideoUrl(data.videoUrl);
+          setIsGeneratingTryOn(false);
+        } else if (data.status === 'FAILED') {
+          setIsGeneratingTryOn(false);
+        }
+      } catch (_error) {}
+    };
+
+    const interval = setInterval(pollVideoStatus, 3000);
+
+    return () => clearInterval(interval);
+  }, [generatedVideoId, videoStatus]);
+
   const handleSizeChange = (size: string) => {
     const variant = product.variants.find(
       (v) => v.size === size && (!selectedVariant?.color || v.color === selectedVariant.color),
@@ -120,22 +144,55 @@ export default function ProductDetail({ product }: ProductDetailProps) {
 
   const handleAddToCart = () => {
     if (!selectedVariant) {
-      alert('Please select a size');
       return;
     }
-    console.log('Add to cart:', { productId: product.id, variantId: selectedVariant.id, quantity });
-    alert('Product added to cart!');
   };
 
-  const handleTryOn = () => {
-    console.log('Try on:', { productId: product.id, variantId: selectedVariant?.id });
-    alert('Try-on feature coming soon!');
+  const handleTryOn = async () => {
+    const user = localStorage.getItem('user');
+    if (!user) {
+      return;
+    }
+
+    const userData = JSON.parse(user);
+    const userId = userData.id;
+
+    if (!userId) {
+      return;
+    }
+
+    setIsGeneratingTryOn(true);
+
+    try {
+      const response = await fetch('/api/videos/generate', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          userId,
+          productId: product.id,
+          modelHeight: 170,
+          modelWeight: 65,
+        }),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.error || 'Failed to generate try-on');
+      }
+
+      setGeneratedVideoId(data.videoId);
+      setVideoStatus(data.status);
+    } catch (_error) {
+      setIsGeneratingTryOn(false);
+    }
   };
 
   return (
     <div className="min-h-screen py-12 px-4">
       <div className="max-w-7xl mx-auto">
-        {/* Breadcrumb */}
         <nav className="mb-8">
           <ol className="flex items-center space-x-2 text-sm text-gray-600">
             <li>
@@ -164,9 +221,7 @@ export default function ProductDetail({ product }: ProductDetailProps) {
         </nav>
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
-          {/* Image Gallery */}
           <div className="space-y-4">
-            {/* Main Image */}
             <div className="relative aspect-square bg-gradient-to-br from-purple-50 to-cyan-50 rounded-2xl overflow-hidden shadow-xl shadow-purple-500/20">
               {selectedImage ? (
                 <img
@@ -192,8 +247,6 @@ export default function ProductDetail({ product }: ProductDetailProps) {
                 </div>
               )}
             </div>
-
-            {/* Thumbnail Gallery */}
             {displayImages.length > 1 && (
               <div className="grid grid-cols-4 gap-3">
                 {displayImages.map((image) => (
@@ -217,30 +270,19 @@ export default function ProductDetail({ product }: ProductDetailProps) {
               </div>
             )}
           </div>
-
-          {/* Product Info */}
           <div className="space-y-6">
-            {/* Category Badge */}
             <div>
               <span className="inline-block px-4 py-1 bg-gradient-to-r from-purple-100 to-cyan-100 text-purple-700 rounded-full text-sm font-semibold">
                 {product.category.name}
               </span>
             </div>
-
-            {/* Product Name */}
             <h1 className="text-4xl font-bold text-gray-900">{product.name}</h1>
-
-            {/* Price */}
             <div className="text-5xl font-bold bg-gradient-to-r from-purple-600 to-cyan-600 bg-clip-text text-transparent">
               ${product.price.toFixed(2)}
             </div>
-
-            {/* Description */}
             {product.description && (
               <p className="text-gray-600 leading-relaxed text-lg">{product.description}</p>
             )}
-
-            {/* Size Selection */}
             {availableSizes.length > 0 && (
               <div>
                 <div className="block text-sm font-semibold text-gray-700 mb-3">
@@ -276,8 +318,6 @@ export default function ProductDetail({ product }: ProductDetailProps) {
                 </div>
               </div>
             )}
-
-            {/* Color Selection */}
             {availableColors.length > 0 && (
               <div>
                 <div className="block text-sm font-semibold text-gray-700 mb-3">
@@ -311,8 +351,6 @@ export default function ProductDetail({ product }: ProductDetailProps) {
                 </div>
               </div>
             )}
-
-            {/* Stock Status */}
             {selectedVariant && (
               <div className="flex items-center space-x-2">
                 {selectedVariant.stock > 0 ? (
@@ -342,8 +380,6 @@ export default function ProductDetail({ product }: ProductDetailProps) {
                 )}
               </div>
             )}
-
-            {/* Quantity */}
             <div>
               <div className="block text-sm font-semibold text-gray-700 mb-3">Quantity</div>
               <div className="flex items-center space-x-3">
@@ -371,23 +407,58 @@ export default function ProductDetail({ product }: ProductDetailProps) {
                 </button>
               </div>
             </div>
-
-            {/* Action Buttons */}
+            {!userPhotoUrl && (
+              <div className="pt-6 pb-2">
+                <div className="bg-gradient-to-r from-purple-50 to-cyan-50 rounded-xl p-4 border border-purple-200">
+                  <p className="text-sm text-gray-700 mb-2">
+                    <span className="font-semibold">💡 Tip:</span> Upload your photo in your{' '}
+                    <Link href="/profile" className="text-purple-600 hover:underline font-semibold">
+                      profile settings
+                    </Link>{' '}
+                    for personalized try-on results!
+                  </p>
+                </div>
+              </div>
+            )}
             <div className="space-y-3 pt-6">
               <button
                 type="button"
                 onClick={handleTryOn}
-                className="w-full py-4 bg-gradient-to-r from-cyan-600 to-blue-600 text-white rounded-xl font-bold text-lg hover:shadow-2xl hover:shadow-cyan-500/50 transition-all duration-300 hover:scale-105 flex items-center justify-center space-x-2"
+                disabled={isGeneratingTryOn}
+                className="w-full py-4 bg-gradient-to-r from-cyan-600 to-blue-600 text-white rounded-xl font-bold text-lg hover:shadow-2xl hover:shadow-cyan-500/50 transition-all duration-300 hover:scale-105 flex items-center justify-center space-x-2 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100"
               >
-                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"
-                  />
-                </svg>
-                <span>Try On This Item</span>
+                {isGeneratingTryOn ? (
+                  <>
+                    <svg className="w-6 h-6 animate-spin" fill="none" viewBox="0 0 24 24">
+                      <circle
+                        className="opacity-25"
+                        cx="12"
+                        cy="12"
+                        r="10"
+                        stroke="currentColor"
+                        strokeWidth="4"
+                      />
+                      <path
+                        className="opacity-75"
+                        fill="currentColor"
+                        d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                      />
+                    </svg>
+                    <span>Generating...</span>
+                  </>
+                ) : (
+                  <>
+                    <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"
+                      />
+                    </svg>
+                    <span>Try On This Item</span>
+                  </>
+                )}
               </button>
 
               <button
@@ -407,8 +478,6 @@ export default function ProductDetail({ product }: ProductDetailProps) {
                 <span>Add to Cart</span>
               </button>
             </div>
-
-            {/* Product Details */}
             <div className="pt-6 border-t border-purple-100">
               <h3 className="font-bold text-lg text-gray-900 mb-3">Product Details</h3>
               <dl className="space-y-2 text-sm">
@@ -426,6 +495,79 @@ export default function ProductDetail({ product }: ProductDetailProps) {
             </div>
           </div>
         </div>
+        {(isGeneratingTryOn || generatedVideoUrl) && (
+          <div className="mt-12 bg-gradient-to-br from-purple-50/50 via-blue-50/50 to-cyan-50/50 rounded-3xl p-8 border border-purple-100/50">
+            <h2 className="text-3xl font-bold mb-6 text-center">
+              <span className="bg-gradient-to-r from-purple-600 to-cyan-600 bg-clip-text text-transparent">
+                AI Try-On Result
+              </span>
+            </h2>
+
+            {isGeneratingTryOn && !generatedVideoUrl && (
+              <div className="text-center py-12">
+                <svg
+                  className="w-16 h-16 animate-spin mx-auto mb-4 text-purple-600"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                >
+                  <circle
+                    className="opacity-25"
+                    cx="12"
+                    cy="12"
+                    r="10"
+                    stroke="currentColor"
+                    strokeWidth="4"
+                  />
+                  <path
+                    className="opacity-75"
+                    fill="currentColor"
+                    d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                  />
+                </svg>
+                <p className="text-lg font-semibold text-gray-700 mb-2">
+                  Generating your AI try-on...
+                </p>
+                <p className="text-sm text-gray-600">
+                  This usually takes 30-60 seconds. Please wait.
+                </p>
+                <p className="text-xs text-gray-500 mt-2">Status: {videoStatus || 'PENDING'}</p>
+              </div>
+            )}
+
+            {generatedVideoUrl && (
+              <div className="max-w-2xl mx-auto">
+                <BeforeAfterComparison
+                  beforeImage={
+                    userPhotoUrl ||
+                    'https://images.unsplash.com/photo-1539571696357-5a69c17a67c6?w=400&h=600&fit=crop'
+                  }
+                  afterImage={generatedVideoUrl}
+                  beforeLabel={userPhotoUrl ? 'Your Photo' : 'Default Model'}
+                  afterLabel="With Product"
+                />
+                <div className="mt-6 text-center">
+                  <p className="text-sm text-gray-600 mb-2 font-semibold">
+                    Drag the slider to compare before and after!
+                  </p>
+                  <p className="text-xs text-gray-500 mb-4">
+                    Here&apos;s how this product looks on a virtual model
+                  </p>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setGeneratedVideoUrl(null);
+                      setGeneratedVideoId(null);
+                      setVideoStatus(null);
+                    }}
+                    className="px-6 py-2 bg-white border-2 border-purple-600 text-purple-600 rounded-full font-semibold text-sm hover:bg-purple-50 transition-all"
+                  >
+                    Try Again
+                  </button>
+                </div>
+              </div>
+            )}
+          </div>
+        )}
       </div>
     </div>
   );

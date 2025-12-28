@@ -1,10 +1,10 @@
 {
-  "name": "Virtual Try-On Video Generation",
+  "name": "Virtual Try-On Image Generation",
   "nodes": [
     {
       "parameters": {
         "httpMethod": "POST",
-        "path": "generate-video",
+        "path": "generate-image",
         "responseMode": "responseNode",
         "options": {}
       },
@@ -13,15 +13,23 @@
       "type": "n8n-nodes-base.webhook",
       "typeVersion": 1,
       "position": [250, 300],
-      "webhookId": "generate-video"
+      "webhookId": "generate-image"
     },
     {
       "parameters": {
         "values": {
           "string": [
             {
-              "name": "videoId",
-              "value": "={{ $json.body.videoId }}"
+              "name": "imageId",
+              "value": "={{ $json.body.imageId }}"
+            },
+            {
+              "name": "userId",
+              "value": "={{ $json.body.userId }}"
+            },
+            {
+              "name": "productId",
+              "value": "={{ $json.body.productId }}"
             },
             {
               "name": "productImageUrl",
@@ -47,17 +55,18 @@
     },
     {
       "parameters": {
-        "url": "=http://web:3000/api/videos/process",
+        "url": "http://web:3000/api/images/process",
         "authentication": "none",
         "requestMethod": "POST",
-        "jsonParameters": true,
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify({\n  imageId: $json.imageId,\n  productImageUrl: $json.productImageUrl,\n  modelHeight: $json.modelHeight,\n  modelWeight: $json.modelWeight,\n  productId: $json.productId\n}) }}",
         "options": {
           "timeout": 300000
-        },
-        "bodyParametersJson": "={\n  \"videoId\": \"{{ $json.videoId }}\",\n  \"productImageUrl\": \"{{ $json.productImageUrl }}\",\n  \"modelHeight\": {{ $json.modelHeight }},\n  \"modelWeight\": {{ $json.modelWeight }}\n}"
+        }
       },
-      "id": "call-huggingface",
-      "name": "Generate Video with Hugging Face",
+      "id": "generate-image",
+      "name": "Generate Image with Replicate",
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 3,
       "position": [690, 300]
@@ -65,9 +74,9 @@
     {
       "parameters": {
         "respondWith": "json",
-        "responseBody": "={{ $json }}"
+        "responseBody": "={{ JSON.stringify({\n  success: true,\n  message: 'image generation started',\n  imageId: $('Extract Request Data').item.json.imageId\n}) }}"
       },
-      "id": "respond-to-webhook",
+      "id": "respond-webhook",
       "name": "Respond to Webhook",
       "type": "n8n-nodes-base.respondToWebhook",
       "typeVersion": 1,
@@ -90,14 +99,14 @@
       "main": [
         [
           {
-            "node": "Generate Video with Hugging Face",
+            "node": "Generate Image with Replicate",
             "type": "main",
             "index": 0
           }
         ]
       ]
     },
-    "Generate Video with Hugging Face": {
+    "Generate Image with Replicate": {
       "main": [
         [
           {
@@ -109,10 +118,11 @@
       ]
     }
   },
-  "settings": {},
-  "staticData": null,
-  "tags": [],
-  "triggerCount": 1,
-  "updatedAt": "2025-01-01T00:00:00.000Z",
-  "versionId": "3"
+  "active": true,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "1",
+  "id": "virtual-tryon-workflow",
+  "tags": []
 }

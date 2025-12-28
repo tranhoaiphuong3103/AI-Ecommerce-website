@@ -1,5 +1,6 @@
 import { comparePassword, generateToken } from '@/lib/auth';
 import { prisma } from '@/lib/prisma';
+import type { User } from '@/types';
 import { NextResponse } from 'next/server';
 
 export async function POST(request: Request) {
@@ -30,16 +31,17 @@ export async function POST(request: Request) {
       email: user.email,
     });
 
+    const userResponse: User = {
+      id: user.id,
+      name: user.name,
+      email: user.email,
+    };
+
     return NextResponse.json({
       token,
-      user: {
-        id: user.id,
-        name: user.name,
-        email: user.email,
-      },
+      user: userResponse,
     });
-  } catch (error) {
-    console.error('Login error:', error);
+  } catch (_error) {
     return NextResponse.json({ error: 'Failed to login' }, { status: 500 });
   }
 }

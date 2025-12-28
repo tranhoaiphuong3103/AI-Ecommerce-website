@@ -37,8 +37,7 @@ export async function GET(request: Request) {
         hasMore: offset + limit < total,
       },
     });
-  } catch (error) {
-    console.error('Error fetching products:', error);
+  } catch (_error) {
     return NextResponse.json({ error: 'Failed to fetch products' }, { status: 500 });
   }
 }

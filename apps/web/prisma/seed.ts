@@ -1,13 +1,19 @@
 import { PrismaClient } from '@prisma/client';
 
-const prisma = new PrismaClient();
+const prisma = new PrismaClient({
+  datasources: {
+    db: {
+      url: process.env.DATABASE_URL,
+    },
+  },
+});
 
 async function main() {
   console.log('🌱 Starting seed...');
   console.log('🗑️  Cleaning database...');
-  await prisma.cartItem.deleteMany();
   await prisma.orderItem.deleteMany();
   await prisma.order.deleteMany();
+  await prisma.generatedVideo.deleteMany();
   await prisma.productVariant.deleteMany();
   await prisma.productImage.deleteMany();
   await prisma.product.deleteMany();
@@ -71,6 +77,14 @@ async function main() {
         name: 'Jersey',
         slug: 'jersey',
         description: 'Authentic and elite performance jersey',
+        imageUrl: 'https://images.unsplash.com/photo-1542291026-7eec264c27ff?q=80&w=800&fit=crop',
+      },
+    }),
+    prisma.category.create({
+      data: {
+        name: 'Dress',
+        slug: 'dress',
+        description: 'Beautiful and elegant dress',
         imageUrl: 'https://images.unsplash.com/photo-1542291026-7eec264c27ff?q=80&w=800&fit=crop',
       },
     }),
@@ -468,6 +482,39 @@ With its bold 3-Stripes and team crest, this adidas jersey is a symbol of pride 
       ],
     },
     {
+      name: 'Real Madrid LFSTLR Jersey',
+      slug: 'real-madrid-lfstlr-jersey',
+      description: `Introducing the Real Madrid LFSTLR Jersey, where fashion meets football. Crafted for those who value form and function, this jersey pays homage to football heritage while embracing modern trends.
+
+Its interlock fabric provides durability and comfort, while the loose fit offers a relaxed vibe that blends seamlessly into your wardrobe. The V-neck design adds a touch of elegance, making it suitable for both match days and casual outings.
+
+The iconic club crest on the left chest and the embroidered adidas Trefoil logo on the right chest are not just symbols; they are statements of allegiance and style. Be it cheering from the stands or a night out with friends, this jersey has got you covered.`,
+      price: 95.08,
+      category: categories[6],
+      images: [
+        {
+          url: 'https://assets.adidas.com/images/h_2000,f_auto,q_auto,fl_lossy,c_fill,g_auto/64ce7c41f89e4c989eb23790ba807283_9366/Real_Madrid_LFSTLR_Jersey_Purple_JN3055_HM30.jpg',
+          alt: 'RealMadrid Red - Front View',
+          isPrimary: true,
+          order: 1,
+        },
+        {
+          url: 'https://assets.adidas.com/images/h_2000,f_auto,q_auto,fl_lossy,c_fill,g_auto/7b93e7b2305c4a009e61bfa8529865c1_9366/Real_Madrid_LFSTLR_Jersey_Purple_JN3055_HM31.jpg',
+          alt: 'RealMadrid - Back View',
+          isPrimary: false,
+          order: 2,
+        },
+      ],
+      variants: [
+        { size: 'XS', color: 'White', stock: 15, sku: 'REA-JEY-XS' },
+        { size: 'S', color: 'White', stock: 25, sku: 'REA-JEY-S' },
+        { size: 'M', color: 'White', stock: 30, sku: 'REA-JEY-M' },
+        { size: 'L', color: 'White', stock: 25, sku: 'REA-JEY-L' },
+        { size: 'XL', color: 'White', stock: 20, sku: 'REA-JEY-XL' },
+        { size: '2XL', color: 'White', stock: 20, sku: 'REA-JEY-2XL' },
+      ],
+    },
+    {
       name: 'ALL SZN French Terry Regular Tapered Pants',
       slug: 'all-szn-french-terry-regular-tapered-pants',
       description: `Comfort that's in it for the long haul. These adidas pants are your go-to for lazy mornings, busy afternoons and everything in between. The soft cotton French terry fabric keeps you cosy whether you're lounging at home or running errands around town. The tapered cut with elastic cuffs is relaxed yet refined and finished with a drawcord waist for a customised fit. Pair these pants with a hoodie for a laid-back look or mix and match with your favourite tee. Whatever the mood, these pants have you covered.`,
@@ -511,6 +558,162 @@ With its bold 3-Stripes and team crest, this adidas jersey is a symbol of pride 
         { size: 'US 10', color: 'Preloved Violet', stock: 15, sku: 'SZN-FRA-PV-10' },
         { size: 'US 11', color: 'Preloved Violet', stock: 15, sku: 'SZN-FRA-PV-11' },
         { size: 'US 12', color: 'Preloved Violet', stock: 15, sku: 'SZN-FRA-PV-12' },
+      ],
+    },
+    {
+      name: 'Anthony Edwards Schematic Hoody',
+      slug: 'anthony-edwards-schematic-hoody',
+      description: `Bring the schematics to the court in the Anthony Edwards Schematic Hoodie from adidas. This basketball hoodie takes inspiration from the technical drawings used to design the game's strategies and plays. French terry fabric and a regular fit provide comfortable warmth during pickup games or cold-weather hoops sessions.`,
+      price: 60.85,
+      category: categories[2],
+      images: [
+        {
+          url: 'https://assets.adidas.com/images/h_2000,f_auto,q_auto,fl_lossy,c_fill,g_auto/00226ba40c4f4e34a9d7e7238c75ca0b_9366/Anthony_Edwards_Schematic_Hoody_Black_JM2675_HM5.jpg',
+          alt: 'Black - Side View',
+          isPrimary: true,
+          order: 1,
+        },
+        {
+          url: 'https://assets.adidas.com/images/h_2000,f_auto,q_auto,fl_lossy,c_fill,g_auto/13cae4691419401cacf84cec9544182d_9366/Anthony_Edwards_Schematic_Hoody_Black_JM2675_HM10.jpg',
+          alt: 'Black - Back View',
+          isPrimary: false,
+          order: 2,
+        },
+        {
+          url: 'https://assets.adidas.com/images/h_2000,f_auto,q_auto,fl_lossy,c_fill,g_auto/724de485010f4489b93677270f59cee0_9366/Anthony_Edwards_Schematic_Hoody_Black_JM2675_HM6.jpg',
+          alt: 'Black - Logo View',
+          isPrimary: false,
+          order: 3,
+        },
+        {
+          url: 'https://assets.adidas.com/images/h_2000,f_auto,q_auto,fl_lossy,c_fill,g_auto/8be70b1a135b42a5b0c684a11decf4e4_9366/Anthony_Edwards_Schematic_Hoody_Black_JM2675_HM9.jpg',
+          alt: 'Black - Details View',
+          isPrimary: false,
+          order: 4,
+        },
+      ],
+      variants: [
+        { size: 'XS', color: 'White', stock: 15, sku: 'AE-HD-XS' },
+        { size: 'S', color: 'White', stock: 25, sku: 'AE-HD-S' },
+        { size: 'M', color: 'White', stock: 30, sku: 'AE-HD-M' },
+        { size: 'L', color: 'White', stock: 25, sku: 'AE-HD-L' },
+      ],
+    },
+    {
+      name: 'Liverpool FC Terrace Icons Dress',
+      slug: 'liverpool-fc-terrace-icons-dress',
+      description: `This Liverpool FC dress from adidas lets you take your support for your club everywhere you go. Inspired by iconic '80s football fashion, it reimagines a classic pinstriped match jersey in a polo dress silhouette. On the chest, an embroidered team crest and Trefoil logo proudly display your allegiance to the Reds and your sporty style.`,
+      price: 68.46,
+      category: categories[7],
+      images: [
+        {
+          url: 'https://assets.adidas.com/images/h_2000,f_auto,q_auto,fl_lossy,c_fill,g_auto/6f6738f796844d6fb87bb46bf704f65c_9366/Liverpool_FC_Terrace_Icons_Dress_Green_JW8008_HM30.jpg',
+          alt: 'Sea Green with White stripe - Front View',
+          isPrimary: true,
+          order: 1,
+        },
+        {
+          url: 'https://assets.adidas.com/images/h_2000,f_auto,q_auto,fl_lossy,c_fill,g_auto/2a55a139d0fd4071a52bf53e77dd825f_9366/Liverpool_FC_Terrace_Icons_Dress_Green_JW8008_HM6.jpg',
+          alt: 'Sea Green with White stripe - Icon View',
+          isPrimary: false,
+          order: 2,
+        },
+      ],
+      variants: [
+        { size: 'XS', color: 'White', stock: 15, sku: 'LIV-DRE-XS' },
+        { size: 'S', color: 'White', stock: 25, sku: 'LIV-DRE-S' },
+        { size: 'M', color: 'White', stock: 30, sku: 'LIV-DRE-M' },
+        { size: 'L', color: 'White', stock: 25, sku: 'LIV-DRE-L' },
+      ],
+    },
+    {
+      name: 'City Escape Summer Dress',
+      slug: 'city-escape-summer-dress',
+      description: `Functional and flattering, this lightweight adidas dress is ready when adventure calls. The relaxed shape keeps you comfortable whether you're exploring a new city or enjoying a picnic in the park. A water-repellent finish helps you stay dry in warm-weather showers.
+
+This product is made with 100% recycled materials. By reusing materials that have already been created, we help to reduce waste and our reliance on finite resources and reduce the footprint of the products we make.`,
+      price: 41.08,
+      category: categories[7],
+      images: [
+        {
+          url: 'https://assets.adidas.com/images/h_2000,f_auto,q_auto,fl_lossy,c_fill,g_auto/aa014a04049245b38987c48d8f51107d_9366/City_Escape_Summer_Dress_Purple_JC5822_01_laydown.jpg',
+          alt: 'Bliss Lilac - Front View',
+          isPrimary: true,
+          order: 1,
+        },
+        {
+          url: 'https://assets.adidas.com/images/h_2000,f_auto,q_auto,fl_lossy,c_fill,g_auto/f1b1a1ba075e436090cd823fe7baab8f_9366/City_Escape_Summer_Dress_Purple_JC5822_23_hover_model.jpg',
+          alt: 'Bliss Lilac - Icon View',
+          isPrimary: false,
+          order: 2,
+        },
+      ],
+      variants: [
+        { size: 'XS', color: 'White', stock: 15, sku: 'SUM-DRE-XS' },
+        { size: 'S', color: 'White', stock: 25, sku: 'SUM-DRE-S' },
+        { size: 'M', color: 'White', stock: 30, sku: 'SUM-DRE-M' },
+        { size: 'L', color: 'White', stock: 25, sku: 'SUM-DRE-L' },
+      ],
+    },
+    {
+      name: 'Terrex Multi Printed Wind Jacket',
+      slug: 'terrex-multi-printed-wind-jacket',
+      description: `Exposed ridge or changing weather, this versatile Terrex windbreaker is a lightweight running jacket that lets you push into the alpine or cover up as the weather changes. Lightweight ripstop material blocks the wind and holds in heat. The lightweight design packs into its own pocket for compact storage in a vest or pack. Side pockets keep your phone, snacks and other small stuff handy.
+
+This product is made with 100% recycled materials. By reusing materials that have already been created, we help to reduce waste and our reliance on finite resources and reduce the footprint of the products we make.`,
+      price: 95.08,
+      category: categories[2],
+      images: [
+        {
+          url: 'https://assets.adidas.com/images/h_2000,f_auto,q_auto,fl_lossy,c_fill,g_auto/966bb623bd96482abfb1c53f0687a99a_9366/Terrex_Multi_Printed_Wind_Jacket_Green_JL9767_01_laydown.jpg',
+          alt: 'Pure Teal - Front View',
+          isPrimary: true,
+          order: 1,
+        },
+        {
+          url: 'https://assets.adidas.com/images/h_2000,f_auto,q_auto,fl_lossy,c_fill,g_auto/7fcc236ff6ba49e6824e0931fc021614_9366/Terrex_Multi_Printed_Wind_Jacket_Green_JL9767_23_hover_model.jpg',
+          alt: 'Pure Teal - Back View',
+          isPrimary: false,
+          order: 2,
+        },
+      ],
+      variants: [
+        { size: 'M', color: 'White', stock: 30, sku: 'TER-JK-M' },
+        { size: 'L', color: 'White', stock: 25, sku: 'TER-JK-L' },
+        { size: 'XL', color: 'White', stock: 25, sku: 'TER-JK-XL' },
+      ],
+    },
+    {
+      name: 'MENS HYBRID COLD RDY FULL ZIP JACKET',
+      slug: 'mens-hybrid-cold-rdy-full-zip-jacket',
+      description: `The adidas Hybrid Cold.RDY Full Zip Jacket is built to give you an edge against the elements—to help you stay locked in on every shot, whatever the weather.
+
+The jacket’s comfortable regular fit gives it a modern silhouette and allows a full range of motion, to help your swing movement be as fluid as possible. Layering is made easy thanks to the zip closure, letting you adapt your look on the move.
+
+Insulated using advanced materials, Cold.RDY technology helps hold in warmth when the temperature dips—ideal for early tee times and brisk afternoon rounds.
+
+Dialled in for performance and refined in style, this is a layer made for the long game—not just the back nine.`,
+      price: 117.91,
+      category: categories[2],
+      images: [
+        {
+          url: 'https://assets.adidas.com/images/h_2000,f_auto,q_auto,fl_lossy,c_fill,g_auto/7af56593f9674fafa2d84679db023ae8_9366/MENS_HYBRID_COLD_RDY_FULL_ZIP_JACKET_Beige_JM2935_01_laydown.jpg',
+          alt: 'Alumina - Side View',
+          isPrimary: true,
+          order: 1,
+        },
+        {
+          url: 'https://assets.adidas.com/images/h_2000,f_auto,q_auto,fl_lossy,c_fill,g_auto/49d7db414d584cf3854da8f3ceede3fa_9366/MENS_HYBRID_COLD_RDY_FULL_ZIP_JACKET_Black_JL7947_01_laydown.jpg',
+          alt: 'Black - Front View',
+          isPrimary: false,
+          order: 2,
+        },
+      ],
+      variants: [
+        { size: 'XS', color: 'White', stock: 15, sku: 'RDY-JK-XS' },
+        { size: 'S', color: 'White', stock: 25, sku: 'RDY-JK-S' },
+        { size: 'M', color: 'White', stock: 30, sku: 'RDY-JK-M' },
+        { size: 'L', color: 'White', stock: 25, sku: 'RDY-JK-L' },
       ],
     },
   ];

@@ -36,24 +36,25 @@ export async function POST(request: Request) {
       },
     });
 
-    const n8nWebhookUrl = process.env.N8N_WEBHOOK_URL || 'http://n8n:5678/webhook/generate-video';
+    const processUrl = 'http://web:3000/api/videos/process';
 
-    await axios.post(n8nWebhookUrl, {
-      videoId: video.id,
-      userId,
-      productId,
-      productImageUrl: product.images[0]?.url,
-      modelHeight,
-      modelWeight,
-    });
+    axios
+      .post(processUrl, {
+        videoId: video.id,
+        userId,
+        productId,
+        productImageUrl: product.images[0]?.url,
+        modelHeight,
+        modelWeight,
+      })
+      .catch((_error) => {});
 
     return NextResponse.json({
       videoId: video.id,
       status: video.status,
       message: 'Video generation started',
     });
-  } catch (error) {
-    console.error('Error generating video:', error);
+  } catch (_error) {
     return NextResponse.json({ error: 'Failed to generate video' }, { status: 500 });
   }
 }
@@ -83,8 +84,7 @@ export async function GET(request: Request) {
     }
 
     return NextResponse.json(video);
-  } catch (error) {
-    console.error('Error fetching video:', error);
+  } catch (_error) {
     return NextResponse.json({ error: 'Failed to fetch video' }, { status: 500 });
   }
 }
