@@ -1,22 +1,7 @@
 'use client';
 
+import type { FeaturedProduct } from '@/types';
 import Link from 'next/link';
-
-interface ProductImage {
-  id: string;
-  url: string;
-  alt: string | null;
-  isPrimary: boolean;
-}
-
-interface FeaturedProduct {
-  id: string;
-  name: string;
-  slug: string;
-  price: number;
-  images: ProductImage[];
-  badge?: 'AI Ready' | 'Trending' | 'New';
-}
 
 interface HomeContentProps {
   featuredProducts: FeaturedProduct[];

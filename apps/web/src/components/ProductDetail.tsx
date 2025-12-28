@@ -1,39 +1,9 @@
 'use client';
 
+import type { Product } from '@/types';
 import Link from 'next/link';
 import { useEffect, useState } from 'react';
 import BeforeAfterComparison from './BeforeAfterComparison';
-
-interface ProductImage {
-  id: string;
-  url: string;
-  alt: string | null;
-  isPrimary: boolean;
-  order: number;
-}
-
-interface ProductVariant {
-  id: string;
-  size: string;
-  color: string | null;
-  sku: string;
-  stock: number;
-}
-
-interface Product {
-  id: string;
-  name: string;
-  slug: string;
-  description: string | null;
-  price: number;
-  category: {
-    id: string;
-    name: string;
-    slug: string;
-  };
-  images: ProductImage[];
-  variants: ProductVariant[];
-}
 
 interface ProductDetailProps {
   product: Product;

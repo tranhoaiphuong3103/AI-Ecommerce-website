@@ -1,26 +1,14 @@
 'use client';
 
 import CustomSelect from '@/components/CustomSelect';
+import type { User, UserMeasurements } from '@/types';
 import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import { toast } from 'react-toastify';
 
-interface UserMeasurements {
-  height: number;
-  weight: number;
-  chest?: number;
-  waist?: number;
-  hips?: number;
-  shoulder?: number;
-  photoUrl?: string;
-  skinTone?: string;
-  hairColor?: string;
-  gender?: string;
-}
-
 export default function ProfilePage() {
   const router = useRouter();
-  const [user, setUser] = useState<{ id: string; name: string; email: string } | null>(null);
+  const [user, setUser] = useState<User | null>(null);
   const [measurements, setMeasurements] = useState<UserMeasurements>({
     height: 170,
     weight: 65,

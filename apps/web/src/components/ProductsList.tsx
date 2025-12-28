@@ -1,30 +1,12 @@
 'use client';
 
+import type { Category, Product } from '@/types';
 import Link from 'next/link';
 import { useState } from 'react';
 
-interface Product {
-  id: string;
-  name: string;
-  slug: string;
-  description: string | null;
-  price: number;
-  category: {
-    id: string;
-    name: string;
-    slug: string;
-  };
-  images: {
-    id: string;
-    url: string;
-    alt: string | null;
-    isPrimary: boolean;
-  }[];
-}
-
 interface ProductsListProps {
   initialProducts: Product[];
-  categories: { id: string; name: string; slug: string }[];
+  categories: Category[];
 }
 
 export default function ProductsList({ initialProducts, categories }: ProductsListProps) {
