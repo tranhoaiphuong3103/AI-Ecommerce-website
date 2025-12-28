@@ -17,7 +17,6 @@ export async function POST(request: Request) {
   try {
     event = stripe.webhooks.constructEvent(body, signature, process.env.STRIPE_WEBHOOK_SECRET!);
   } catch (err) {
-    console.error('Webhook signature verification failed:', err);
     return NextResponse.json({ error: 'Invalid signature' }, { status: 400 });
   }
 
@@ -46,7 +45,6 @@ export async function POST(request: Request) {
               eventType: 'payment.succeeded',
             })
             .catch((err) => {
-              console.error('Failed to trigger n8n order notification:', err.message);
             });
         }
         break;
@@ -54,7 +52,6 @@ export async function POST(request: Request) {
 
       case 'payment_intent.succeeded': {
         const paymentIntent = event.data.object as Stripe.PaymentIntent;
-        console.log('Payment succeeded:', paymentIntent.id);
         break;
       }
 
@@ -62,7 +59,6 @@ export async function POST(request: Request) {
         const paymentIntent = event.data.object as Stripe.PaymentIntent;
         const orderId = paymentIntent.metadata?.orderId;
 
-        console.error('Payment failed:', paymentIntent.id);
 
         if (orderId) {
           await prisma.order.update({
@@ -84,19 +80,16 @@ export async function POST(request: Request) {
                 paymentIntent.last_payment_error?.message || 'Payment verification failed',
             })
             .catch((err) => {
-              console.error('Failed to trigger n8n order notification:', err.message);
             });
         }
         break;
       }
 
       default:
-        console.log(`Unhandled event type: ${event.type}`);
     }
 
     return NextResponse.json({ received: true });
   } catch (error) {
-    console.error('Error processing webhook:', error);
     return NextResponse.json({ error: 'Webhook processing failed' }, { status: 500 });
   }
 }

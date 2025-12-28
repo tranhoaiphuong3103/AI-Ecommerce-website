@@ -21,7 +21,9 @@ export async function uploadFile(
   metadata?: Record<string, string>,
 ): Promise<string> {
   await minioClient.putObject(bucket, fileName, fileBuffer, fileBuffer.length, metadata);
-  return `http://${process.env.MINIO_ENDPOINT}:${process.env.MINIO_PORT}/${bucket}/${fileName}`;
+
+  const publicMinioUrl = process.env.MINIO_PUBLIC_URL || `http://localhost:19000`;
+  return `${publicMinioUrl}/${bucket}/${fileName}`;
 }
 
 export async function getFileUrl(bucket: string, fileName: string): Promise<string> {

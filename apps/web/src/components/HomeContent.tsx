@@ -159,7 +159,6 @@ export default function HomeContent({ featuredProducts }: HomeContentProps) {
                   onClick={(e) => {
                     e.preventDefault();
                     e.stopPropagation();
-                    alert('Try-on feature coming soon!');
                   }}
                 >
                   <span className="flex items-center justify-center gap-2">✨ Generate Try-On</span>
@@ -171,7 +170,7 @@ export default function HomeContent({ featuredProducts }: HomeContentProps) {
       </section>
 
       {/* How It Works */}
-      <section className="relative bg-gradient-to-br from-purple-50/50 via-blue-50/50 to-cyan-50/50 rounded-3xl p-12 border border-purple-100/50 backdrop-blur-sm">
+      <section id="how-it-works" className="relative bg-gradient-to-br from-purple-50/50 via-blue-50/50 to-cyan-50/50 rounded-3xl p-12 border border-purple-100/50 backdrop-blur-sm scroll-mt-24">
         <div className="absolute top-6 right-6 opacity-20">
           <div className="w-32 h-32 bg-gradient-to-br from-purple-400 to-cyan-400 rounded-full blur-2xl" />
         </div>

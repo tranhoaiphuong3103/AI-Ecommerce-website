@@ -2,6 +2,7 @@
 
 import Link from 'next/link';
 import { useEffect, useState } from 'react';
+import BeforeAfterComparison from './BeforeAfterComparison';
 
 interface ProductImage {
   id: string;
@@ -55,6 +56,7 @@ export default function ProductDetail({ product }: ProductDetailProps) {
   const [generatedVideoId, setGeneratedVideoId] = useState<string | null>(null);
   const [generatedVideoUrl, setGeneratedVideoUrl] = useState<string | null>(null);
   const [videoStatus, setVideoStatus] = useState<string | null>(null);
+  const [userPhotoUrl, setUserPhotoUrl] = useState<string | null>(null);
 
   const sortSizes = (sizes: string[]) => {
     return sizes.sort((a, b) => {
@@ -99,6 +101,29 @@ export default function ProductDetail({ product }: ProductDetailProps) {
   }, [selectedColor, product.images, selectedImage]);
 
   useEffect(() => {
+    const fetchUserPhoto = async () => {
+      const user = localStorage.getItem('user');
+      if (!user) return;
+
+      const userData = JSON.parse(user);
+      const userId = userData.id;
+
+      try {
+        const response = await fetch(`/api/user/measurements?userId=${userId}`);
+        if (response.ok) {
+          const data = await response.json();
+          if (data.measurements?.photoUrl) {
+            setUserPhotoUrl(data.measurements.photoUrl);
+          }
+        }
+      } catch (error) {
+      }
+    };
+
+    fetchUserPhoto();
+  }, []);
+
+  useEffect(() => {
     if (!generatedVideoId || videoStatus === 'COMPLETED' || videoStatus === 'FAILED') {
       return;
     }
@@ -115,10 +140,8 @@ export default function ProductDetail({ product }: ProductDetailProps) {
           setIsGeneratingTryOn(false);
         } else if (data.status === 'FAILED') {
           setIsGeneratingTryOn(false);
-          alert('Video generation failed. Please try again.');
         }
       } catch (error) {
-        console.error('Error polling video status:', error);
       }
     };
 
@@ -153,17 +176,13 @@ export default function ProductDetail({ product }: ProductDetailProps) {
 
   const handleAddToCart = () => {
     if (!selectedVariant) {
-      alert('Please select a size');
       return;
     }
-    console.log('Add to cart:', { productId: product.id, variantId: selectedVariant.id, quantity });
-    alert('Product added to cart!');
   };
 
   const handleTryOn = async () => {
     const user = localStorage.getItem('user');
     if (!user) {
-      alert('Please sign in to use the try-on feature');
       return;
     }
 
@@ -171,7 +190,6 @@ export default function ProductDetail({ product }: ProductDetailProps) {
     const userId = userData.id;
 
     if (!userId) {
-      alert('Please sign in to use the try-on feature');
       return;
     }
 
@@ -200,8 +218,6 @@ export default function ProductDetail({ product }: ProductDetailProps) {
       setGeneratedVideoId(data.videoId);
       setVideoStatus(data.status);
     } catch (error) {
-      console.error('Error generating try-on:', error);
-      alert('Failed to start try-on generation. Please try again.');
       setIsGeneratingTryOn(false);
     }
   };
@@ -209,7 +225,6 @@ export default function ProductDetail({ product }: ProductDetailProps) {
   return (
     <div className="min-h-screen py-12 px-4">
       <div className="max-w-7xl mx-auto">
-        {/* Breadcrumb */}
         <nav className="mb-8">
           <ol className="flex items-center space-x-2 text-sm text-gray-600">
             <li>
@@ -238,9 +253,7 @@ export default function ProductDetail({ product }: ProductDetailProps) {
         </nav>
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
-          {/* Image Gallery */}
           <div className="space-y-4">
-            {/* Main Image */}
             <div className="relative aspect-square bg-gradient-to-br from-purple-50 to-cyan-50 rounded-2xl overflow-hidden shadow-xl shadow-purple-500/20">
               {selectedImage ? (
                 <img
@@ -266,8 +279,6 @@ export default function ProductDetail({ product }: ProductDetailProps) {
                 </div>
               )}
             </div>
-
-            {/* Thumbnail Gallery */}
             {displayImages.length > 1 && (
               <div className="grid grid-cols-4 gap-3">
                 {displayImages.map((image) => (
@@ -291,30 +302,19 @@ export default function ProductDetail({ product }: ProductDetailProps) {
               </div>
             )}
           </div>
-
-          {/* Product Info */}
           <div className="space-y-6">
-            {/* Category Badge */}
             <div>
               <span className="inline-block px-4 py-1 bg-gradient-to-r from-purple-100 to-cyan-100 text-purple-700 rounded-full text-sm font-semibold">
                 {product.category.name}
               </span>
             </div>
-
-            {/* Product Name */}
             <h1 className="text-4xl font-bold text-gray-900">{product.name}</h1>
-
-            {/* Price */}
             <div className="text-5xl font-bold bg-gradient-to-r from-purple-600 to-cyan-600 bg-clip-text text-transparent">
               ${product.price.toFixed(2)}
             </div>
-
-            {/* Description */}
             {product.description && (
               <p className="text-gray-600 leading-relaxed text-lg">{product.description}</p>
             )}
-
-            {/* Size Selection */}
             {availableSizes.length > 0 && (
               <div>
                 <div className="block text-sm font-semibold text-gray-700 mb-3">
@@ -350,8 +350,6 @@ export default function ProductDetail({ product }: ProductDetailProps) {
                 </div>
               </div>
             )}
-
-            {/* Color Selection */}
             {availableColors.length > 0 && (
               <div>
                 <div className="block text-sm font-semibold text-gray-700 mb-3">
@@ -385,8 +383,6 @@ export default function ProductDetail({ product }: ProductDetailProps) {
                 </div>
               </div>
             )}
-
-            {/* Stock Status */}
             {selectedVariant && (
               <div className="flex items-center space-x-2">
                 {selectedVariant.stock > 0 ? (
@@ -416,8 +412,6 @@ export default function ProductDetail({ product }: ProductDetailProps) {
                 )}
               </div>
             )}
-
-            {/* Quantity */}
             <div>
               <div className="block text-sm font-semibold text-gray-700 mb-3">Quantity</div>
               <div className="flex items-center space-x-3">
@@ -445,8 +439,19 @@ export default function ProductDetail({ product }: ProductDetailProps) {
                 </button>
               </div>
             </div>
-
-            {/* Action Buttons */}
+            {!userPhotoUrl && (
+              <div className="pt-6 pb-2">
+                <div className="bg-gradient-to-r from-purple-50 to-cyan-50 rounded-xl p-4 border border-purple-200">
+                  <p className="text-sm text-gray-700 mb-2">
+                    <span className="font-semibold">💡 Tip:</span> Upload your photo in your{' '}
+                    <Link href="/profile" className="text-purple-600 hover:underline font-semibold">
+                      profile settings
+                    </Link>{' '}
+                    for personalized try-on results!
+                  </p>
+                </div>
+              </div>
+            )}
             <div className="space-y-3 pt-6">
               <button
                 type="button"
@@ -505,8 +510,6 @@ export default function ProductDetail({ product }: ProductDetailProps) {
                 <span>Add to Cart</span>
               </button>
             </div>
-
-            {/* Product Details */}
             <div className="pt-6 border-t border-purple-100">
               <h3 className="font-bold text-lg text-gray-900 mb-3">Product Details</h3>
               <dl className="space-y-2 text-sm">
@@ -524,8 +527,6 @@ export default function ProductDetail({ product }: ProductDetailProps) {
             </div>
           </div>
         </div>
-
-        {/* AI Try-On Result Section */}
         {(isGeneratingTryOn || generatedVideoUrl) && (
           <div className="mt-12 bg-gradient-to-br from-purple-50/50 via-blue-50/50 to-cyan-50/50 rounded-3xl p-8 border border-purple-100/50">
             <h2 className="text-3xl font-bold mb-6 text-center">
@@ -567,16 +568,21 @@ export default function ProductDetail({ product }: ProductDetailProps) {
 
             {generatedVideoUrl && (
               <div className="max-w-2xl mx-auto">
-                <div className="relative aspect-square bg-white rounded-2xl overflow-hidden shadow-2xl shadow-purple-500/20">
-                  <img
-                    src={generatedVideoUrl}
-                    alt="AI Try-On Result"
-                    className="w-full h-full object-contain"
-                  />
-                </div>
+                <BeforeAfterComparison
+                  beforeImage={
+                    userPhotoUrl ||
+                    'https://images.unsplash.com/photo-1539571696357-5a69c17a67c6?w=400&h=600&fit=crop'
+                  }
+                  afterImage={generatedVideoUrl}
+                  beforeLabel={userPhotoUrl ? 'Your Photo' : 'Default Model'}
+                  afterLabel="With Product"
+                />
                 <div className="mt-6 text-center">
-                  <p className="text-sm text-gray-600 mb-4">
-                    Here&apos;s how this product looks on a virtual model!
+                  <p className="text-sm text-gray-600 mb-2 font-semibold">
+                    Drag the slider to compare before and after!
+                  </p>
+                  <p className="text-xs text-gray-500 mb-4">
+                    Here&apos;s how this product looks on a virtual model
                   </p>
                   <button
                     type="button"

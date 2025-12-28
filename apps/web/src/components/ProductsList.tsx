@@ -46,7 +46,6 @@ export default function ProductsList({ initialProducts, categories }: ProductsLi
   return (
     <div className="min-h-screen py-12 px-4">
       <div className="max-w-7xl mx-auto">
-        {/* Header */}
         <div className="text-center mb-12">
           <h1 className="text-4xl font-bold bg-gradient-to-r from-purple-600 to-cyan-600 bg-clip-text text-transparent mb-4">
             Product Catalog
@@ -56,9 +55,7 @@ export default function ProductsList({ initialProducts, categories }: ProductsLi
           </p>
         </div>
 
-        {/* Search & Filters */}
         <div className="mb-8 space-y-4">
-          {/* Search Bar */}
           <div className="relative">
             <svg
               className="absolute left-4 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400"
@@ -81,8 +78,6 @@ export default function ProductsList({ initialProducts, categories }: ProductsLi
               className="w-full pl-12 pr-4 py-3 rounded-xl border-2 border-purple-100 focus:border-purple-500 focus:outline-none transition-colors bg-white/50 text-gray-900 placeholder:text-gray-400"
             />
           </div>
-
-          {/* Category Filters */}
           <div className="flex flex-wrap gap-3">
             <button
               type="button"
@@ -111,8 +106,6 @@ export default function ProductsList({ initialProducts, categories }: ProductsLi
             ))}
           </div>
         </div>
-
-        {/* Products Grid */}
         {filteredProducts.length > 0 ? (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
             {filteredProducts.map((product) => {
@@ -124,7 +117,6 @@ export default function ProductsList({ initialProducts, categories }: ProductsLi
                   href={`/products/${product.slug}`}
                   className="group bg-white/80 backdrop-blur-xl rounded-2xl shadow-xl shadow-purple-500/10 border border-purple-100/50 overflow-hidden hover:shadow-2xl hover:shadow-purple-500/20 transition-all duration-300 hover:scale-105 flex flex-col"
                 >
-                  {/* Product Image */}
                   <div className="relative h-64 bg-gradient-to-br from-purple-50 to-cyan-50 overflow-hidden">
                     {primaryImage ? (
                       <img
@@ -149,15 +141,12 @@ export default function ProductsList({ initialProducts, categories }: ProductsLi
                         </svg>
                       </div>
                     )}
-                    {/* Category Badge */}
                     <div className="absolute top-3 left-3">
                       <span className="px-3 py-1 bg-white/90 backdrop-blur-sm rounded-full text-xs font-semibold text-purple-600">
                         {product.category.name}
                       </span>
                     </div>
                   </div>
-
-                  {/* Product Info */}
                   <div className="p-5 flex flex-col flex-1">
                     <h3 className="font-bold text-lg text-gray-900 mb-2 line-clamp-2 group-hover:text-purple-600 transition-colors h-14">
                       {product.name}
