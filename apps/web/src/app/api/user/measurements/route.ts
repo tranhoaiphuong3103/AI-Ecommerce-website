@@ -1,4 +1,5 @@
 import { prisma } from '@/lib/prisma';
+import type { UserMeasurements } from '@prisma/client';
 import { NextResponse } from 'next/server';
 
 export async function GET(request: Request) {
@@ -15,7 +16,7 @@ export async function GET(request: Request) {
     });
 
     return NextResponse.json({ measurements });
-  } catch (error) {
+  } catch (_error) {
     return NextResponse.json({ error: 'Failed to fetch measurements' }, { status: 500 });
   }
 }
@@ -33,7 +34,7 @@ export async function POST(request: Request) {
       where: { userId },
     });
 
-    let result;
+    let result: UserMeasurements;
     if (existingMeasurements) {
       result = await prisma.userMeasurements.update({
         where: { userId },

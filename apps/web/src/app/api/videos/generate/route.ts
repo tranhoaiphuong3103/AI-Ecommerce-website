@@ -47,15 +47,14 @@ export async function POST(request: Request) {
         modelHeight,
         modelWeight,
       })
-      .catch((error) => {
-      });
+      .catch((_error) => {});
 
     return NextResponse.json({
       videoId: video.id,
       status: video.status,
       message: 'Video generation started',
     });
-  } catch (error) {
+  } catch (_error) {
     return NextResponse.json({ error: 'Failed to generate video' }, { status: 500 });
   }
 }
@@ -85,7 +84,7 @@ export async function GET(request: Request) {
     }
 
     return NextResponse.json(video);
-  } catch (error) {
+  } catch (_error) {
     return NextResponse.json({ error: 'Failed to fetch video' }, { status: 500 });
   }
 }

@@ -116,8 +116,7 @@ export default function ProductDetail({ product }: ProductDetailProps) {
             setUserPhotoUrl(data.measurements.photoUrl);
           }
         }
-      } catch (error) {
-      }
+      } catch (_error) {}
     };
 
     fetchUserPhoto();
@@ -141,8 +140,7 @@ export default function ProductDetail({ product }: ProductDetailProps) {
         } else if (data.status === 'FAILED') {
           setIsGeneratingTryOn(false);
         }
-      } catch (error) {
-      }
+      } catch (_error) {}
     };
 
     const interval = setInterval(pollVideoStatus, 3000);
@@ -217,7 +215,7 @@ export default function ProductDetail({ product }: ProductDetailProps) {
 
       setGeneratedVideoId(data.videoId);
       setVideoStatus(data.status);
-    } catch (error) {
+    } catch (_error) {
       setIsGeneratingTryOn(false);
     }
   };

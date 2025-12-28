@@ -16,7 +16,7 @@ export async function POST(request: Request) {
 
   try {
     event = stripe.webhooks.constructEvent(body, signature, process.env.STRIPE_WEBHOOK_SECRET!);
-  } catch (err) {
+  } catch (_err) {
     return NextResponse.json({ error: 'Invalid signature' }, { status: 400 });
   }
 
@@ -44,21 +44,19 @@ export async function POST(request: Request) {
               userId: order.userId,
               eventType: 'payment.succeeded',
             })
-            .catch((err) => {
-            });
+            .catch((_err) => {});
         }
         break;
       }
 
       case 'payment_intent.succeeded': {
-        const paymentIntent = event.data.object as Stripe.PaymentIntent;
+        const _paymentIntent = event.data.object as Stripe.PaymentIntent;
         break;
       }
 
       case 'payment_intent.payment_failed': {
         const paymentIntent = event.data.object as Stripe.PaymentIntent;
         const orderId = paymentIntent.metadata?.orderId;
-
 
         if (orderId) {
           await prisma.order.update({
@@ -79,8 +77,7 @@ export async function POST(request: Request) {
               errorMessage:
                 paymentIntent.last_payment_error?.message || 'Payment verification failed',
             })
-            .catch((err) => {
-            });
+            .catch((_err) => {});
         }
         break;
       }
@@ -89,7 +86,7 @@ export async function POST(request: Request) {
     }
 
     return NextResponse.json({ received: true });
-  } catch (error) {
+  } catch (_error) {
     return NextResponse.json({ error: 'Webhook processing failed' }, { status: 500 });
   }
 }

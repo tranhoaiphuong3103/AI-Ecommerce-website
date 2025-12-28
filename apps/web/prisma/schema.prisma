@@ -4,7 +4,6 @@ generator client {
 
 datasource db {
   provider = "postgresql"
-  url      = env("DATABASE_URL")
 }
 
 model User {
@@ -27,7 +26,6 @@ model UserMeasurements {
   userId    String   @unique
   user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 
-  // Physical measurements
   height    Float    // in cm
   weight    Float    // in kg
   chest     Float?   // in cm
@@ -35,7 +33,6 @@ model UserMeasurements {
   hips      Float?   // in cm
   shoulder  Float?   // in cm
 
-  // Personalization
   photoUrl  String?  // User's full-body photo for AI try-on
   skinTone  String?  // e.g., fair, light, medium, tan, dark
   hairColor String?  // e.g., black, brown, blonde, red, gray

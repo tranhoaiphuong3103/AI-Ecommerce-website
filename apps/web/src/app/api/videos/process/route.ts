@@ -1,5 +1,5 @@
-import { generateTryOnVideo } from '@/lib/replicate';
 import { prisma } from '@/lib/prisma';
+import { generateTryOnVideo } from '@/lib/replicate';
 import { NextResponse } from 'next/server';
 
 export async function POST(request: Request) {
@@ -15,8 +15,6 @@ export async function POST(request: Request) {
       where: { id: videoId },
       data: { status: 'PROCESSING' },
     });
-
-    // Get product category and images for logo detection
     let productCategory = 'upperbody';
     let productImages: Array<{ url: string; alt: string | null }> = [];
     if (productId) {
@@ -36,7 +34,6 @@ export async function POST(request: Request) {
       productImages = product?.images || [];
     }
 
-    // Get user's photo from measurements or use default
     const video = await prisma.generatedVideo.findUnique({
       where: { id: videoId },
       include: {
@@ -87,8 +84,7 @@ export async function POST(request: Request) {
       videoUrl: result.imageUrl,
       message: 'Video generation completed',
     });
-  } catch (error) {
-
+  } catch {
     const body = await request.json();
     if (body.videoId) {
       await prisma.generatedVideo.update({

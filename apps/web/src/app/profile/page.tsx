@@ -1,8 +1,8 @@
 'use client';
 
+import CustomSelect from '@/components/CustomSelect';
 import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
-import CustomSelect from '@/components/CustomSelect';
 import { toast } from 'react-toastify';
 
 interface UserMeasurements {
@@ -51,7 +51,7 @@ export default function ProfilePage() {
           setMeasurements(data.measurements);
         }
       }
-    } catch (error) {
+    } catch (_error) {
     } finally {
       setIsLoading(false);
     }
@@ -80,7 +80,7 @@ export default function ProfilePage() {
       const data = await response.json();
       setMeasurements((prev) => ({ ...prev, photoUrl: data.photoUrl }));
       toast.success('Photo uploaded successfully!');
-    } catch (error) {
+    } catch (_error) {
       toast.error('Failed to upload photo. Please try again.');
     } finally {
       setUploadingPhoto(false);
@@ -172,7 +172,7 @@ export default function ProfilePage() {
                 <div className="relative w-32 h-48 rounded-xl overflow-hidden border-2 border-purple-200">
                   <img
                     src={measurements.photoUrl}
-                    alt="Your photo"
+                    alt="User profile"
                     className="w-full h-full object-cover"
                   />
                 </div>
@@ -203,10 +203,11 @@ export default function ProfilePage() {
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div>
-                <label className="block text-sm font-semibold text-gray-700 mb-2">
+                <label htmlFor="height" className="block text-sm font-semibold text-gray-700 mb-2">
                   Height (cm) *
                 </label>
                 <input
+                  id="height"
                   type="number"
                   value={measurements.height}
                   onChange={(e) =>
@@ -219,10 +220,11 @@ export default function ProfilePage() {
               </div>
 
               <div>
-                <label className="block text-sm font-semibold text-gray-700 mb-2">
+                <label htmlFor="weight" className="block text-sm font-semibold text-gray-700 mb-2">
                   Weight (kg) *
                 </label>
                 <input
+                  id="weight"
                   type="number"
                   value={measurements.weight}
                   onChange={(e) =>
@@ -235,8 +237,11 @@ export default function ProfilePage() {
               </div>
 
               <div>
-                <label className="block text-sm font-semibold text-gray-700 mb-2">Chest (cm)</label>
+                <label htmlFor="chest" className="block text-sm font-semibold text-gray-700 mb-2">
+                  Chest (cm)
+                </label>
                 <input
+                  id="chest"
                   type="number"
                   value={measurements.chest || ''}
                   onChange={(e) =>
@@ -251,8 +256,11 @@ export default function ProfilePage() {
               </div>
 
               <div>
-                <label className="block text-sm font-semibold text-gray-700 mb-2">Waist (cm)</label>
+                <label htmlFor="waist" className="block text-sm font-semibold text-gray-700 mb-2">
+                  Waist (cm)
+                </label>
                 <input
+                  id="waist"
                   type="number"
                   value={measurements.waist || ''}
                   onChange={(e) =>
@@ -267,8 +275,11 @@ export default function ProfilePage() {
               </div>
 
               <div>
-                <label className="block text-sm font-semibold text-gray-700 mb-2">Hips (cm)</label>
+                <label htmlFor="hips" className="block text-sm font-semibold text-gray-700 mb-2">
+                  Hips (cm)
+                </label>
                 <input
+                  id="hips"
                   type="number"
                   value={measurements.hips || ''}
                   onChange={(e) =>
@@ -283,10 +294,14 @@ export default function ProfilePage() {
               </div>
 
               <div>
-                <label className="block text-sm font-semibold text-gray-700 mb-2">
+                <label
+                  htmlFor="shoulder"
+                  className="block text-sm font-semibold text-gray-700 mb-2"
+                >
                   Shoulder (cm)
                 </label>
                 <input
+                  id="shoulder"
                   type="number"
                   value={measurements.shoulder || ''}
                   onChange={(e) =>
@@ -308,8 +323,14 @@ export default function ProfilePage() {
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div>
-                <label className="block text-sm font-semibold text-gray-700 mb-2">Skin Tone</label>
+                <label
+                  htmlFor="skinTone"
+                  className="block text-sm font-semibold text-gray-700 mb-2"
+                >
+                  Skin Tone
+                </label>
                 <CustomSelect
+                  id="skinTone"
                   value={measurements.skinTone || ''}
                   onChange={(value) => setMeasurements({ ...measurements, skinTone: value })}
                   placeholder="Select skin tone"
@@ -325,8 +346,14 @@ export default function ProfilePage() {
               </div>
 
               <div>
-                <label className="block text-sm font-semibold text-gray-700 mb-2">Hair Color</label>
+                <label
+                  htmlFor="hairColor"
+                  className="block text-sm font-semibold text-gray-700 mb-2"
+                >
+                  Hair Color
+                </label>
                 <CustomSelect
+                  id="hairColor"
                   value={measurements.hairColor || ''}
                   onChange={(value) => setMeasurements({ ...measurements, hairColor: value })}
                   placeholder="Select hair color"
@@ -343,8 +370,11 @@ export default function ProfilePage() {
               </div>
 
               <div>
-                <label className="block text-sm font-semibold text-gray-700 mb-2">Gender</label>
+                <label htmlFor="gender" className="block text-sm font-semibold text-gray-700 mb-2">
+                  Gender
+                </label>
                 <CustomSelect
+                  id="gender"
                   value={measurements.gender || ''}
                   onChange={(value) => setMeasurements({ ...measurements, gender: value })}
                   placeholder="Select gender"

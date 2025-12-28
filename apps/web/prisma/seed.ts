@@ -1,6 +1,12 @@
 import { PrismaClient } from '@prisma/client';
 
-const prisma = new PrismaClient();
+const prisma = new PrismaClient({
+  datasources: {
+    db: {
+      url: process.env.DATABASE_URL,
+    },
+  },
+});
 
 async function main() {
   console.log('🌱 Starting seed...');
@@ -669,7 +675,7 @@ This product is made with 100% recycled materials. By reusing materials that hav
           alt: 'Pure Teal - Back View',
           isPrimary: false,
           order: 2,
-        }
+        },
       ],
       variants: [
         { size: 'M', color: 'White', stock: 30, sku: 'TER-JK-M' },

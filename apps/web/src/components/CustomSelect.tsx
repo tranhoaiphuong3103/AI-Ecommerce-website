@@ -1,15 +1,22 @@
 'use client';
 
-import { useState, useRef, useEffect } from 'react';
+import { useEffect, useRef, useState } from 'react';
 
 interface CustomSelectProps {
   value: string;
   onChange: (value: string) => void;
   options: { value: string; label: string }[];
   placeholder: string;
+  id?: string;
 }
 
-export default function CustomSelect({ value, onChange, options, placeholder }: CustomSelectProps) {
+export default function CustomSelect({
+  value,
+  onChange,
+  options,
+  placeholder,
+  id,
+}: CustomSelectProps) {
   const [isOpen, setIsOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
 
@@ -29,6 +36,7 @@ export default function CustomSelect({ value, onChange, options, placeholder }: 
   return (
     <div className="relative" ref={dropdownRef}>
       <button
+        id={id}
         type="button"
         onClick={() => setIsOpen(!isOpen)}
         className="w-full px-4 py-3 border-2 border-purple-100 rounded-xl focus:border-purple-600 focus:outline-none text-gray-900 bg-white text-left pr-10 transition-all"

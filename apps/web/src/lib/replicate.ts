@@ -1,5 +1,5 @@
 import Replicate from 'replicate';
-import { minioClient, BUCKETS } from './minio';
+import { BUCKETS, minioClient } from './minio';
 
 const replicate = new Replicate({
   auth: process.env.REPLICATE_API_TOKEN,
@@ -30,7 +30,7 @@ async function convertToDataUrl(imageUrl: string): Promise<string> {
     const dataUrl = `data:${mimeType};base64,${base64}`;
 
     return dataUrl;
-  } catch (error) {
+  } catch (_error) {
     throw new Error('Failed to process user image');
   }
 }
@@ -91,20 +91,22 @@ function detectGarmentCategory(productCategory?: string): 'upper_body' | 'lower_
 function hasLogoOrBadgeViews(productImages?: Array<{ url: string; alt: string | null }>): boolean {
   if (!productImages) return false;
 
-  return productImages.some(img => {
+  return productImages.some((img) => {
     const altLower = img.alt?.toLowerCase() || '';
-    return altLower.includes('logo view') ||
-           altLower.includes('badge view') ||
-           altLower.includes('detail view') ||
-           altLower.includes('close-up') ||
-           altLower.includes('closeup');
+    return (
+      altLower.includes('logo view') ||
+      altLower.includes('badge view') ||
+      altLower.includes('detail view') ||
+      altLower.includes('close-up') ||
+      altLower.includes('closeup')
+    );
   });
 }
 
 function generateGarmentDescription(
   productCategory?: string,
   category?: string,
-  hasDetailViews?: boolean
+  hasDetailViews?: boolean,
 ): string {
   if (!productCategory) return 'High-quality garment with authentic texture and fabric details';
 
@@ -138,13 +140,22 @@ VERIFICATION: After generation, check that pants color matches input image pants
     return `${detailEmphasis}CRITICAL: Preserve ALL logos, badges, and sponsor details with EXACT precision. Reproduce the team crest/badge with EVERY fine detail visible - colors, borders, text, emblems. Reproduce brand logo (Adidas three stripes/Nike swoosh/Puma cat) with pixel-perfect accuracy. Reproduce ALL sponsor logos with sharp edges and readable text. Maintain authentic fabric texture with official team colors and stripe patterns. Keep collar design, sleeve details, and all branding elements identical to the original garment. Keep lower body clothing (pants/shorts) unchanged.`;
   }
 
-  if (categoryLower.includes('shirt') || categoryLower.includes('tee') || categoryLower.includes('t-shirt')) {
+  if (
+    categoryLower.includes('shirt') ||
+    categoryLower.includes('tee') ||
+    categoryLower.includes('t-shirt')
+  ) {
     return `${detailEmphasis}CRITICAL: Preserve ALL logos, graphics, text prints, and brand details with EXACT precision. Reproduce any brand logos (Adidas/Nike/Puma) with sharp, clear edges and accurate proportions. Reproduce graphic prints, typography, and artwork with high fidelity - every line, color, and detail must match the original. Maintain authentic fabric texture, collar style, and all design elements. Keep lower body clothing unchanged.`;
   }
 
-  if (categoryLower.includes('jacket') || categoryLower.includes('hoodie') ||
-      categoryLower.includes('hoody') || categoryLower.includes('sweatshirt') ||
-      categoryLower.includes('sweater') || categoryLower.includes('coat')) {
+  if (
+    categoryLower.includes('jacket') ||
+    categoryLower.includes('hoodie') ||
+    categoryLower.includes('hoody') ||
+    categoryLower.includes('sweatshirt') ||
+    categoryLower.includes('sweater') ||
+    categoryLower.includes('coat')
+  ) {
     return `${detailEmphasis}CRITICAL: Preserve ALL logos, badges, emblems, and brand details with EXACT precision. Reproduce brand logos (Adidas three stripes/Nike swoosh/Puma cat) with pixel-perfect accuracy and sharp edges. Reproduce team crests, patches, embroidery with EVERY fine detail - colors, stitching, borders, text. Reproduce text prints with readable, sharp letters. Maintain authentic material texture (windbreaker/fleece/cotton), zipper details, drawstrings, pockets, and hood design. Keep collar, cuffs, and hem details identical. Keep lower body pants and shoes unchanged.`;
   }
 
@@ -200,7 +211,11 @@ export async function generateVirtualTryOn(params: TryOnParams): Promise<TryOnRe
 
     const garmentCategory = category || detectGarmentCategory(productCategory);
     const hasDetailViews = hasLogoOrBadgeViews(params.productImages);
-    const garmentDescription = generateGarmentDescription(productCategory, garmentCategory, hasDetailViews);
+    const garmentDescription = generateGarmentDescription(
+      productCategory,
+      garmentCategory,
+      hasDetailViews,
+    );
 
     const output = await replicate.run(
       'cuuupid/idm-vton:0513734a452173b8173e907e3a59d19a36266e55b48528559432bd21c7d7e985',
@@ -227,8 +242,7 @@ export async function generateVirtualTryOn(params: TryOnParams): Promise<TryOnRe
     ) {
       const urlResult = output.url();
       resultImageUrl = typeof urlResult === 'string' ? urlResult : urlResult.toString();
-    }
-    else if (Array.isArray(output) && output.length > 0) {
+    } else if (Array.isArray(output) && output.length > 0) {
       const lastItem = output[output.length - 1];
       if (
         lastItem &&
@@ -241,17 +255,15 @@ export async function generateVirtualTryOn(params: TryOnParams): Promise<TryOnRe
       } else if (typeof lastItem === 'string') {
         resultImageUrl = lastItem;
       }
-    }
-    else if (typeof output === 'string') {
+    } else if (typeof output === 'string') {
       resultImageUrl = output;
     }
 
     if (!resultImageUrl || typeof resultImageUrl !== 'string') {
       throw new Error(
-        `Invalid output from Replicate API. Unable to extract image URL from output.`,
+        'Invalid output from Replicate API. Unable to extract image URL from output.',
       );
     }
-
 
     const imageBlob = await fetchImageAsBlob(resultImageUrl);
     const arrayBuffer = await imageBlob.arrayBuffer();
@@ -260,7 +272,6 @@ export async function generateVirtualTryOn(params: TryOnParams): Promise<TryOnRe
     const { uploadFile } = await import('./minio');
     const fileName = `tryon-${Date.now()}.png`;
     const imageUrl = await uploadFile('videos', fileName, buffer);
-
 
     return {
       imageUrl,
@@ -354,7 +365,7 @@ export async function healthCheck(): Promise<boolean> {
       return false;
     }
     return true;
-  } catch (error) {
+  } catch (_error) {
     return false;
   }
 }
