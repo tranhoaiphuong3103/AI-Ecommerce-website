@@ -27,11 +27,8 @@ export async function cacheSet(
 ): Promise<void> {
   const client = await getRedisClient();
   const serialized = JSON.stringify(value);
-  if (expirationSeconds) {
-    await client.setEx(key, expirationSeconds, serialized);
-  } else {
-    await client.set(key, serialized);
-  }
+  if (expirationSeconds) await client.setEx(key, expirationSeconds, serialized);
+  else await client.set(key, serialized);
 }
 
 export async function cacheDel(key: string): Promise<void> {

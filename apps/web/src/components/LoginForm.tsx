@@ -23,9 +23,7 @@ export default function LoginForm() {
 
       const data = await res.json();
 
-      if (!res.ok) {
-        throw new Error(data.error || 'Login failed');
-      }
+      if (!res.ok) throw new Error(data.error || 'Login failed');
 
       localStorage.setItem('token', data.token);
       localStorage.setItem('user', JSON.stringify(data.user));
@@ -38,11 +36,11 @@ export default function LoginForm() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center px-4 py-12">
+    <div className="min-h-screen flex items-center justify-center px-4 py-12 bg-white">
       <div className="w-full max-w-md">
-        <div className="bg-white/80 backdrop-blur-xl rounded-3xl shadow-2xl shadow-purple-500/20 border border-purple-100/50 p-8">
+        <div className="bg-white border border-gray-200 p-8">
           <div className="text-center mb-8">
-            <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-gradient-to-r from-purple-600 to-cyan-600 mb-4 shadow-lg shadow-purple-500/50">
+            <div className="inline-flex items-center justify-center w-16 h-16 bg-black mb-4">
               <svg
                 className="w-8 h-8 text-white"
                 fill="none"
@@ -57,21 +55,21 @@ export default function LoginForm() {
                 />
               </svg>
             </div>
-            <h1 className="text-3xl font-bold bg-gradient-to-r from-purple-600 to-cyan-600 bg-clip-text text-transparent mb-2">
+            <h1 className="text-3xl font-bold text-black uppercase tracking-tight mb-2">
               Welcome Back
             </h1>
             <p className="text-gray-600">Sign in to your account</p>
           </div>
 
           {error && (
-            <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-xl text-red-600 text-sm">
+            <div className="mb-6 p-4 bg-gray-100 border border-gray-300 text-black text-sm">
               {error}
             </div>
           )}
 
           <form onSubmit={handleSubmit} className="space-y-6">
             <div>
-              <label htmlFor="email" className="block text-sm font-semibold text-gray-700 mb-2">
+              <label htmlFor="email" className="block text-sm font-bold text-black mb-2 uppercase">
                 Email Address
               </label>
               <input
@@ -80,13 +78,16 @@ export default function LoginForm() {
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 required
-                className="w-full px-4 py-3 rounded-xl border-2 border-purple-100 focus:border-purple-500 focus:outline-none transition-colors bg-white/50 text-gray-900 placeholder:text-gray-400"
+                className="w-full px-4 py-3 border-2 border-gray-300 focus:border-black focus:outline-none transition-colors bg-white text-black placeholder:text-gray-400"
                 placeholder="you@example.com"
               />
             </div>
 
             <div>
-              <label htmlFor="password" className="block text-sm font-semibold text-gray-700 mb-2">
+              <label
+                htmlFor="password"
+                className="block text-sm font-bold text-black mb-2 uppercase"
+              >
                 Password
               </label>
               <input
@@ -95,7 +96,7 @@ export default function LoginForm() {
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 required
-                className="w-full px-4 py-3 rounded-xl border-2 border-purple-100 focus:border-purple-500 focus:outline-none transition-colors bg-white/50 text-gray-900 placeholder:text-gray-400"
+                className="w-full px-4 py-3 border-2 border-gray-300 focus:border-black focus:outline-none transition-colors bg-white text-black placeholder:text-gray-400"
                 placeholder="••••••••"
               />
             </div>
@@ -104,11 +105,11 @@ export default function LoginForm() {
               <label className="flex items-center space-x-2 cursor-pointer">
                 <input
                   type="checkbox"
-                  className="w-4 h-4 rounded border-purple-300 text-purple-600 focus:ring-purple-500"
+                  className="w-4 h-4 border-gray-300 text-black focus:ring-black"
                 />
                 <span className="text-gray-600">Remember me</span>
               </label>
-              <a href="#" className="text-purple-600 hover:text-purple-700 font-semibold">
+              <a href="#" className="text-black hover:underline font-semibold">
                 Forgot password?
               </a>
             </div>
@@ -116,7 +117,7 @@ export default function LoginForm() {
             <button
               type="submit"
               disabled={loading}
-              className="w-full py-3 bg-gradient-to-r from-purple-600 to-cyan-600 text-white rounded-xl font-semibold hover:shadow-xl hover:shadow-purple-500/50 transition-all duration-300 hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed"
+              className="w-full py-3 bg-black text-white font-bold uppercase tracking-wider hover:bg-gray-800 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
             >
               {loading ? 'Signing in...' : 'Sign In'}
             </button>
@@ -124,7 +125,7 @@ export default function LoginForm() {
 
           <p className="mt-6 text-center text-sm text-gray-600">
             Don&apos;t have an account?{' '}
-            <Link href="/signup" className="text-purple-600 hover:text-purple-700 font-semibold">
+            <Link href="/signup" className="text-black hover:underline font-semibold">
               Sign up
             </Link>
           </p>

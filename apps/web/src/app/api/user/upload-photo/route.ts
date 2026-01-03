@@ -30,7 +30,14 @@ export async function POST(request: Request) {
     });
 
     return NextResponse.json({ success: true, photoUrl, measurements });
-  } catch (_error) {
-    return NextResponse.json({ error: 'Failed to upload photo' }, { status: 500 });
+  } catch (error) {
+    console.error('Upload photo error:', error);
+    return NextResponse.json(
+      {
+        error: 'Failed to upload photo',
+        details: error instanceof Error ? error.message : 'Unknown error',
+      },
+      { status: 500 },
+    );
   }
 }

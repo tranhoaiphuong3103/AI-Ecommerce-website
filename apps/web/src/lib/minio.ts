@@ -22,7 +22,7 @@ export async function uploadFile(
 ): Promise<string> {
   await minioClient.putObject(bucket, fileName, fileBuffer, fileBuffer.length, metadata);
 
-  const publicMinioUrl = process.env.MINIO_PUBLIC_URL || 'http://localhost:19000';
+  const publicMinioUrl = process.env.NEXT_PUBLIC_MINIO_URL || 'http://localhost:19000';
   return `${publicMinioUrl}/${bucket}/${fileName}`;
 }
 
