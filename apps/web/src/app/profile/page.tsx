@@ -62,20 +62,17 @@ export default function ProfilePage() {
         const data = await response.json();
         if (data.measurements) setMeasurements(data.measurements);
       }
-    } catch (_error) {
     } finally {
       setIsLoading(false);
     }
   };
 
   const fetchOrders = async (userId: string) => {
-    try {
-      const response = await fetch(`/api/user/orders?userId=${userId}`);
-      if (response.ok) {
-        const data = await response.json();
-        setOrders(data.orders || []);
-      }
-    } catch (_error) {}
+    const response = await fetch(`/api/user/orders?userId=${userId}`);
+    if (response.ok) {
+      const data = await response.json();
+      setOrders(data.orders || []);
+    }
   };
 
   const handlePhotoUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -101,7 +98,7 @@ export default function ProfilePage() {
       const data = await response.json();
       setMeasurements((prev) => ({ ...prev, photoUrl: data.photoUrl }));
       toast.success('Photo uploaded successfully!');
-    } catch (_error) {
+    } catch {
       toast.error('Failed to upload photo. Please try again.');
     } finally {
       setUploadingPhoto(false);

@@ -49,10 +49,8 @@ export async function POST(request: Request) {
         break;
       }
 
-      case 'payment_intent.succeeded': {
-        const _paymentIntent = event.data.object as Stripe.PaymentIntent;
+      case 'payment_intent.succeeded':
         break;
-      }
 
       case 'payment_intent.payment_failed': {
         const paymentIntent = event.data.object as Stripe.PaymentIntent;
@@ -86,7 +84,7 @@ export async function POST(request: Request) {
     }
 
     return NextResponse.json({ received: true });
-  } catch (_error) {
+  } catch {
     return NextResponse.json({ error: 'Webhook processing failed' }, { status: 500 });
   }
 }

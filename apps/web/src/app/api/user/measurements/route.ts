@@ -14,7 +14,7 @@ export async function GET(request: Request) {
     });
 
     return NextResponse.json({ measurements });
-  } catch (_error) {
+  } catch {
     return NextResponse.json({ error: 'Failed to fetch measurements' }, { status: 500 });
   }
 }

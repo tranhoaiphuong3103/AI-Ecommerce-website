@@ -8,10 +8,8 @@ export async function POST(request: Request) {
     const body = await request.json();
     const { userId, productId, productImageUrl: providedImageUrl, modelHeight, modelWeight } = body;
 
-    if (!userId || !productId || !modelHeight || !modelWeight) {
-      console.error('[Image Generation] Missing required fields');
+    if (!userId || !productId || !modelHeight || !modelWeight)
       return NextResponse.json({ error: 'Missing required fields' }, { status: 400 });
-    }
 
     const product = await prisma.product.findUnique({
       where: { id: productId },
@@ -23,10 +21,7 @@ export async function POST(request: Request) {
       },
     });
 
-    if (!product) {
-      console.error('[Image Generation] Product not found:', productId);
-      return NextResponse.json({ error: 'Product not found' }, { status: 404 });
-    }
+    if (!product) return NextResponse.json({ error: 'Product not found' }, { status: 404 });
 
     const productImageUrl = providedImageUrl || product.images[0]?.url;
 
@@ -54,7 +49,7 @@ export async function POST(request: Request) {
         modelHeight,
         modelWeight,
       })
-      .catch((_error) => {
+      .catch(() => {
         toast.error('Failed to trigger image processing');
       });
 
@@ -66,8 +61,6 @@ export async function POST(request: Request) {
   } catch (error) {
     const errorMessage = error instanceof Error ? error.message : 'Unknown error';
     const errorStack = error instanceof Error ? error.stack : 'No stack';
-    console.error('[Image Generation] Unexpected error:', errorMessage);
-    console.error('[Image Generation] Error stack:', errorStack);
     return NextResponse.json(
       {
         error: 'Failed to generate image',
@@ -84,9 +77,7 @@ export async function GET(request: Request) {
     const { searchParams } = new URL(request.url);
     const imageId = searchParams.get('imageId');
 
-    if (!imageId) {
-      return NextResponse.json({ error: 'Image ID required' }, { status: 400 });
-    }
+    if (!imageId) return NextResponse.json({ error: 'Image ID required' }, { status: 400 });
 
     const generatedImage = await prisma.generatedVideo.findUnique({
       where: { id: imageId },
@@ -103,7 +94,7 @@ export async function GET(request: Request) {
       return NextResponse.json({ error: 'Generated image not found' }, { status: 404 });
 
     return NextResponse.json(generatedImage);
-  } catch (_error) {
+  } catch {
     return NextResponse.json({ error: 'Failed to fetch image status' }, { status: 500 });
   }
 }

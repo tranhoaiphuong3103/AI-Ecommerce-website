@@ -87,8 +87,6 @@ export async function POST(request: Request) {
       message: 'Image generation completed',
     });
   } catch (error) {
-    console.error('Image processing error:', error);
-
     if (imageId) {
       try {
         await prisma.generatedVideo.update({

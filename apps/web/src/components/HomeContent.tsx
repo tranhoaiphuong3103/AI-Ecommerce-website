@@ -2,12 +2,15 @@
 
 import type { FeaturedProduct } from '@/types';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 
 interface HomeContentProps {
   featuredProducts: FeaturedProduct[];
 }
 
 export default function HomeContent({ featuredProducts }: HomeContentProps) {
+  const router = useRouter();
+
   return (
     <div className="bg-white">
       <section className="bg-black text-white py-20 px-4">
@@ -45,12 +48,14 @@ export default function HomeContent({ featuredProducts }: HomeContentProps) {
               const primaryImage = product.images.find((img) => img.isPrimary) || product.images[0];
 
               return (
-                <Link
+                <article
                   key={product.id}
-                  href={`/products/${product.slug}`}
                   className="group bg-white border border-gray-200 hover:border-black transition-colors flex flex-col rounded-lg overflow-hidden"
                 >
-                  <div className="relative aspect-square bg-gray-100 overflow-hidden">
+                  <Link
+                    href={`/products/${product.slug}`}
+                    className="relative aspect-square bg-gray-100 overflow-hidden block"
+                  >
                     {primaryImage ? (
                       <img
                         src={primaryImage.url}
@@ -67,21 +72,23 @@ export default function HomeContent({ featuredProducts }: HomeContentProps) {
                         {product.badge}
                       </div>
                     )}
-                  </div>
+                  </Link>
                   <div className="p-4 flex flex-col flex-grow">
-                    <h3 className="font-bold text-sm mb-2 text-black uppercase line-clamp-2 min-h-[40px]">
-                      {product.name}
-                    </h3>
+                    <Link href={`/products/${product.slug}`}>
+                      <h3 className="font-bold text-sm mb-2 text-black uppercase line-clamp-2 min-h-[40px] hover:underline">
+                        {product.name}
+                      </h3>
+                    </Link>
                     <p className="text-black font-bold text-xl mb-4">${product.price.toFixed(2)}</p>
-                    <Link
-                      href={`/products/${product.slug}?tryOn=true`}
+                    <button
+                      type="button"
+                      onClick={() => router.push(`/products/${product.slug}?tryOn=true`)}
                       className="block w-full bg-black text-white py-3 font-bold uppercase tracking-wider hover:bg-gray-800 transition-colors mt-auto rounded-full text-center"
-                      onClick={(e) => e.stopPropagation()}
                     >
                       Try On
-                    </Link>
+                    </button>
                   </div>
-                </Link>
+                </article>
               );
             })}
           </div>

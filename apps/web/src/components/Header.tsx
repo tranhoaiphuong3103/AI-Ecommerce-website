@@ -16,7 +16,7 @@ export default function Header() {
       try {
         const userString = localStorage.getItem('user');
         if (userString) setUser(JSON.parse(userString));
-      } catch (_error) {
+      } catch {
         localStorage.removeItem('token');
         localStorage.removeItem('user');
       }

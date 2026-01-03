@@ -91,13 +91,11 @@ export default function ProductDetail({ product }: ProductDetailProps) {
       const userData = JSON.parse(user);
       const userId = userData.id;
 
-      try {
-        const response = await fetch(`/api/user/measurements?userId=${userId}`);
-        if (response.ok) {
-          const data = await response.json();
-          if (data.measurements?.photoUrl) setUserPhotoUrl(data.measurements.photoUrl);
-        }
-      } catch (_error) {}
+      const response = await fetch(`/api/user/measurements?userId=${userId}`);
+      if (response.ok) {
+        const data = await response.json();
+        if (data.measurements?.photoUrl) setUserPhotoUrl(data.measurements.photoUrl);
+      }
     };
 
     fetchUserPhoto();
@@ -145,7 +143,7 @@ export default function ProductDetail({ product }: ProductDetailProps) {
             autoClose: 5000,
           });
         }
-      } catch (_error) {
+      } catch {
         if (retryCount > 3) if (intervalId) clearInterval(intervalId);
         setImageStatus('FAILED');
         setIsGeneratingTryOn(false);

@@ -7,9 +7,8 @@ export async function POST(request: Request) {
     const body = await request.json();
     const { userId, items } = body;
 
-    if (!userId || !items || !Array.isArray(items) || items.length === 0) {
+    if (!userId || !items || !Array.isArray(items) || items.length === 0)
       return NextResponse.json({ error: 'Invalid request data' }, { status: 400 });
-    }
 
     const productIds = items.map((item: { productId: string }) => item.productId);
     const products = await prisma.product.findMany({
@@ -77,7 +76,7 @@ export async function POST(request: Request) {
       sessionId: session.id,
       url: session.url,
     });
-  } catch (_error) {
+  } catch {
     return NextResponse.json({ error: 'Failed to create checkout session' }, { status: 500 });
   }
 }

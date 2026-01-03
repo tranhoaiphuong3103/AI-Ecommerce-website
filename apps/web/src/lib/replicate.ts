@@ -424,7 +424,7 @@ export async function healthCheck(): Promise<boolean> {
     if (!process.env.REPLICATE_API_TOKEN) return false;
 
     return true;
-  } catch (_error) {
+  } catch {
     return false;
   }
 }

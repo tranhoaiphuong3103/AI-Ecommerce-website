@@ -31,7 +31,6 @@ export async function POST(request: Request) {
 
     return NextResponse.json({ success: true, photoUrl, measurements });
   } catch (error) {
-    console.error('Upload photo error:', error);
     return NextResponse.json(
       {
         error: 'Failed to upload photo',
