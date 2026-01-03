@@ -3,8 +3,6 @@ import { generateTryOnImage } from '@/lib/replicate';
 import { NextResponse } from 'next/server';
 
 export async function POST(request: Request) {
-  console.log('=== [Process Route] HIT ===');
-
   let imageId: string | undefined;
 
   try {
@@ -12,20 +10,9 @@ export async function POST(request: Request) {
     const { imageId: id, productImageUrl, modelHeight, modelWeight, productId } = body;
     imageId = id;
 
-    console.log('[Image Processing] Request received:', {
-      imageId,
-      productImageUrl,
-      productId,
-      modelHeight,
-      modelWeight,
-    });
-
-    if (!imageId || !productImageUrl) {
-      console.error('[Image Processing] Missing required fields');
+    if (!imageId || !productImageUrl)
       return NextResponse.json({ error: 'Missing required fields' }, { status: 400 });
-    }
 
-    console.log('[Image Processing] Updating status to PROCESSING');
     await prisma.generatedVideo.update({
       where: { id: imageId },
       data: { status: 'PROCESSING' },
@@ -64,13 +51,6 @@ export async function POST(request: Request) {
       generatedImage?.user?.measurements?.photoUrl ||
       'https://images.unsplash.com/photo-1539571696357-5a69c17a67c6?w=400&h=600&fit=crop';
 
-    console.log('[Image Processing] Starting Replicate API call:', {
-      personImageUrl: `${personImageUrl.substring(0, 50)}...`,
-      garmentImageUrl: `${productImageUrl?.substring(0, 50)}...`,
-      productCategory,
-      hasProductImages: productImages.length > 0,
-    });
-
     const result = await generateTryOnImage({
       personImage: personImageUrl,
       garmentImage: productImageUrl,
@@ -80,14 +60,7 @@ export async function POST(request: Request) {
       productImages,
     });
 
-    console.log('[Image Processing] Replicate API result:', {
-      status: result.status,
-      imageUrl: result.imageUrl ? `${result.imageUrl.substring(0, 50)}...` : 'none',
-      error: result.error,
-    });
-
     if (result.status === 'failed') {
-      console.error('[Image Processing] Generation failed:', result.error);
       await prisma.generatedVideo.update({
         where: { id: imageId },
         data: {
@@ -98,7 +71,6 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: result.error }, { status: 500 });
     }
 
-    console.log('[Image Processing] Updating status to COMPLETED');
     await prisma.generatedVideo.update({
       where: { id: imageId },
       data: {
@@ -107,8 +79,6 @@ export async function POST(request: Request) {
         updatedAt: new Date(),
       },
     });
-
-    console.log('[Image Processing] Image generation completed successfully!');
 
     return NextResponse.json({
       success: true,

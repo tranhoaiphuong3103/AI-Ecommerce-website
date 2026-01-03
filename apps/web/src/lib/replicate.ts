@@ -6,19 +6,11 @@ const replicate = new Replicate({
 });
 
 async function convertToDataUrl(imageUrl: string): Promise<string> {
-  console.log('[Replicate] convertToDataUrl called with:', imageUrl);
-
-  if (!imageUrl.includes('localhost') && !imageUrl.includes('minio')) {
-    console.log('[Replicate] URL is external, returning as-is');
-    return imageUrl;
-  }
-
+  if (!imageUrl.includes('localhost') && !imageUrl.includes('minio')) return imageUrl;
   try {
     const urlParts = imageUrl.split('/');
     const fileName = urlParts[urlParts.length - 1];
     const bucketName = urlParts[urlParts.length - 2];
-
-    console.log('[Replicate] Fetching from MinIO:', { bucketName, fileName });
 
     const stream = await minioClient.getObject(bucketName, fileName);
 
@@ -26,7 +18,6 @@ async function convertToDataUrl(imageUrl: string): Promise<string> {
     for await (const chunk of stream) chunks.push(chunk);
 
     const buffer = Buffer.concat(chunks);
-    console.log('[Replicate] Fetched image size:', buffer.length, 'bytes');
 
     const ext = fileName.split('.').pop()?.toLowerCase();
     const mimeType = ext === 'png' ? 'image/png' : 'image/jpeg';
@@ -36,7 +27,6 @@ async function convertToDataUrl(imageUrl: string): Promise<string> {
 
     return dataUrl;
   } catch (error) {
-    console.error('[Replicate] Failed to fetch from MinIO:', error);
     throw new Error(
       `Failed to process user image: ${error instanceof Error ? error.message : 'Unknown error'}`,
     );
@@ -288,21 +278,13 @@ export async function generateVirtualTryOn(params: TryOnParams): Promise<TryOnRe
   try {
     const { personImage, garmentImage, category, productCategory } = params;
 
-    console.log('[Replicate] generateVirtualTryOn started:', {
-      personImage: typeof personImage === 'string' ? personImage.substring(0, 80) : 'Blob',
-      garmentImage: typeof garmentImage === 'string' ? garmentImage.substring(0, 80) : 'Blob',
-      productCategory,
-    });
-
     let personImageUrl = typeof personImage === 'string' ? personImage : '';
     let garmentImageUrl = typeof garmentImage === 'string' ? garmentImage : '';
 
     if (!personImageUrl || !garmentImageUrl)
       throw new Error('Both person image and garment image URLs are required');
 
-    console.log('[Replicate] Converting person image to data URL...');
     personImageUrl = await convertToDataUrl(personImageUrl);
-    console.log('[Replicate] Converting garment image to data URL...');
     garmentImageUrl = await convertToDataUrl(garmentImageUrl);
 
     const garmentCategory = category || detectGarmentCategory(productCategory);
@@ -312,9 +294,6 @@ export async function generateVirtualTryOn(params: TryOnParams): Promise<TryOnRe
       garmentCategory,
       hasDetailViews,
     );
-
-    console.log('[Replicate] Calling Replicate API with category:', garmentCategory);
-    console.log('[Replicate] API Token exists:', !!process.env.REPLICATE_API_TOKEN);
 
     const output = await replicate.run(
       'cuuupid/idm-vton:0513734a452173b8173e907e3a59d19a36266e55b48528559432bd21c7d7e985',
@@ -330,8 +309,6 @@ export async function generateVirtualTryOn(params: TryOnParams): Promise<TryOnRe
         },
       },
     );
-
-    console.log('[Replicate] API call completed, output type:', typeof output);
 
     let resultImageUrl: string | null = null;
 

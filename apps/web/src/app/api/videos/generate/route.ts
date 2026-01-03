@@ -1,21 +1,12 @@
 import { prisma } from '@/lib/prisma';
 import axios from 'axios';
 import { NextResponse } from 'next/server';
+import { toast } from 'react-toastify';
 
 export async function POST(request: Request) {
-  console.log('=== [Generate Route] HIT ===');
-
   try {
     const body = await request.json();
     const { userId, productId, productImageUrl: providedImageUrl, modelHeight, modelWeight } = body;
-
-    console.log('[Image Generation] Request received:', {
-      userId,
-      productId,
-      providedImageUrl,
-      modelHeight,
-      modelWeight,
-    });
 
     if (!userId || !productId || !modelHeight || !modelWeight) {
       console.error('[Image Generation] Missing required fields');
@@ -39,13 +30,6 @@ export async function POST(request: Request) {
 
     const productImageUrl = providedImageUrl || product.images[0]?.url;
 
-    console.log('[Image Generation] Product found:', {
-      productId: product.id,
-      productName: product.name,
-      selectedImageUrl: productImageUrl,
-      primaryImage: product.images[0]?.url,
-    });
-
     const video = await prisma.generatedVideo.create({
       data: {
         userId,
@@ -61,18 +45,6 @@ export async function POST(request: Request) {
       ? `${process.env.NEXT_PUBLIC_WEB_URL}/api/videos/process`
       : 'http://localhost:3000/api/videos/process';
 
-    console.log('[Image Generation] Triggering background processing:', {
-      imageId: video.id,
-      processUrl,
-      productImageUrl,
-    });
-
-    console.log('[Image Generation] Product image URL:', productImageUrl);
-
-    if (!productImageUrl) {
-      console.error('[Image Generation] No product image found!');
-    }
-
     axios
       .post(processUrl, {
         imageId: video.id,
@@ -82,22 +54,9 @@ export async function POST(request: Request) {
         modelHeight,
         modelWeight,
       })
-      .then((response) => {
-        console.log(
-          '[Image Generation] Background processing triggered successfully:',
-          response.data,
-        );
-      })
-      .catch((error) => {
-        console.error('[Image Generation] Failed to trigger image processing:', {
-          error: error.message,
-          code: error.code,
-          url: processUrl,
-          response: error.response?.data,
-        });
+      .catch((_error) => {
+        toast.error('Failed to trigger image processing');
       });
-
-    console.log('[Image Generation] Request completed, returning imageId:', video.id);
 
     return NextResponse.json({
       imageId: video.id,
@@ -140,9 +99,8 @@ export async function GET(request: Request) {
       },
     });
 
-    if (!generatedImage) {
+    if (!generatedImage)
       return NextResponse.json({ error: 'Generated image not found' }, { status: 404 });
-    }
 
     return NextResponse.json(generatedImage);
   } catch (_error) {
