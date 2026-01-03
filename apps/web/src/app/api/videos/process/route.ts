@@ -1,18 +1,20 @@
 import { prisma } from '@/lib/prisma';
-import { generateTryOnVideo } from '@/lib/replicate';
+import { generateTryOnImage } from '@/lib/replicate';
 import { NextResponse } from 'next/server';
 
 export async function POST(request: Request) {
+  let imageId: string | undefined;
+
   try {
     const body = await request.json();
-    const { videoId, productImageUrl, modelHeight, modelWeight, productId } = body;
+    const { imageId: id, productImageUrl, modelHeight, modelWeight, productId } = body;
+    imageId = id;
 
-    if (!videoId || !productImageUrl) {
+    if (!imageId || !productImageUrl)
       return NextResponse.json({ error: 'Missing required fields' }, { status: 400 });
-    }
 
     await prisma.generatedVideo.update({
-      where: { id: videoId },
+      where: { id: imageId },
       data: { status: 'PROCESSING' },
     });
     let productCategory = 'upperbody';
@@ -34,8 +36,8 @@ export async function POST(request: Request) {
       productImages = product?.images || [];
     }
 
-    const video = await prisma.generatedVideo.findUnique({
-      where: { id: videoId },
+    const generatedImage = await prisma.generatedVideo.findUnique({
+      where: { id: imageId },
       include: {
         user: {
           include: {
@@ -46,10 +48,10 @@ export async function POST(request: Request) {
     });
 
     const personImageUrl =
-      video?.user?.measurements?.photoUrl ||
+      generatedImage?.user?.measurements?.photoUrl ||
       'https://images.unsplash.com/photo-1539571696357-5a69c17a67c6?w=400&h=600&fit=crop';
 
-    const result = await generateTryOnVideo({
+    const result = await generateTryOnImage({
       personImage: personImageUrl,
       garmentImage: productImageUrl,
       modelHeight,
@@ -60,7 +62,7 @@ export async function POST(request: Request) {
 
     if (result.status === 'failed') {
       await prisma.generatedVideo.update({
-        where: { id: videoId },
+        where: { id: imageId },
         data: {
           status: 'FAILED',
         },
@@ -70,7 +72,7 @@ export async function POST(request: Request) {
     }
 
     await prisma.generatedVideo.update({
-      where: { id: videoId },
+      where: { id: imageId },
       data: {
         status: 'COMPLETED',
         videoUrl: result.imageUrl,
@@ -80,21 +82,30 @@ export async function POST(request: Request) {
 
     return NextResponse.json({
       success: true,
-      videoId,
-      videoUrl: result.imageUrl,
-      message: 'Video generation completed',
+      imageId,
+      imageUrl: result.imageUrl,
+      message: 'Image generation completed',
     });
-  } catch {
-    const body = await request.json();
-    if (body.videoId) {
-      await prisma.generatedVideo.update({
-        where: { id: body.videoId },
-        data: {
-          status: 'FAILED',
-        },
-      });
+  } catch (error) {
+    if (imageId) {
+      try {
+        await prisma.generatedVideo.update({
+          where: { id: imageId },
+          data: {
+            status: 'FAILED',
+          },
+        });
+      } catch (dbError) {
+        console.error('Failed to update image generation status:', dbError);
+      }
     }
 
-    return NextResponse.json({ error: 'Failed to process video' }, { status: 500 });
+    return NextResponse.json(
+      {
+        error: 'Failed to process image',
+        details: error instanceof Error ? error.message : 'Unknown error',
+      },
+      { status: 500 },
+    );
   }
 }

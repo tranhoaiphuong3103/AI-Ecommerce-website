@@ -14,16 +14,13 @@ export default function AuthGuard({ children }: { children: React.ReactNode }) {
     const token = localStorage.getItem('token');
     const isPublicRoute = PUBLIC_ROUTES.includes(pathname);
 
-    if (!token && !isPublicRoute) {
-      router.push('/login');
-    } else if (token && isPublicRoute) {
-      router.push('/');
-    }
+    if (!token && !isPublicRoute) router.push('/login');
+    else if (token && isPublicRoute) router.push('/');
 
     setIsLoading(false);
   }, [pathname, router]);
 
-  if (isLoading) {
+  if (isLoading)
     return (
       <div className="min-h-screen flex items-center justify-center">
         <div className="relative">
@@ -31,7 +28,6 @@ export default function AuthGuard({ children }: { children: React.ReactNode }) {
         </div>
       </div>
     );
-  }
 
   return <>{children}</>;
 }

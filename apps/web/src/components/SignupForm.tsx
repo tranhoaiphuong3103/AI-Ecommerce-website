@@ -31,9 +31,7 @@ export default function SignupForm() {
 
       const data = await res.json();
 
-      if (!res.ok) {
-        throw new Error(data.error || 'Signup failed');
-      }
+      if (!res.ok) throw new Error(data.error || 'Signup failed');
 
       localStorage.setItem('token', data.token);
       localStorage.setItem('user', JSON.stringify(data.user));
@@ -46,11 +44,11 @@ export default function SignupForm() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center px-4 py-12">
+    <div className="min-h-screen flex items-center justify-center px-4 py-12 bg-white">
       <div className="w-full max-w-md">
-        <div className="bg-white/80 backdrop-blur-xl rounded-3xl shadow-2xl shadow-cyan-500/20 border border-cyan-100/50 p-8">
+        <div className="bg-white border border-gray-200 p-8">
           <div className="text-center mb-8">
-            <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-gradient-to-r from-cyan-600 to-blue-600 mb-4 shadow-lg shadow-cyan-500/50">
+            <div className="inline-flex items-center justify-center w-16 h-16 bg-black mb-4">
               <svg
                 className="w-8 h-8 text-white"
                 fill="none"
@@ -65,21 +63,21 @@ export default function SignupForm() {
                 />
               </svg>
             </div>
-            <h1 className="text-3xl font-bold bg-gradient-to-r from-cyan-600 to-blue-600 bg-clip-text text-transparent mb-2">
+            <h1 className="text-3xl font-bold text-black uppercase tracking-tight mb-2">
               Create Account
             </h1>
             <p className="text-gray-600">Join us and start trying on!</p>
           </div>
 
           {error && (
-            <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-xl text-red-600 text-sm">
+            <div className="mb-6 p-4 bg-gray-100 border border-gray-300 text-black text-sm">
               {error}
             </div>
           )}
 
           <form onSubmit={handleSubmit} className="space-y-5">
             <div>
-              <label htmlFor="name" className="block text-sm font-semibold text-gray-700 mb-2">
+              <label htmlFor="name" className="block text-sm font-bold text-black mb-2 uppercase">
                 Full Name
               </label>
               <input
@@ -88,13 +86,13 @@ export default function SignupForm() {
                 value={name}
                 onChange={(e) => setName(e.target.value)}
                 required
-                className="w-full px-4 py-3 rounded-xl border-2 border-cyan-100 focus:border-cyan-500 focus:outline-none transition-colors bg-white/50 text-gray-900 placeholder:text-gray-400"
+                className="w-full px-4 py-3 border-2 border-gray-300 focus:border-black focus:outline-none transition-colors bg-white text-black placeholder:text-gray-400"
                 placeholder="John Doe"
               />
             </div>
 
             <div>
-              <label htmlFor="email" className="block text-sm font-semibold text-gray-700 mb-2">
+              <label htmlFor="email" className="block text-sm font-bold text-black mb-2 uppercase">
                 Email Address
               </label>
               <input
@@ -103,13 +101,16 @@ export default function SignupForm() {
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 required
-                className="w-full px-4 py-3 rounded-xl border-2 border-cyan-100 focus:border-cyan-500 focus:outline-none transition-colors bg-white/50 text-gray-900 placeholder:text-gray-400"
+                className="w-full px-4 py-3 border-2 border-gray-300 focus:border-black focus:outline-none transition-colors bg-white text-black placeholder:text-gray-400"
                 placeholder="you@example.com"
               />
             </div>
 
             <div>
-              <label htmlFor="password" className="block text-sm font-semibold text-gray-700 mb-2">
+              <label
+                htmlFor="password"
+                className="block text-sm font-bold text-black mb-2 uppercase"
+              >
                 Password
               </label>
               <input
@@ -119,7 +120,7 @@ export default function SignupForm() {
                 onChange={(e) => setPassword(e.target.value)}
                 required
                 minLength={6}
-                className="w-full px-4 py-3 rounded-xl border-2 border-cyan-100 focus:border-cyan-500 focus:outline-none transition-colors bg-white/50 text-gray-900 placeholder:text-gray-400"
+                className="w-full px-4 py-3 border-2 border-gray-300 focus:border-black focus:outline-none transition-colors bg-white text-black placeholder:text-gray-400"
                 placeholder="••••••••"
               />
             </div>
@@ -127,7 +128,7 @@ export default function SignupForm() {
             <div>
               <label
                 htmlFor="confirmPassword"
-                className="block text-sm font-semibold text-gray-700 mb-2"
+                className="block text-sm font-bold text-black mb-2 uppercase"
               >
                 Confirm Password
               </label>
@@ -138,7 +139,7 @@ export default function SignupForm() {
                 onChange={(e) => setConfirmPassword(e.target.value)}
                 required
                 minLength={6}
-                className="w-full px-4 py-3 rounded-xl border-2 border-cyan-100 focus:border-cyan-500 focus:outline-none transition-colors bg-white/50 text-gray-900 placeholder:text-gray-400"
+                className="w-full px-4 py-3 border-2 border-gray-300 focus:border-black focus:outline-none transition-colors bg-white text-black placeholder:text-gray-400"
                 placeholder="••••••••"
               />
             </div>
@@ -147,15 +148,15 @@ export default function SignupForm() {
               <input
                 type="checkbox"
                 required
-                className="w-4 h-4 mt-0.5 rounded border-cyan-300 text-cyan-600 focus:ring-cyan-500"
+                className="w-4 h-4 mt-0.5 border-gray-300 text-black focus:ring-black"
               />
               <span className="text-gray-600">
                 I agree to the{' '}
-                <a href="#" className="text-cyan-600 hover:text-cyan-700 font-semibold">
+                <a href="#" className="text-black hover:underline font-semibold">
                   Terms of Service
                 </a>{' '}
                 and{' '}
-                <a href="#" className="text-cyan-600 hover:text-cyan-700 font-semibold">
+                <a href="#" className="text-black hover:underline font-semibold">
                   Privacy Policy
                 </a>
               </span>
@@ -164,7 +165,7 @@ export default function SignupForm() {
             <button
               type="submit"
               disabled={loading}
-              className="w-full py-3 bg-gradient-to-r from-cyan-600 to-blue-600 text-white rounded-xl font-semibold hover:shadow-xl hover:shadow-cyan-500/50 transition-all duration-300 hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed"
+              className="w-full py-3 bg-black text-white font-bold uppercase tracking-wider hover:bg-gray-800 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
             >
               {loading ? 'Creating account...' : 'Create Account'}
             </button>
@@ -172,7 +173,7 @@ export default function SignupForm() {
 
           <p className="mt-6 text-center text-sm text-gray-600">
             Already have an account?{' '}
-            <Link href="/login" className="text-cyan-600 hover:text-cyan-700 font-semibold">
+            <Link href="/login" className="text-black hover:underline font-semibold">
               Sign in
             </Link>
           </p>

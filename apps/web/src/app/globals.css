@@ -4,24 +4,79 @@
 
 :root {
   --background: #ffffff;
-  --foreground: #171717;
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+  --foreground: #000000;
+  --primary: #000000;
+  --primary-foreground: #ffffff;
+  --secondary: #767677;
+  --border: #e5e5e5;
+  --muted: #f5f5f5;
 }
 
 body {
   color: var(--foreground);
   background: var(--background);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 
 @layer utilities {
   .text-balance {
     text-wrap: balance;
   }
+}
+
+@layer components {
+  .btn-primary {
+    @apply bg-black text-white font-bold py-3 px-6 hover:bg-gray-800 transition-colors uppercase tracking-wider;
+  }
+
+  .btn-secondary {
+    @apply bg-white text-black font-bold py-3 px-6 border-2 border-black hover:bg-black hover:text-white transition-colors uppercase tracking-wider;
+  }
+
+  .link-underline {
+    @apply relative after:absolute after:bottom-0 after:left-0 after:w-0 after:h-0.5 after:bg-black after:transition-all hover:after:w-full;
+  }
+}
+
+@keyframes wiggle {
+  0% {
+    transform: rotate(-2deg);
+  }
+  2.86% {
+    transform: rotate(2deg);
+  }
+  5.71% {
+    transform: rotate(-2deg);
+  }
+  8.57% {
+    transform: rotate(2deg);
+  }
+  11.43% {
+    transform: rotate(-2deg);
+  }
+  14.29% {
+    transform: rotate(2deg);
+  }
+  17.14% {
+    transform: rotate(-2deg);
+  }
+  20% {
+    transform: rotate(2deg);
+  }
+  22.86% {
+    transform: rotate(-2deg);
+  }
+  25.71% {
+    transform: rotate(2deg);
+  }
+  28.57%,
+  100% {
+    transform: rotate(0deg);
+  }
+}
+
+.animate-wiggle {
+  animation: wiggle 7s ease-in-out infinite;
 }

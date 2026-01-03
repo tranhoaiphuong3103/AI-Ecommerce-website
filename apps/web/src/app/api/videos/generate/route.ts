@@ -1,15 +1,15 @@
 import { prisma } from '@/lib/prisma';
 import axios from 'axios';
 import { NextResponse } from 'next/server';
+import { toast } from 'react-toastify';
 
 export async function POST(request: Request) {
   try {
     const body = await request.json();
-    const { userId, productId, modelHeight, modelWeight } = body;
+    const { userId, productId, productImageUrl: providedImageUrl, modelHeight, modelWeight } = body;
 
-    if (!userId || !productId || !modelHeight || !modelWeight) {
+    if (!userId || !productId || !modelHeight || !modelWeight)
       return NextResponse.json({ error: 'Missing required fields' }, { status: 400 });
-    }
 
     const product = await prisma.product.findUnique({
       where: { id: productId },
@@ -21,9 +21,9 @@ export async function POST(request: Request) {
       },
     });
 
-    if (!product) {
-      return NextResponse.json({ error: 'Product not found' }, { status: 404 });
-    }
+    if (!product) return NextResponse.json({ error: 'Product not found' }, { status: 404 });
+
+    const productImageUrl = providedImageUrl || product.images[0]?.url;
 
     const video = await prisma.generatedVideo.create({
       data: {
@@ -36,40 +36,51 @@ export async function POST(request: Request) {
       },
     });
 
-    const processUrl = 'http://web:3000/api/videos/process';
+    const processUrl = process.env.NEXT_PUBLIC_WEB_URL
+      ? `${process.env.NEXT_PUBLIC_WEB_URL}/api/videos/process`
+      : 'http://localhost:3000/api/videos/process';
 
     axios
       .post(processUrl, {
-        videoId: video.id,
+        imageId: video.id,
         userId,
         productId,
-        productImageUrl: product.images[0]?.url,
+        productImageUrl,
         modelHeight,
         modelWeight,
       })
-      .catch((_error) => {});
+      .catch(() => {
+        toast.error('Failed to trigger image processing');
+      });
 
     return NextResponse.json({
-      videoId: video.id,
+      imageId: video.id,
       status: video.status,
-      message: 'Video generation started',
+      message: 'Image generation started',
     });
-  } catch (_error) {
-    return NextResponse.json({ error: 'Failed to generate video' }, { status: 500 });
+  } catch (error) {
+    const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+    const errorStack = error instanceof Error ? error.stack : 'No stack';
+    return NextResponse.json(
+      {
+        error: 'Failed to generate image',
+        details: errorMessage,
+        stack: errorStack,
+      },
+      { status: 500 },
+    );
   }
 }
 
 export async function GET(request: Request) {
   try {
     const { searchParams } = new URL(request.url);
-    const videoId = searchParams.get('videoId');
+    const imageId = searchParams.get('imageId');
 
-    if (!videoId) {
-      return NextResponse.json({ error: 'Video ID required' }, { status: 400 });
-    }
+    if (!imageId) return NextResponse.json({ error: 'Image ID required' }, { status: 400 });
 
-    const video = await prisma.generatedVideo.findUnique({
-      where: { id: videoId },
+    const generatedImage = await prisma.generatedVideo.findUnique({
+      where: { id: imageId },
       include: {
         product: {
           include: {
@@ -79,12 +90,11 @@ export async function GET(request: Request) {
       },
     });
 
-    if (!video) {
-      return NextResponse.json({ error: 'Video not found' }, { status: 404 });
-    }
+    if (!generatedImage)
+      return NextResponse.json({ error: 'Generated image not found' }, { status: 404 });
 
-    return NextResponse.json(video);
-  } catch (_error) {
-    return NextResponse.json({ error: 'Failed to fetch video' }, { status: 500 });
+    return NextResponse.json(generatedImage);
+  } catch {
+    return NextResponse.json({ error: 'Failed to fetch image status' }, { status: 500 });
   }
 }

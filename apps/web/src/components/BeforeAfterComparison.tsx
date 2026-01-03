@@ -39,7 +39,6 @@ export default function BeforeAfterComparison({
 
   return (
     <div className="relative w-full aspect-square bg-gray-100 rounded-2xl overflow-hidden select-none">
-      {/* Before Image (Full) */}
       <div className="absolute inset-0">
         <img
           src={beforeImage}
@@ -48,8 +47,6 @@ export default function BeforeAfterComparison({
           draggable={false}
         />
       </div>
-
-      {/* After Image (Clipped) */}
       <div
         className="absolute inset-0"
         style={{ clipPath: `inset(0 ${100 - sliderPosition}% 0 0)` }}
@@ -61,8 +58,6 @@ export default function BeforeAfterComparison({
           draggable={false}
         />
       </div>
-
-      {/* Slider Line and Handle */}
       <div
         className="absolute inset-0 cursor-ew-resize"
         onMouseDown={handleMouseDown}
@@ -77,7 +72,6 @@ export default function BeforeAfterComparison({
           className="absolute top-0 bottom-0 w-1 bg-white shadow-lg"
           style={{ left: `${sliderPosition}%`, transform: 'translateX(-50%)' }}
         >
-          {/* Slider Handle */}
           <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-12 h-12 bg-white rounded-full shadow-xl border-4 border-purple-600 flex items-center justify-center">
             <svg
               className="w-6 h-6 text-purple-600"
@@ -95,8 +89,6 @@ export default function BeforeAfterComparison({
           </div>
         </div>
       </div>
-
-      {/* Labels */}
       <div className="absolute top-4 left-4 bg-black/60 backdrop-blur-sm px-3 py-1 rounded-full text-white text-sm font-semibold">
         {beforeLabel}
       </div>

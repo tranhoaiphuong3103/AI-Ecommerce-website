@@ -1,8 +1,10 @@
 'use client';
 
-import type { Product } from '@/types';
+import type { Product, ProductVariant } from '@/types';
 import Link from 'next/link';
-import { useEffect, useState } from 'react';
+import { useSearchParams } from 'next/navigation';
+import { useCallback, useEffect, useRef, useState } from 'react';
+import { toast } from 'react-toastify';
 import BeforeAfterComparison from './BeforeAfterComparison';
 
 interface ProductDetailProps {
@@ -10,6 +12,9 @@ interface ProductDetailProps {
 }
 
 export default function ProductDetail({ product }: ProductDetailProps) {
+  const searchParams = useSearchParams();
+  const autoTryOnTriggered = useRef(false);
+
   const primaryImage = product.images.find((img) => img.isPrimary) || product.images[0];
   const primaryColor = primaryImage?.alt?.split(' - ')[0] || null;
 
@@ -23,10 +28,23 @@ export default function ProductDetail({ product }: ProductDetailProps) {
   });
   const [quantity, setQuantity] = useState(1);
   const [isGeneratingTryOn, setIsGeneratingTryOn] = useState(false);
-  const [generatedVideoId, setGeneratedVideoId] = useState<string | null>(null);
-  const [generatedVideoUrl, setGeneratedVideoUrl] = useState<string | null>(null);
-  const [videoStatus, setVideoStatus] = useState<string | null>(null);
+  const [generatedImageId, setGeneratedImageId] = useState<string | null>(null);
+  const [generatedImageUrl, setGeneratedImageUrl] = useState<string | null>(null);
+  const [imageStatus, setImageStatus] = useState<string | null>(null);
   const [userPhotoUrl, setUserPhotoUrl] = useState<string | null>(null);
+  const [isZooming, setIsZooming] = useState(false);
+  const [zoomPosition, setZoomPosition] = useState({ x: 0, y: 0 });
+  const imageContainerRef = useRef<HTMLDivElement>(null);
+
+  const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
+    if (!imageContainerRef.current) return;
+
+    const rect = imageContainerRef.current.getBoundingClientRect();
+    const x = ((e.clientX - rect.left) / rect.width) * 100;
+    const y = ((e.clientY - rect.top) / rect.height) * 100;
+
+    setZoomPosition({ x: Math.max(0, Math.min(100, x)), y: Math.max(0, Math.min(100, y)) });
+  };
 
   const sortSizes = (sizes: string[]) => {
     return sizes.sort((a, b) => {
@@ -35,16 +53,12 @@ export default function ProductDetail({ product }: ProductDetailProps) {
       const aIndex = sizeOrder.indexOf(a);
       const bIndex = sizeOrder.indexOf(b);
 
-      if (aIndex !== -1 && bIndex !== -1) {
-        return aIndex - bIndex;
-      }
+      if (aIndex !== -1 && bIndex !== -1) return aIndex - bIndex;
 
       const aNum = Number.parseFloat(a.replace(/\D/g, ''));
       const bNum = Number.parseFloat(b.replace(/\D/g, ''));
 
-      if (!Number.isNaN(aNum) && !Number.isNaN(bNum)) {
-        return aNum - bNum;
-      }
+      if (!Number.isNaN(aNum) && !Number.isNaN(bNum)) return aNum - bNum;
 
       return a.localeCompare(b);
     });
@@ -64,9 +78,8 @@ export default function ProductDetail({ product }: ProductDetailProps) {
   useEffect(() => {
     if (selectedColor) {
       const colorImages = product.images.filter((img) => img.alt?.startsWith(selectedColor));
-      if (colorImages.length > 0 && !colorImages.find((img) => img.id === selectedImage?.id)) {
+      if (colorImages.length > 0 && !colorImages.find((img) => img.id === selectedImage?.id))
         setSelectedImage(colorImages[0]);
-      }
     }
   }, [selectedColor, product.images, selectedImage]);
 
@@ -78,53 +91,82 @@ export default function ProductDetail({ product }: ProductDetailProps) {
       const userData = JSON.parse(user);
       const userId = userData.id;
 
-      try {
-        const response = await fetch(`/api/user/measurements?userId=${userId}`);
-        if (response.ok) {
-          const data = await response.json();
-          if (data.measurements?.photoUrl) {
-            setUserPhotoUrl(data.measurements.photoUrl);
-          }
-        }
-      } catch (_error) {}
+      const response = await fetch(`/api/user/measurements?userId=${userId}`);
+      if (response.ok) {
+        const data = await response.json();
+        if (data.measurements?.photoUrl) setUserPhotoUrl(data.measurements.photoUrl);
+      }
     };
 
     fetchUserPhoto();
   }, []);
 
   useEffect(() => {
-    if (!generatedVideoId || videoStatus === 'COMPLETED' || videoStatus === 'FAILED') {
-      return;
-    }
+    if (!generatedImageId) return;
 
-    const pollVideoStatus = async () => {
+    let retryCount = 0;
+    const MAX_RETRIES = 40;
+    const POLL_INTERVAL = 3000;
+    let intervalId: NodeJS.Timeout | null = null;
+
+    const pollImageStatus = async () => {
       try {
-        const response = await fetch(`/api/videos/generate?videoId=${generatedVideoId}`);
+        retryCount++;
+
+        if (retryCount > MAX_RETRIES) {
+          if (intervalId) clearInterval(intervalId);
+          setImageStatus('FAILED');
+          setIsGeneratingTryOn(false);
+          toast.error('Image generation timed out. Please try again.', {
+            position: 'top-center',
+            autoClose: 5000,
+          });
+          return;
+        }
+
+        const response = await fetch(`/api/videos/generate?imageId=${generatedImageId}`);
+
+        if (!response.ok) throw new Error('Failed to fetch image status');
+
         const data = await response.json();
+        setImageStatus(data.status);
 
-        setVideoStatus(data.status);
-
-        if (data.status === 'COMPLETED') {
-          setGeneratedVideoUrl(data.videoUrl);
+        if (data.status === 'COMPLETED' && data.videoUrl) {
+          if (intervalId) clearInterval(intervalId);
+          setGeneratedImageUrl(data.videoUrl);
           setIsGeneratingTryOn(false);
         } else if (data.status === 'FAILED') {
+          if (intervalId) clearInterval(intervalId);
           setIsGeneratingTryOn(false);
+          toast.error('Image generation failed. Please try again.', {
+            position: 'top-center',
+            autoClose: 5000,
+          });
         }
-      } catch (_error) {}
+      } catch {
+        if (retryCount > 3) if (intervalId) clearInterval(intervalId);
+        setImageStatus('FAILED');
+        setIsGeneratingTryOn(false);
+        toast.error('Failed to check image status. Please try again.', {
+          position: 'top-center',
+          autoClose: 5000,
+        });
+      }
     };
 
-    const interval = setInterval(pollVideoStatus, 3000);
+    pollImageStatus();
+    intervalId = setInterval(pollImageStatus, POLL_INTERVAL);
 
-    return () => clearInterval(interval);
-  }, [generatedVideoId, videoStatus]);
+    return () => {
+      if (intervalId) clearInterval(intervalId);
+    };
+  }, [generatedImageId]);
 
   const handleSizeChange = (size: string) => {
     const variant = product.variants.find(
       (v) => v.size === size && (!selectedVariant?.color || v.color === selectedVariant.color),
     );
-    if (variant) {
-      setSelectedVariant(variant);
-    }
+    if (variant) setSelectedVariant(variant);
   };
 
   const handleColorChange = (color: string) => {
@@ -136,30 +178,22 @@ export default function ProductDetail({ product }: ProductDetailProps) {
       setSelectedColor(color);
 
       const colorImages = product.images.filter((img) => img.alt?.startsWith(color));
-      if (colorImages.length > 0) {
-        setSelectedImage(colorImages[0]);
-      }
+      if (colorImages.length > 0) setSelectedImage(colorImages[0]);
     }
   };
 
   const handleAddToCart = () => {
-    if (!selectedVariant) {
-      return;
-    }
+    if (!selectedVariant) return;
   };
 
-  const handleTryOn = async () => {
+  const handleTryOn = useCallback(async () => {
     const user = localStorage.getItem('user');
-    if (!user) {
-      return;
-    }
+    if (!user) return;
 
     const userData = JSON.parse(user);
     const userId = userData.id;
 
-    if (!userId) {
-      return;
-    }
+    if (!userId) return;
 
     setIsGeneratingTryOn(true);
 
@@ -172,6 +206,7 @@ export default function ProductDetail({ product }: ProductDetailProps) {
         body: JSON.stringify({
           userId,
           productId: product.id,
+          productImageUrl: selectedImage?.url,
           modelHeight: 170,
           modelWeight: 65,
         }),
@@ -180,29 +215,43 @@ export default function ProductDetail({ product }: ProductDetailProps) {
       const data = await response.json();
 
       if (!response.ok) {
-        throw new Error(data.error || 'Failed to generate try-on');
+        console.error('[TryOn] Server error details:', data);
+        throw new Error(data.details || data.error || 'Failed to generate try-on');
       }
 
-      setGeneratedVideoId(data.videoId);
-      setVideoStatus(data.status);
-    } catch (_error) {
+      setGeneratedImageId(data.imageId);
+      setImageStatus(data.status);
+    } catch (error) {
+      console.error('[TryOn] Failed to start generation:', error);
       setIsGeneratingTryOn(false);
+      toast.error('Failed to start image generation. Please try again.', {
+        position: 'top-center',
+        autoClose: 5000,
+      });
     }
-  };
+  }, [product.id, selectedImage?.url]);
+
+  useEffect(() => {
+    const shouldAutoTryOn = searchParams.get('tryOn') === 'true';
+    if (shouldAutoTryOn && !autoTryOnTriggered.current && !isGeneratingTryOn) {
+      autoTryOnTriggered.current = true;
+      handleTryOn();
+    }
+  }, [searchParams, isGeneratingTryOn, handleTryOn]);
 
   return (
-    <div className="min-h-screen py-12 px-4">
+    <div className="min-h-screen py-12 px-4 bg-white">
       <div className="max-w-7xl mx-auto">
         <nav className="mb-8">
           <ol className="flex items-center space-x-2 text-sm text-gray-600">
             <li>
-              <Link href="/" className="hover:text-purple-600 transition-colors">
+              <Link href="/" className="hover:text-black underline transition-colors">
                 Home
               </Link>
             </li>
             <li>/</li>
             <li>
-              <Link href="/products" className="hover:text-purple-600 transition-colors">
+              <Link href="/products" className="hover:text-black underline transition-colors">
                 Products
               </Link>
             </li>
@@ -210,7 +259,7 @@ export default function ProductDetail({ product }: ProductDetailProps) {
             <li>
               <Link
                 href={`/products?category=${product.category.slug}`}
-                className="hover:text-purple-600 transition-colors"
+                className="hover:text-black underline transition-colors"
               >
                 {product.category.name}
               </Link>
@@ -222,13 +271,30 @@ export default function ProductDetail({ product }: ProductDetailProps) {
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
           <div className="space-y-4">
-            <div className="relative aspect-square bg-gradient-to-br from-purple-50 to-cyan-50 rounded-2xl overflow-hidden shadow-xl shadow-purple-500/20">
+            <div
+              ref={imageContainerRef}
+              className="relative aspect-square bg-gray-100 overflow-hidden cursor-zoom-in"
+              onMouseEnter={() => setIsZooming(true)}
+              onMouseLeave={() => setIsZooming(false)}
+              onMouseMove={handleMouseMove}
+            >
               {selectedImage ? (
-                <img
-                  src={selectedImage.url}
-                  alt={selectedImage.alt || product.name}
-                  className="w-full h-full object-cover"
-                />
+                <>
+                  <img
+                    src={selectedImage.url}
+                    alt={selectedImage.alt || product.name}
+                    className={`w-full h-full object-cover pointer-events-none transition-opacity duration-200 ${isZooming ? 'opacity-0' : 'opacity-100'}`}
+                  />
+                  <div
+                    className={`absolute inset-0 transition-opacity duration-200 ${isZooming ? 'opacity-100' : 'opacity-0'}`}
+                    style={{
+                      backgroundImage: `url(${selectedImage.url})`,
+                      backgroundSize: '250%',
+                      backgroundPosition: `${zoomPosition.x}% ${zoomPosition.y}%`,
+                      backgroundRepeat: 'no-repeat',
+                    }}
+                  />
+                </>
               ) : (
                 <div className="w-full h-full flex items-center justify-center">
                   <svg
@@ -256,8 +322,8 @@ export default function ProductDetail({ product }: ProductDetailProps) {
                     onClick={() => setSelectedImage(image)}
                     className={`aspect-square rounded-xl overflow-hidden border-2 transition-all ${
                       selectedImage?.id === image.id
-                        ? 'border-purple-600 shadow-lg shadow-purple-500/50'
-                        : 'border-purple-100 hover:border-purple-300'
+                        ? 'border-black'
+                        : 'border-gray-200 hover:border-black'
                     }`}
                   >
                     <img
@@ -272,14 +338,12 @@ export default function ProductDetail({ product }: ProductDetailProps) {
           </div>
           <div className="space-y-6">
             <div>
-              <span className="inline-block px-4 py-1 bg-gradient-to-r from-purple-100 to-cyan-100 text-purple-700 rounded-full text-sm font-semibold">
+              <span className="inline-block px-4 py-1 bg-black text-white rounded-full text-sm font-semibold">
                 {product.category.name}
               </span>
             </div>
             <h1 className="text-4xl font-bold text-gray-900">{product.name}</h1>
-            <div className="text-5xl font-bold bg-gradient-to-r from-purple-600 to-cyan-600 bg-clip-text text-transparent">
-              ${product.price.toFixed(2)}
-            </div>
+            <div className="text-5xl font-bold text-black">${product.price.toFixed(2)}</div>
             {product.description && (
               <p className="text-gray-600 leading-relaxed text-lg">{product.description}</p>
             )}
@@ -303,11 +367,11 @@ export default function ProductDetail({ product }: ProductDetailProps) {
                         type="button"
                         onClick={() => handleSizeChange(size)}
                         disabled={!isAvailableForColor}
-                        className={`px-6 py-3 rounded-xl font-semibold text-sm transition-all ${
+                        className={`px-6 py-3 rounded-full font-semibold text-sm transition-all ${
                           isSelected
-                            ? 'bg-gradient-to-r from-purple-600 to-cyan-600 text-white shadow-lg shadow-purple-500/50'
+                            ? 'bg-black text-white'
                             : isAvailableForColor
-                              ? 'bg-white border-2 border-purple-100 text-gray-700 hover:border-purple-600'
+                              ? 'bg-white border-2 border-gray-300 text-gray-700 hover:border-black'
                               : 'bg-gray-100 text-gray-400 cursor-not-allowed opacity-50'
                         }`}
                       >
@@ -336,11 +400,11 @@ export default function ProductDetail({ product }: ProductDetailProps) {
                         type="button"
                         onClick={() => handleColorChange(color)}
                         disabled={!isAvailable}
-                        className={`px-6 py-3 rounded-xl font-semibold text-sm transition-all ${
+                        className={`px-6 py-3 rounded-full font-semibold text-sm transition-all ${
                           isSelected
-                            ? 'bg-gradient-to-r from-purple-600 to-cyan-600 text-white shadow-lg shadow-purple-500/50'
+                            ? 'bg-black text-white'
                             : isAvailable
-                              ? 'bg-white border-2 border-purple-100 text-gray-700 hover:border-purple-600'
+                              ? 'bg-white border-2 border-gray-300 text-gray-700 hover:border-black'
                               : 'bg-gray-100 text-gray-400 cursor-not-allowed'
                         }`}
                       >
@@ -386,7 +450,7 @@ export default function ProductDetail({ product }: ProductDetailProps) {
                 <button
                   type="button"
                   onClick={() => setQuantity(Math.max(1, quantity - 1))}
-                  className="w-12 h-12 rounded-xl bg-white border-2 border-purple-100 text-gray-700 hover:border-purple-600 transition-all font-bold"
+                  className="w-12 h-12 rounded-xl bg-white border-2 border-gray-300 text-gray-700 hover:border-black transition-all font-bold"
                 >
                   -
                 </button>
@@ -396,12 +460,12 @@ export default function ProductDetail({ product }: ProductDetailProps) {
                   max={selectedVariant?.stock || 99}
                   value={quantity}
                   onChange={(e) => setQuantity(Math.max(1, Number.parseInt(e.target.value) || 1))}
-                  className="w-20 h-12 text-center rounded-xl border-2 border-purple-100 focus:border-purple-600 focus:outline-none text-gray-900 font-semibold leading-[3rem]"
+                  className="w-20 h-12 text-center rounded-xl border-2 border-gray-300 focus:border-black focus:outline-none text-gray-900 font-semibold [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
                 />
                 <button
                   type="button"
                   onClick={() => setQuantity(Math.min(selectedVariant?.stock || 99, quantity + 1))}
-                  className="w-12 h-12 rounded-xl bg-white border-2 border-purple-100 text-gray-700 hover:border-purple-600 transition-all font-bold"
+                  className="w-12 h-12 rounded-xl bg-white border-2 border-gray-300 text-gray-700 hover:border-black transition-all font-bold"
                 >
                   +
                 </button>
@@ -409,10 +473,13 @@ export default function ProductDetail({ product }: ProductDetailProps) {
             </div>
             {!userPhotoUrl && (
               <div className="pt-6 pb-2">
-                <div className="bg-gradient-to-r from-purple-50 to-cyan-50 rounded-xl p-4 border border-purple-200">
+                <div className="bg-gray-100 p-4 border border-gray-300">
                   <p className="text-sm text-gray-700 mb-2">
                     <span className="font-semibold">💡 Tip:</span> Upload your photo in your{' '}
-                    <Link href="/profile" className="text-purple-600 hover:underline font-semibold">
+                    <Link
+                      href="/profile"
+                      className="text-black underline hover:underline font-semibold"
+                    >
                       profile settings
                     </Link>{' '}
                     for personalized try-on results!
@@ -425,7 +492,7 @@ export default function ProductDetail({ product }: ProductDetailProps) {
                 type="button"
                 onClick={handleTryOn}
                 disabled={isGeneratingTryOn}
-                className="w-full py-4 bg-gradient-to-r from-cyan-600 to-blue-600 text-white rounded-xl font-bold text-lg hover:shadow-2xl hover:shadow-cyan-500/50 transition-all duration-300 hover:scale-105 flex items-center justify-center space-x-2 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100"
+                className="w-full py-4 bg-white text-black border-2 border-black font-bold text-lg uppercase tracking-wider hover:bg-black hover:text-white transition-colors flex items-center justify-center space-x-2 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100 rounded-full"
               >
                 {isGeneratingTryOn ? (
                   <>
@@ -461,11 +528,16 @@ export default function ProductDetail({ product }: ProductDetailProps) {
                 )}
               </button>
 
+              {selectedVariant && selectedVariant.stock === 1 && (
+                <p className="text-red-600 font-bold text-sm mb-2">
+                  Please hurry! Only 1 left in stock
+                </p>
+              )}
               <button
                 type="button"
                 onClick={handleAddToCart}
                 disabled={!selectedVariant || selectedVariant.stock === 0}
-                className="w-full py-4 bg-gradient-to-r from-purple-600 to-cyan-600 text-white rounded-xl font-bold text-lg hover:shadow-2xl hover:shadow-purple-500/50 transition-all duration-300 hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center space-x-2"
+                className="w-full py-4 bg-black text-white font-bold text-lg uppercase tracking-wider hover:bg-gray-800 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center space-x-2 rounded-full animate-wiggle"
               >
                 <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path
@@ -478,7 +550,7 @@ export default function ProductDetail({ product }: ProductDetailProps) {
                 <span>Add to Cart</span>
               </button>
             </div>
-            <div className="pt-6 border-t border-purple-100">
+            <div className="pt-6 border-t border-gray-300">
               <h3 className="font-bold text-lg text-gray-900 mb-3">Product Details</h3>
               <dl className="space-y-2 text-sm">
                 <div className="flex">
@@ -495,18 +567,16 @@ export default function ProductDetail({ product }: ProductDetailProps) {
             </div>
           </div>
         </div>
-        {(isGeneratingTryOn || generatedVideoUrl) && (
-          <div className="mt-12 bg-gradient-to-br from-purple-50/50 via-blue-50/50 to-cyan-50/50 rounded-3xl p-8 border border-purple-100/50">
+        {(isGeneratingTryOn || generatedImageUrl) && (
+          <div className="mt-12 bg-gray-100 p-8 border border-gray-200">
             <h2 className="text-3xl font-bold mb-6 text-center">
-              <span className="bg-gradient-to-r from-purple-600 to-cyan-600 bg-clip-text text-transparent">
-                AI Try-On Result
-              </span>
+              <span className="text-black">AI Try-On Result</span>
             </h2>
 
-            {isGeneratingTryOn && !generatedVideoUrl && (
+            {isGeneratingTryOn && !generatedImageUrl && (
               <div className="text-center py-12">
                 <svg
-                  className="w-16 h-16 animate-spin mx-auto mb-4 text-purple-600"
+                  className="w-16 h-16 animate-spin mx-auto mb-4 text-black underline"
                   fill="none"
                   viewBox="0 0 24 24"
                 >
@@ -528,20 +598,22 @@ export default function ProductDetail({ product }: ProductDetailProps) {
                   Generating your AI try-on...
                 </p>
                 <p className="text-sm text-gray-600">
-                  This usually takes 30-60 seconds. Please wait.
+                  This usually takes 30-120 seconds. Please wait.
                 </p>
-                <p className="text-xs text-gray-500 mt-2">Status: {videoStatus || 'PENDING'}</p>
+                <p className="text-xs text-gray-500 mt-2">
+                  Status: {imageStatus || 'PENDING'} • Maximum wait time: 2 minutes
+                </p>
               </div>
             )}
 
-            {generatedVideoUrl && (
+            {generatedImageUrl && (
               <div className="max-w-2xl mx-auto">
                 <BeforeAfterComparison
                   beforeImage={
                     userPhotoUrl ||
                     'https://images.unsplash.com/photo-1539571696357-5a69c17a67c6?w=400&h=600&fit=crop'
                   }
-                  afterImage={generatedVideoUrl}
+                  afterImage={generatedImageUrl}
                   beforeLabel={userPhotoUrl ? 'Your Photo' : 'Default Model'}
                   afterLabel="With Product"
                 />
@@ -555,11 +627,11 @@ export default function ProductDetail({ product }: ProductDetailProps) {
                   <button
                     type="button"
                     onClick={() => {
-                      setGeneratedVideoUrl(null);
-                      setGeneratedVideoId(null);
-                      setVideoStatus(null);
+                      setGeneratedImageUrl(null);
+                      setGeneratedImageId(null);
+                      setImageStatus(null);
                     }}
-                    className="px-6 py-2 bg-white border-2 border-purple-600 text-purple-600 rounded-full font-semibold text-sm hover:bg-purple-50 transition-all"
+                    className="px-6 py-2 bg-white border-2 border-black text-black font-semibold text-sm hover:bg-black hover:text-white transition-colors uppercase tracking-wider"
                   >
                     Try Again
                   </button>

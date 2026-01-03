@@ -26,10 +26,10 @@ export default function ProductsList({ initialProducts, categories }: ProductsLi
   });
 
   return (
-    <div className="min-h-screen py-12 px-4">
+    <div className="min-h-screen py-12 px-4 bg-white">
       <div className="max-w-7xl mx-auto">
         <div className="text-center mb-12">
-          <h1 className="text-4xl font-bold bg-gradient-to-r from-purple-600 to-cyan-600 bg-clip-text text-transparent mb-4">
+          <h1 className="text-4xl font-bold text-black uppercase tracking-tight mb-4">
             Product Catalog
           </h1>
           <p className="text-gray-600 text-lg">
@@ -57,17 +57,17 @@ export default function ProductsList({ initialProducts, categories }: ProductsLi
               placeholder="Search products..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full pl-12 pr-4 py-3 rounded-xl border-2 border-purple-100 focus:border-purple-500 focus:outline-none transition-colors bg-white/50 text-gray-900 placeholder:text-gray-400"
+              className="w-full pl-12 pr-4 py-3 border-2 border-gray-300 focus:border-black focus:outline-none transition-colors bg-white text-black placeholder:text-gray-400 rounded-full"
             />
           </div>
           <div className="flex flex-wrap gap-3">
             <button
               type="button"
               onClick={() => setSelectedCategory('all')}
-              className={`px-6 py-2 rounded-full font-semibold text-sm transition-all duration-300 ${
+              className={`px-6 py-2 font-bold text-sm uppercase tracking-wider transition-colors rounded-full ${
                 selectedCategory === 'all'
-                  ? 'bg-gradient-to-r from-purple-600 to-cyan-600 text-white shadow-lg shadow-purple-500/50'
-                  : 'bg-white/80 text-gray-700 hover:bg-white border-2 border-purple-100'
+                  ? 'bg-black text-white'
+                  : 'bg-white text-black border-2 border-gray-300 hover:border-black'
               }`}
             >
               All Products
@@ -77,10 +77,10 @@ export default function ProductsList({ initialProducts, categories }: ProductsLi
                 key={category.id}
                 type="button"
                 onClick={() => setSelectedCategory(category.slug)}
-                className={`px-6 py-2 rounded-full font-semibold text-sm transition-all duration-300 ${
+                className={`px-6 py-2 font-bold text-sm uppercase tracking-wider transition-colors rounded-full ${
                   selectedCategory === category.slug
-                    ? 'bg-gradient-to-r from-purple-600 to-cyan-600 text-white shadow-lg shadow-purple-500/50'
-                    : 'bg-white/80 text-gray-700 hover:bg-white border-2 border-purple-100'
+                    ? 'bg-black text-white'
+                    : 'bg-white text-black border-2 border-gray-300 hover:border-black'
                 }`}
               >
                 {category.name}
@@ -97,14 +97,14 @@ export default function ProductsList({ initialProducts, categories }: ProductsLi
                 <Link
                   key={product.id}
                   href={`/products/${product.slug}`}
-                  className="group bg-white/80 backdrop-blur-xl rounded-2xl shadow-xl shadow-purple-500/10 border border-purple-100/50 overflow-hidden hover:shadow-2xl hover:shadow-purple-500/20 transition-all duration-300 hover:scale-105 flex flex-col"
+                  className="group bg-white border border-gray-200 hover:border-black transition-colors flex flex-col rounded-lg overflow-hidden"
                 >
-                  <div className="relative h-64 bg-gradient-to-br from-purple-50 to-cyan-50 overflow-hidden">
+                  <div className="relative aspect-square bg-gray-100 overflow-hidden">
                     {primaryImage ? (
                       <img
                         src={primaryImage.url}
                         alt={primaryImage.alt || product.name}
-                        className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300"
+                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
                       />
                     ) : (
                       <div className="w-full h-full flex items-center justify-center">
@@ -124,24 +124,24 @@ export default function ProductsList({ initialProducts, categories }: ProductsLi
                       </div>
                     )}
                     <div className="absolute top-3 left-3">
-                      <span className="px-3 py-1 bg-white/90 backdrop-blur-sm rounded-full text-xs font-semibold text-purple-600">
+                      <span className="px-3 py-1 bg-black text-white text-xs font-bold uppercase tracking-wider rounded-full">
                         {product.category.name}
                       </span>
                     </div>
                   </div>
-                  <div className="p-5 flex flex-col flex-1">
-                    <h3 className="font-bold text-lg text-gray-900 mb-2 line-clamp-2 group-hover:text-purple-600 transition-colors h-14">
+                  <div className="p-4 flex flex-col flex-grow">
+                    <h3 className="font-bold text-sm text-black uppercase mb-2 line-clamp-2 min-h-[40px]">
                       {product.name}
                     </h3>
-                    <p className="text-sm text-gray-600 mb-3 line-clamp-2 h-10">
+                    <p className="text-sm text-gray-600 mb-3 line-clamp-2 min-h-[40px]">
                       {product.description || '\u00A0'}
                     </p>
                     <div className="flex items-center justify-between mt-auto">
-                      <span className="text-2xl font-bold bg-gradient-to-r from-purple-600 to-cyan-600 bg-clip-text text-transparent">
+                      <span className="text-xl font-bold text-black">
                         ${product.price.toFixed(2)}
                       </span>
-                      <span className="text-sm text-gray-500 group-hover:text-purple-600 transition-colors font-semibold">
-                        View Details →
+                      <span className="text-sm text-gray-500 group-hover:text-black transition-colors font-semibold uppercase">
+                        View →
                       </span>
                     </div>
                   </div>
@@ -164,7 +164,7 @@ export default function ProductsList({ initialProducts, categories }: ProductsLi
                 d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
               />
             </svg>
-            <h3 className="text-xl font-semibold text-gray-700 mb-2">No products found</h3>
+            <h3 className="text-xl font-bold text-black mb-2 uppercase">No products found</h3>
             <p className="text-gray-500">Try adjusting your search or filter criteria</p>
           </div>
         )}

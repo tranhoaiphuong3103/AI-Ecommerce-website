@@ -7,16 +7,14 @@ export async function GET(request: Request) {
     const { searchParams } = new URL(request.url);
     const userId = searchParams.get('userId');
 
-    if (!userId) {
-      return NextResponse.json({ error: 'User ID required' }, { status: 400 });
-    }
+    if (!userId) return NextResponse.json({ error: 'User ID required' }, { status: 400 });
 
     const measurements = await prisma.userMeasurements.findUnique({
       where: { userId },
     });
 
     return NextResponse.json({ measurements });
-  } catch (_error) {
+  } catch {
     return NextResponse.json({ error: 'Failed to fetch measurements' }, { status: 500 });
   }
 }
@@ -26,9 +24,7 @@ export async function POST(request: Request) {
     const body = await request.json();
     const { userId, measurements } = body;
 
-    if (!userId) {
-      return NextResponse.json({ error: 'User ID required' }, { status: 400 });
-    }
+    if (!userId) return NextResponse.json({ error: 'User ID required' }, { status: 400 });
 
     const existingMeasurements = await prisma.userMeasurements.findUnique({
       where: { userId },
