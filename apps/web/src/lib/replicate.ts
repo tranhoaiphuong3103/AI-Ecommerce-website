@@ -164,6 +164,8 @@ FABRIC TEXTURE & DESIGN FIDELITY:
 
 CRITICAL: Keep lower body clothing (pants/shorts) COMPLETELY UNCHANGED - do not modify color, style, or fit.
 
+GARMENT LENGTH REQUIREMENT: The jersey MUST be long enough to FULLY COVER the midriff area. NO exposed skin should be visible between the jersey and the pants/shorts. Extend the garment length slightly if needed to ensure complete coverage of the torso with NO gaps.
+
 QUALITY INSTRUCTION: Generate at HIGHEST POSSIBLE DETAIL LEVEL with MAXIMUM SHARPNESS for all text and logos.`;
 
   if (
@@ -196,6 +198,8 @@ STRICT REQUIREMENTS - NO COMPROMISES:
    - Every tiny element must be visible and recognizable
 
 Keep AUTHENTIC fabric texture, collar style, seam lines, and all construction details. Keep lower body clothing COMPLETELY UNCHANGED.
+
+GARMENT LENGTH REQUIREMENT: The shirt/top MUST be long enough to FULLY COVER the midriff area. NO exposed skin should be visible between the top and the pants/bottom. Extend the garment length slightly if needed to ensure complete coverage of the torso with NO gaps.
 
 QUALITY INSTRUCTION: Generate at HIGHEST POSSIBLE DETAIL LEVEL with MAXIMUM SHARPNESS for all text and graphics.`;
 
@@ -238,6 +242,8 @@ MATERIAL & CONSTRUCTION FIDELITY:
 
 CRITICAL: Keep lower body pants and shoes COMPLETELY UNCHANGED - do not modify color, style, or fit.
 
+GARMENT LENGTH REQUIREMENT: The jacket/hoodie/sweater MUST be long enough to FULLY COVER the midriff area. NO exposed skin should be visible between the top and the pants/bottom. Extend the garment length slightly if needed to ensure complete coverage of the torso with NO gaps.
+
 QUALITY INSTRUCTION: Generate at HIGHEST POSSIBLE DETAIL LEVEL with MAXIMUM SHARPNESS for all logos, patches, and text elements.`;
 
   if (
@@ -245,19 +251,27 @@ QUALITY INSTRUCTION: Generate at HIGHEST POSSIBLE DETAIL LEVEL with MAXIMUM SHAR
     categoryLower.includes('trouser') ||
     categoryLower.includes('jean')
   )
-    return 'Well-fitted pants with natural fabric draping and realistic seams. Keep upper body shirt and shoes unchanged.';
+    return `Well-fitted pants with natural fabric draping and realistic seams. Keep upper body shirt and shoes unchanged.
+
+CRITICAL SKIN TONE PRESERVATION: The skin tone of ALL visible body parts (hands, arms, midriff, any exposed skin) MUST be EXACTLY IDENTICAL to the skin tone in the input image. DO NOT alter, lighten, darken, or change the hue of ANY skin. Match the EXACT same skin color, undertone, and lighting as the original person image. This is MANDATORY.`;
 
   if (categoryLower.includes('short'))
-    return 'Comfortable shorts with authentic texture. Preserve original top clothing and footwear.';
+    return `Comfortable shorts with authentic texture. Preserve original top clothing and footwear.
+
+CRITICAL SKIN TONE PRESERVATION: The skin tone of ALL visible body parts (legs, hands, arms, any exposed skin) MUST be EXACTLY IDENTICAL to the skin tone in the input image. DO NOT alter, lighten, darken, or change the hue of ANY skin. Match the EXACT same skin color, undertone, and lighting as the original person image. This is MANDATORY.`;
 
   if (categoryLower.includes('skirt'))
-    return 'Elegant skirt with natural fabric flow. Keep upper body clothing and shoes as is.';
+    return `Elegant skirt with natural fabric flow. Keep upper body clothing and shoes as is.
+
+CRITICAL SKIN TONE PRESERVATION: The skin tone of ALL visible body parts MUST be EXACTLY IDENTICAL to the skin tone in the input image. DO NOT alter the skin color in any way. This is MANDATORY.`;
 
   if (categoryLower.includes('dress') || categoryLower.includes('gown'))
     return 'Elegant dress with fine fabric details, natural draping, and authentic texture';
 
   if (category === 'upper_body')
-    return '⚠️ ULTRA-CRITICAL LOGO CLARITY MODE: High-quality upper body garment with detailed texture. Reproduce ALL logos, text, and brand elements with ABSOLUTE MAXIMUM SHARPNESS - KNIFE-EDGE borders, ULTRA-HIGH CONTRAST, and PHOTOREALISTIC CLARITY. Every single letter, character, and graphic element must be CRYSTAL CLEAR, ULTRA-LEGIBLE, and RAZOR-SHARP. NO blur, NO softness, NO fuzzy edges. Preserve original pants, shoes, and lower body COMPLETELY unchanged.';
+    return `⚠️ ULTRA-CRITICAL LOGO CLARITY MODE: High-quality upper body garment with detailed texture. Reproduce ALL logos, text, and brand elements with ABSOLUTE MAXIMUM SHARPNESS - KNIFE-EDGE borders, ULTRA-HIGH CONTRAST, and PHOTOREALISTIC CLARITY. Every single letter, character, and graphic element must be CRYSTAL CLEAR, ULTRA-LEGIBLE, and RAZOR-SHARP. NO blur, NO softness, NO fuzzy edges. Preserve original pants, shoes, and lower body COMPLETELY unchanged.
+
+GARMENT LENGTH REQUIREMENT: The top MUST be long enough to FULLY COVER the midriff area. NO exposed skin should be visible between the top and the pants/bottom. Extend the garment length slightly if needed to ensure complete coverage of the torso with NO gaps.`;
 
   if (category === 'lower_body') {
     if (
@@ -268,7 +282,9 @@ QUALITY INSTRUCTION: Generate at HIGHEST POSSIBLE DETAIL LEVEL with MAXIMUM SHAR
     )
       return 'Premium footwear with authentic details. ONLY replace shoes. Keep all clothing, face, and accessories unchanged.';
 
-    return 'Premium lower body garment with natural fit. Keep original shirt, upper body, and shoes unchanged.';
+    return `Premium lower body garment with natural fit. Keep original shirt, upper body, and shoes unchanged.
+
+CRITICAL SKIN TONE PRESERVATION: The skin tone of ALL visible body parts MUST be EXACTLY IDENTICAL to the skin tone in the input image. DO NOT alter, lighten, darken, or change the hue of ANY skin. Match the EXACT same skin color, undertone, and lighting as the original person image. This is MANDATORY.`;
   }
 
   return '⚠️ ULTRA-CRITICAL LOGO CLARITY MODE ACTIVATED: Premium clothing item with authentic texture and realistic fabric details. Reproduce ALL logos, text, and brand elements with ABSOLUTE MAXIMUM SHARPNESS - KNIFE-EDGE borders, ULTRA-HIGH CONTRAST, PHOTOREALISTIC PRECISION. Every single letter, character, line, and graphic element must be CRYSTAL CLEAR, ULTRA-LEGIBLE, and RAZOR-SHARP at full resolution. NO blur, NO softness, NO fuzzy edges, NO detail loss. Generate at HIGHEST POSSIBLE QUALITY.';

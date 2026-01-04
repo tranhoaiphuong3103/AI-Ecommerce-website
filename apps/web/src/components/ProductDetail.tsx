@@ -1,5 +1,6 @@
 'use client';
 
+import { useCartStore } from '@/stores/cart-store';
 import type { Product, ProductVariant } from '@/types';
 import Link from 'next/link';
 import { useSearchParams } from 'next/navigation';
@@ -7,6 +8,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import type { Step } from 'react-joyride';
 import { toast } from 'react-toastify';
 import BeforeAfterComparison from './BeforeAfterComparison';
+import FlyToCartAnimation from './FlyToCartAnimation';
 import OnboardingTour from './OnboardingTour';
 
 interface ProductDetailProps {
@@ -35,7 +37,14 @@ export default function ProductDetail({ product }: ProductDetailProps) {
   const [userPhotoUrl, setUserPhotoUrl] = useState<string | null>(null);
   const [isZooming, setIsZooming] = useState(false);
   const [zoomPosition, setZoomPosition] = useState({ x: 0, y: 0 });
+  const [isAddingToCart, setIsAddingToCart] = useState(false);
+  const [flyingImage, setFlyingImage] = useState<{
+    imageUrl: string;
+    startPosition: { x: number; y: number; width: number; height: number };
+  } | null>(null);
   const imageContainerRef = useRef<HTMLDivElement>(null);
+  const productImageRef = useRef<HTMLDivElement>(null);
+  const addToCart = useCartStore((state) => state.addItem);
 
   const tourSteps: Step[] = useMemo(
     () => [
@@ -221,8 +230,57 @@ export default function ProductDetail({ product }: ProductDetailProps) {
     }
   };
 
-  const handleAddToCart = () => {
-    if (!selectedVariant) return;
+  const handleImageClick = (image: (typeof product.images)[0]) => {
+    setSelectedImage(image);
+
+    const imageColor = image.alt?.split(' - ')[0];
+    if (imageColor && imageColor !== selectedColor) {
+      const variant = product.variants.find(
+        (v) =>
+          v.color === imageColor && (!selectedVariant?.size || v.size === selectedVariant.size),
+      );
+      if (variant) {
+        setSelectedVariant(variant);
+        setSelectedColor(imageColor);
+      }
+    }
+  };
+
+  const handleAddToCart = async () => {
+    if (!selectedVariant) {
+      toast.error('Please select a size');
+      return;
+    }
+
+    const user = localStorage.getItem('user');
+    if (!user) {
+      toast.error('Please sign in to add items to cart');
+      return;
+    }
+
+    if (productImageRef.current && selectedImage?.url) {
+      const rect = productImageRef.current.getBoundingClientRect();
+      setFlyingImage({
+        imageUrl: selectedImage.url,
+        startPosition: {
+          x: rect.left + rect.width / 2 - 50,
+          y: rect.top + rect.height / 2 - 50,
+          width: 100,
+          height: 100,
+        },
+      });
+    }
+
+    setIsAddingToCart(true);
+    try {
+      const success = await addToCart(product.id, selectedVariant.id, quantity);
+      if (success) toast.success(`${product.name} added to cart!`);
+      else toast.error('Failed to add to cart');
+    } catch {
+      toast.error('Failed to add to cart');
+    } finally {
+      setIsAddingToCart(false);
+    }
   };
 
   const handleTryOn = useCallback(async () => {
@@ -312,7 +370,10 @@ export default function ProductDetail({ product }: ProductDetailProps) {
           <div className="space-y-4">
             <div
               id="product-image"
-              ref={imageContainerRef}
+              ref={(el) => {
+                (imageContainerRef as React.MutableRefObject<HTMLDivElement | null>).current = el;
+                (productImageRef as React.MutableRefObject<HTMLDivElement | null>).current = el;
+              }}
               className="relative aspect-square bg-gray-100 overflow-hidden cursor-zoom-in"
               onMouseEnter={() => setIsZooming(true)}
               onMouseLeave={() => setIsZooming(false)}
@@ -359,7 +420,7 @@ export default function ProductDetail({ product }: ProductDetailProps) {
                   <button
                     key={image.id}
                     type="button"
-                    onClick={() => setSelectedImage(image)}
+                    onClick={() => handleImageClick(image)}
                     className={`aspect-square rounded-xl overflow-hidden border-2 transition-all ${
                       selectedImage?.id === image.id
                         ? 'border-black'
@@ -578,18 +639,41 @@ export default function ProductDetail({ product }: ProductDetailProps) {
                 id="add-to-cart-button"
                 type="button"
                 onClick={handleAddToCart}
-                disabled={!selectedVariant || selectedVariant.stock === 0}
+                disabled={!selectedVariant || selectedVariant.stock === 0 || isAddingToCart}
                 className="w-full py-4 bg-black text-white font-bold text-lg uppercase tracking-wider hover:bg-gray-800 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center space-x-2 rounded-full animate-wiggle"
               >
-                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z"
-                  />
-                </svg>
-                <span>Add to Cart</span>
+                {isAddingToCart ? (
+                  <>
+                    <svg className="w-6 h-6 animate-spin" fill="none" viewBox="0 0 24 24">
+                      <circle
+                        className="opacity-25"
+                        cx="12"
+                        cy="12"
+                        r="10"
+                        stroke="currentColor"
+                        strokeWidth="4"
+                      />
+                      <path
+                        className="opacity-75"
+                        fill="currentColor"
+                        d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"
+                      />
+                    </svg>
+                    <span>Adding...</span>
+                  </>
+                ) : (
+                  <>
+                    <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z"
+                      />
+                    </svg>
+                    <span>Add to Cart</span>
+                  </>
+                )}
               </button>
             </div>
             <div className="pt-6 border-t border-gray-300">
@@ -653,7 +737,7 @@ export default function ProductDetail({ product }: ProductDetailProps) {
                 <BeforeAfterComparison
                   beforeImage={
                     userPhotoUrl ||
-                    'https://images.unsplash.com/photo-1539571696357-5a69c17a67c6?w=400&h=600&fit=crop'
+                    'https://images.unsplash.com/photo-1539571696357-5a69c17a67c6?w=400&h=900&fit=crop&crop=top'
                   }
                   afterImage={generatedImageUrl}
                   beforeLabel={userPhotoUrl ? 'Your Photo' : 'Default Model'}
@@ -684,6 +768,13 @@ export default function ProductDetail({ product }: ProductDetailProps) {
         )}
       </div>
       <OnboardingTour steps={tourSteps} tourKey="product-detail" />
+      {flyingImage && (
+        <FlyToCartAnimation
+          imageUrl={flyingImage.imageUrl}
+          startPosition={flyingImage.startPosition}
+          onComplete={() => setFlyingImage(null)}
+        />
+      )}
     </div>
   );
 }
