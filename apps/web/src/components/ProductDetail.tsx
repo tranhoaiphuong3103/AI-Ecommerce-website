@@ -3,9 +3,11 @@
 import type { Product, ProductVariant } from '@/types';
 import Link from 'next/link';
 import { useSearchParams } from 'next/navigation';
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import type { Step } from 'react-joyride';
 import { toast } from 'react-toastify';
 import BeforeAfterComparison from './BeforeAfterComparison';
+import OnboardingTour from './OnboardingTour';
 
 interface ProductDetailProps {
   product: Product;
@@ -16,16 +18,15 @@ export default function ProductDetail({ product }: ProductDetailProps) {
   const autoTryOnTriggered = useRef(false);
 
   const primaryImage = product.images.find((img) => img.isPrimary) || product.images[0];
-  const primaryColor = primaryImage?.alt?.split(' - ')[0] || null;
+  const primaryColorFromImage = primaryImage?.alt?.split(' - ')[0] || null;
+  const variantMatchingImage = primaryColorFromImage
+    ? product.variants.find((v) => v.color === primaryColorFromImage)
+    : null;
+  const initialVariant = variantMatchingImage || product.variants[0] || null;
 
   const [selectedImage, setSelectedImage] = useState(primaryImage);
-  const [selectedColor, setSelectedColor] = useState<string | null>(primaryColor);
-  const [selectedVariant, setSelectedVariant] = useState<ProductVariant | null>(() => {
-    if (primaryColor) {
-      return product.variants.find((v) => v.color === primaryColor) || product.variants[0] || null;
-    }
-    return product.variants[0] || null;
-  });
+  const [selectedColor, setSelectedColor] = useState<string | null>(initialVariant?.color || null);
+  const [selectedVariant, setSelectedVariant] = useState<ProductVariant | null>(initialVariant);
   const [quantity, setQuantity] = useState(1);
   const [isGeneratingTryOn, setIsGeneratingTryOn] = useState(false);
   const [generatedImageId, setGeneratedImageId] = useState<string | null>(null);
@@ -35,6 +36,44 @@ export default function ProductDetail({ product }: ProductDetailProps) {
   const [isZooming, setIsZooming] = useState(false);
   const [zoomPosition, setZoomPosition] = useState({ x: 0, y: 0 });
   const imageContainerRef = useRef<HTMLDivElement>(null);
+
+  const tourSteps: Step[] = useMemo(
+    () => [
+      {
+        target: '#product-image',
+        title: 'Product Image',
+        content: 'Hover over the image to zoom in and see the details of the clothing.',
+        placement: 'right',
+        disableBeacon: true,
+      },
+      {
+        target: '#size-selector',
+        title: 'Select Your Size',
+        content: 'Choose your preferred size. Unavailable sizes are grayed out.',
+        placement: 'top',
+      },
+      {
+        target: '#color-selector',
+        title: 'Pick a Color',
+        content: 'Select from available color options. The product image will update to match.',
+        placement: 'top',
+      },
+      {
+        target: '#try-on-button',
+        title: 'AI Virtual Try-On',
+        content:
+          'Click here to see how this item looks on you! Upload your photo in profile settings for personalized results.',
+        placement: 'top',
+      },
+      {
+        target: '#add-to-cart-button',
+        title: 'Add to Cart',
+        content: 'Ready to buy? Add the item to your cart and proceed to checkout.',
+        placement: 'top',
+      },
+    ],
+    [],
+  );
 
   const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
     if (!imageContainerRef.current) return;
@@ -272,6 +311,7 @@ export default function ProductDetail({ product }: ProductDetailProps) {
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
           <div className="space-y-4">
             <div
+              id="product-image"
               ref={imageContainerRef}
               className="relative aspect-square bg-gray-100 overflow-hidden cursor-zoom-in"
               onMouseEnter={() => setIsZooming(true)}
@@ -348,7 +388,7 @@ export default function ProductDetail({ product }: ProductDetailProps) {
               <p className="text-gray-600 leading-relaxed text-lg">{product.description}</p>
             )}
             {availableSizes.length > 0 && (
-              <div>
+              <div id="size-selector">
                 <div className="block text-sm font-semibold text-gray-700 mb-3">
                   Size: {selectedVariant?.size || 'Select'}
                 </div>
@@ -383,7 +423,7 @@ export default function ProductDetail({ product }: ProductDetailProps) {
               </div>
             )}
             {availableColors.length > 0 && (
-              <div>
+              <div id="color-selector">
                 <div className="block text-sm font-semibold text-gray-700 mb-3">
                   Color: {selectedVariant?.color || 'Select'}
                 </div>
@@ -489,6 +529,7 @@ export default function ProductDetail({ product }: ProductDetailProps) {
             )}
             <div className="space-y-3 pt-6">
               <button
+                id="try-on-button"
                 type="button"
                 onClick={handleTryOn}
                 disabled={isGeneratingTryOn}
@@ -534,6 +575,7 @@ export default function ProductDetail({ product }: ProductDetailProps) {
                 </p>
               )}
               <button
+                id="add-to-cart-button"
                 type="button"
                 onClick={handleAddToCart}
                 disabled={!selectedVariant || selectedVariant.stock === 0}
@@ -641,6 +683,7 @@ export default function ProductDetail({ product }: ProductDetailProps) {
           </div>
         )}
       </div>
+      <OnboardingTour steps={tourSteps} tourKey="product-detail" />
     </div>
   );
 }
