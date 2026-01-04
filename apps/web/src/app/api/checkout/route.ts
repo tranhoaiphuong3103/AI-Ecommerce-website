@@ -5,7 +5,7 @@ import { NextResponse } from 'next/server';
 export async function POST(request: Request) {
   try {
     const body = await request.json();
-    const { userId, items } = body;
+    const { userId, items, shippingAddress, email } = body;
 
     if (!userId || !items || !Array.isArray(items) || items.length === 0)
       return NextResponse.json({ error: 'Invalid request data' }, { status: 400 });
@@ -50,13 +50,14 @@ export async function POST(request: Request) {
         userId,
         totalAmount,
         status: 'PENDING',
-        shippingAddress: '',
+        email: email || null,
+        shippingAddress: shippingAddress || '',
         items: {
           create: items.map((item: { productId: string; variantId?: string; quantity: number }) => {
             const product = products.find((p) => p.id === item.productId);
             return {
               productId: item.productId,
-              variantId: item.variantId,
+              variantId: item.variantId || null,
               quantity: item.quantity,
               price: product?.price || 0,
             };
@@ -68,15 +69,25 @@ export async function POST(request: Request) {
     const successUrl = `${process.env.NEXT_PUBLIC_WEB_URL}/order/success?orderId=${order.id}`;
     const cancelUrl = `${process.env.NEXT_PUBLIC_WEB_URL}/cart`;
 
-    const session = await createCheckoutSession(lineItems, successUrl, cancelUrl, {
-      orderId: order.id,
-    });
+    const session = await createCheckoutSession(
+      lineItems,
+      successUrl,
+      cancelUrl,
+      {
+        orderId: order.id,
+      },
+      email,
+    );
 
     return NextResponse.json({
       sessionId: session.id,
       url: session.url,
     });
-  } catch {
-    return NextResponse.json({ error: 'Failed to create checkout session' }, { status: 500 });
+  } catch (error) {
+    console.error('Checkout error:', error);
+    return NextResponse.json(
+      { error: 'Failed to create checkout session', details: String(error) },
+      { status: 500 },
+    );
   }
 }

@@ -22,7 +22,8 @@ services:
       - STRIPE_PUBLIC_KEY=${STRIPE_PUBLIC_KEY}
       - STRIPE_SECRET_KEY=${STRIPE_SECRET_KEY}
       - NEXT_PUBLIC_API_URL=http://localhost:8080
-      - N8N_WEBHOOK_URL=http://n8n:5678/webhook/generate-video
+      - N8N_WEBHOOK_URL=http://n8n:5678/webhook/order-status
+      - N8N_IMAGE_WEBHOOK_URL=http://n8n:5678/webhook/generate-image
       - REPLICATE_API_TOKEN=${REPLICATE_API_TOKEN}
     volumes:
       - ./apps/web:/app

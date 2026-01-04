@@ -20,6 +20,7 @@ export async function createCheckoutSession(
   successUrl: string,
   cancelUrl: string,
   metadata?: Record<string, string>,
+  customerEmail?: string,
 ) {
   return await stripe.checkout.sessions.create({
     payment_method_types: ['card'],
@@ -28,5 +29,6 @@ export async function createCheckoutSession(
     success_url: successUrl,
     cancel_url: cancelUrl,
     metadata,
+    customer_email: customerEmail,
   });
 }
