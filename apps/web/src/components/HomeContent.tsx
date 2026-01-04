@@ -3,6 +3,9 @@
 import type { FeaturedProduct } from '@/types';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
+import { useMemo } from 'react';
+import type { Step } from 'react-joyride';
+import OnboardingTour from './OnboardingTour';
 
 interface HomeContentProps {
   featuredProducts: FeaturedProduct[];
@@ -10,6 +13,56 @@ interface HomeContentProps {
 
 export default function HomeContent({ featuredProducts }: HomeContentProps) {
   const router = useRouter();
+
+  const tourSteps: Step[] = useMemo(
+    () => [
+      {
+        target: '#nav-products',
+        title: 'Browse Products',
+        content: 'Click here to explore our full collection of clothing items.',
+        placement: 'bottom',
+        disableBeacon: true,
+      },
+      {
+        target: '#nav-how-it-works',
+        title: 'How It Works',
+        content: 'Learn how our AI virtual try-on technology works in 3 simple steps.',
+        placement: 'bottom',
+      },
+      {
+        target: '#nav-cart',
+        title: 'Shopping Cart',
+        content: 'View items in your cart and proceed to checkout.',
+        placement: 'bottom',
+      },
+      {
+        target: '#nav-profile, #nav-sign-in',
+        title: 'Your Account',
+        content:
+          'Sign in to upload your photo for personalized try-on results and manage your profile.',
+        placement: 'bottom',
+      },
+      {
+        target: '#shop-now-button',
+        title: 'Start Shopping',
+        content: 'Click here to browse all products and find your perfect outfit.',
+        placement: 'bottom',
+      },
+      {
+        target: '#featured-products',
+        title: 'Featured Products',
+        content: 'Check out our curated selection of trending items.',
+        placement: 'top',
+      },
+      {
+        target: '#try-on-home-button',
+        title: 'Quick Try-On',
+        content: 'Click "Try On" on any product to see how it looks on you using AI!',
+        placement: 'top',
+      },
+    ],
+    [],
+  );
 
   return (
     <div className="bg-white">
@@ -24,6 +77,7 @@ export default function HomeContent({ featuredProducts }: HomeContentProps) {
             See how clothes look on a virtual model that matches your body type before you buy.
           </p>
           <Link
+            id="shop-now-button"
             href="/products"
             className="inline-block bg-white text-black px-10 py-4 font-bold text-lg uppercase tracking-wider hover:bg-gray-200 transition-colors rounded-full"
           >
@@ -43,8 +97,11 @@ export default function HomeContent({ featuredProducts }: HomeContentProps) {
             </p>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {featuredProducts.map((product) => {
+          <div
+            id="featured-products"
+            className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"
+          >
+            {featuredProducts.map((product, index) => {
               const primaryImage = product.images.find((img) => img.isPrimary) || product.images[0];
 
               return (
@@ -81,6 +138,7 @@ export default function HomeContent({ featuredProducts }: HomeContentProps) {
                     </Link>
                     <p className="text-black font-bold text-xl mb-4">${product.price.toFixed(2)}</p>
                     <button
+                      id={index === 0 ? 'try-on-home-button' : undefined}
                       type="button"
                       onClick={() => router.push(`/products/${product.slug}?tryOn=true`)}
                       className="block w-full bg-black text-white py-3 font-bold uppercase tracking-wider hover:bg-gray-800 transition-colors mt-auto rounded-full text-center"
@@ -135,6 +193,7 @@ export default function HomeContent({ featuredProducts }: HomeContentProps) {
           </div>
         </div>
       </section>
+      <OnboardingTour steps={tourSteps} tourKey="home" />
     </div>
   );
 }

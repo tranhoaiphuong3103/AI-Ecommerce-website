@@ -62,6 +62,7 @@ export default function Header() {
 
           <nav className="hidden md:flex items-center space-x-1">
             <Link
+              id="nav-home"
               href="/"
               className="flex items-center justify-center w-10 h-10 text-white hover:text-gray-300 transition-all duration-200 hover:scale-110"
               title="Home"
@@ -76,6 +77,7 @@ export default function Header() {
               </svg>
             </Link>
             <Link
+              id="nav-products"
               href="/products"
               className="flex items-center justify-center w-10 h-10 text-white hover:text-gray-300 transition-all duration-200 hover:scale-110"
               title="Products"
@@ -90,6 +92,7 @@ export default function Header() {
               </svg>
             </Link>
             <Link
+              id="nav-how-it-works"
               href="/#how-it-works"
               className="flex items-center justify-center w-10 h-10 text-white hover:text-gray-300 transition-all duration-200 hover:scale-110"
               title="How It Works"
@@ -104,6 +107,7 @@ export default function Header() {
               </svg>
             </Link>
             <Link
+              id="nav-cart"
               href="/cart"
               className="flex items-center justify-center w-10 h-10 text-white hover:text-gray-300 transition-all duration-200 hover:scale-110 relative"
               title="Cart"
@@ -120,7 +124,7 @@ export default function Header() {
 
             {!isLoading &&
               (user ? (
-                <div className="flex items-center space-x-1">
+                <div id="nav-profile" className="flex items-center space-x-1">
                   <Link
                     href="/profile"
                     className="flex items-center justify-center w-10 h-10 bg-white text-black font-bold text-sm rounded-full hover:bg-gray-200 transition-all duration-200 hover:scale-110"
@@ -146,6 +150,7 @@ export default function Header() {
                 </div>
               ) : (
                 <button
+                  id="nav-sign-in"
                   type="button"
                   onClick={handleSignIn}
                   className="flex items-center justify-center w-10 h-10 bg-white text-black rounded-full hover:bg-gray-200 transition-all duration-200 hover:scale-110"
