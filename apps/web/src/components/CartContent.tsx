@@ -355,12 +355,12 @@ export default function CartContent() {
             >
               Continue Shopping
             </Link>
-            <button
-              type="button"
-              className="flex-1 py-3 bg-black text-white font-bold uppercase tracking-wider hover:bg-gray-800 transition-colors rounded-full"
+            <Link
+              href="/checkout"
+              className="flex-1 py-3 bg-black text-white font-bold uppercase tracking-wider hover:bg-gray-800 transition-colors rounded-full text-center"
             >
               Proceed to Checkout
-            </button>
+            </Link>
           </div>
         </div>
       </div>

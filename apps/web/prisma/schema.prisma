@@ -156,6 +156,7 @@ model Order {
   status          OrderStatus @default(PENDING)
   totalAmount     Float
 
+  email           String?
   shippingAddress String
   billingAddress  String?
 
