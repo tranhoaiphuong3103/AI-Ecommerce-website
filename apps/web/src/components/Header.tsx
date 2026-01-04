@@ -1,5 +1,6 @@
 'use client';
 
+import { useCartStore } from '@/stores/cart-store';
 import type { User } from '@/types';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
@@ -9,6 +10,8 @@ export default function Header() {
   const router = useRouter();
   const [user, setUser] = useState<User | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const { fetchCart, isInitialized } = useCartStore();
+  const totalItems = useCartStore((state) => state.getTotalItems());
 
   useEffect(() => {
     const token = localStorage.getItem('token');
@@ -23,6 +26,10 @@ export default function Header() {
 
     setIsLoading(false);
   }, []);
+
+  useEffect(() => {
+    if (user && !isInitialized) fetchCart();
+  }, [user, isInitialized, fetchCart]);
 
   const handleSignOut = () => {
     localStorage.removeItem('token');
@@ -60,7 +67,7 @@ export default function Header() {
             </div>
           </Link>
 
-          <nav className="hidden md:flex items-center space-x-1">
+          <nav className="hidden md:flex items-center space-x-2">
             <Link
               id="nav-home"
               href="/"
@@ -109,7 +116,7 @@ export default function Header() {
             <Link
               id="nav-cart"
               href="/cart"
-              className="flex items-center justify-center w-10 h-10 text-white hover:text-gray-300 transition-all duration-200 hover:scale-110 relative"
+              className={`flex items-center justify-center w-10 h-10 text-white hover:text-gray-300 transition-all duration-200 hover:scale-110 relative ${totalItems > 0 ? 'mr-2' : ''}`}
               title="Cart"
             >
               <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -120,11 +127,16 @@ export default function Header() {
                   d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z"
                 />
               </svg>
+              {totalItems > 0 && (
+                <span className="absolute -top-1 -right-1 bg-white text-black text-xs font-bold w-5 h-5 rounded-full flex items-center justify-center">
+                  {totalItems > 99 ? '99+' : totalItems}
+                </span>
+              )}
             </Link>
 
             {!isLoading &&
               (user ? (
-                <div id="nav-profile" className="flex items-center space-x-1">
+                <div id="nav-profile" className="flex items-center space-x-2">
                   <Link
                     href="/profile"
                     className="flex items-center justify-center w-10 h-10 bg-white text-black font-bold text-sm rounded-full hover:bg-gray-200 transition-all duration-200 hover:scale-110"

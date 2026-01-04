@@ -58,3 +58,19 @@ export interface FeaturedProduct {
   images: ProductImage[];
   badge?: 'AI Ready' | 'Trending' | 'New';
 }
+
+export interface CartItem {
+  id: string;
+  productId: string;
+  variantId: string | null;
+  quantity: number;
+  product: {
+    id: string;
+    name: string;
+    slug: string;
+    price: number;
+    images: ProductImage[];
+    variants: ProductVariant[];
+  };
+  variant: ProductVariant | null;
+}

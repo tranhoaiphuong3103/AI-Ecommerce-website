@@ -49,7 +49,7 @@ export async function POST(request: Request) {
 
     const personImageUrl =
       generatedImage?.user?.measurements?.photoUrl ||
-      'https://images.unsplash.com/photo-1539571696357-5a69c17a67c6?w=400&h=600&fit=crop';
+      'https://images.unsplash.com/photo-1539571696357-5a69c17a67c6?w=400&h=900&fit=crop&crop=top';
 
     const result = await generateTryOnImage({
       personImage: personImageUrl,
