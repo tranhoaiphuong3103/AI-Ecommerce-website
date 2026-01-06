@@ -1,4 +1,4 @@
-import { uploadFile } from '@/lib/minio';
+import { uploadFile } from '@/lib/blob';
 import { prisma } from '@/lib/prisma';
 import { NextResponse } from 'next/server';
 

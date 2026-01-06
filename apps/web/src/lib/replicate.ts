@@ -1,25 +1,18 @@
 import Replicate from 'replicate';
-import { BUCKETS, minioClient } from './minio';
+import { BUCKETS } from './blob';
 
 const replicate = new Replicate({
   auth: process.env.REPLICATE_API_TOKEN,
 });
 
 async function convertToDataUrl(imageUrl: string): Promise<string> {
-  if (!imageUrl.includes('localhost') && !imageUrl.includes('minio')) return imageUrl;
+  if (!imageUrl.includes('localhost')) return imageUrl;
   try {
-    const urlParts = imageUrl.split('/');
-    const fileName = urlParts[urlParts.length - 1];
-    const bucketName = urlParts[urlParts.length - 2];
+    const response = await fetch(imageUrl);
+    if (!response.ok) throw new Error(`Failed to fetch image: ${response.statusText}`);
 
-    const stream = await minioClient.getObject(bucketName, fileName);
-
-    const chunks: Buffer[] = [];
-    for await (const chunk of stream) chunks.push(chunk);
-
-    const buffer = Buffer.concat(chunks);
-
-    const ext = fileName.split('.').pop()?.toLowerCase();
+    const buffer = Buffer.from(await response.arrayBuffer());
+    const ext = imageUrl.split('.').pop()?.toLowerCase();
     const mimeType = ext === 'png' ? 'image/png' : 'image/jpeg';
 
     const base64 = buffer.toString('base64');
@@ -358,7 +351,7 @@ export async function generateVirtualTryOn(params: TryOnParams): Promise<TryOnRe
     const arrayBuffer = await imageBlob.arrayBuffer();
     const buffer = Buffer.from(arrayBuffer);
 
-    const { uploadFile } = await import('./minio');
+    const { uploadFile } = await import('./blob');
     const fileName = `tryon-${Date.now()}.png`;
     const imageUrl = await uploadFile(BUCKETS.VIDEOS, fileName, buffer);
 
