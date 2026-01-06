@@ -41,16 +41,16 @@ export default function CartContent() {
     toast.success('Item removed from cart');
   };
 
-  const handleGenerateTryOn = async () => {
+  const handleCompare = async () => {
     const selectedItems = getSelectedItems();
-    if (selectedItems.length === 0) {
-      toast.error('Please select at least one item');
+    if (selectedItems.length !== 2) {
+      toast.error('Please select exactly 2 items to compare');
       return;
     }
 
     const user = localStorage.getItem('user');
     if (!user) {
-      toast.error('Please sign in to use try-on');
+      toast.error('Please sign in to compare items');
       router.push('/login');
       return;
     }
@@ -69,7 +69,7 @@ export default function CartContent() {
         return colorMatchedImage?.url || primaryImage?.url || item.product.images[0]?.url;
       });
 
-      const response = await fetch('/api/videos/generate-outfit', {
+      const response = await fetch('/api/videos/compare', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -84,11 +84,11 @@ export default function CartContent() {
 
       if (response.ok) {
         const data = await response.json();
-        toast.success('Try-on generation started!');
+        toast.success('Comparison generation started!');
         router.push(`/try-on/${data.outfitVideoId}`);
-      } else toast.error('Failed to start try-on generation');
+      } else toast.error('Failed to start comparison');
     } catch {
-      toast.error('Failed to generate try-on');
+      toast.error('Failed to generate comparison');
     } finally {
       setIsGenerating(false);
     }
@@ -175,10 +175,10 @@ export default function CartContent() {
             </button>
           </div>
 
-          {someSelected && (
+          {selectedIds.length === 2 && (
             <button
               type="button"
-              onClick={handleGenerateTryOn}
+              onClick={handleCompare}
               disabled={isGenerating}
               className="flex items-center space-x-2 bg-black text-white px-6 py-2 font-bold text-sm uppercase tracking-wider hover:bg-gray-800 transition-colors rounded-full disabled:opacity-50"
             >
@@ -208,13 +208,16 @@ export default function CartContent() {
                       strokeLinecap="round"
                       strokeLinejoin="round"
                       strokeWidth={2}
-                      d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"
+                      d="M9 19V6l12-3v13M9 19c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zm12-3c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zM9 10l12-3"
                     />
                   </svg>
-                  <span>Try On Selected ({selectedIds.length})</span>
+                  <span>Compare These 2</span>
                 </>
               )}
             </button>
+          )}
+          {someSelected && selectedIds.length !== 2 && (
+            <span className="text-sm text-gray-500">Select exactly 2 items to compare</span>
           )}
         </div>
 

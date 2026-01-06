@@ -1,9 +1,21 @@
 'use client';
 
-import Image from 'next/image';
 import Link from 'next/link';
 import { useParams } from 'next/navigation';
 import { useEffect, useState } from 'react';
+
+interface GeneratedImage {
+  id: string;
+  videoUrl: string;
+  status: 'PENDING' | 'PROCESSING' | 'COMPLETED' | 'FAILED';
+  product?: {
+    id: string;
+    name: string;
+    slug: string;
+    price: number;
+    images: Array<{ url: string; alt: string | null; isPrimary: boolean }>;
+  };
+}
 
 interface OutfitItem {
   id: string;
@@ -25,6 +37,9 @@ interface OutfitVideo {
   id: string;
   videoUrl: string;
   status: 'PENDING' | 'PROCESSING' | 'COMPLETED' | 'FAILED';
+  isComparison?: boolean;
+  compareImageA?: GeneratedImage;
+  compareImageB?: GeneratedImage;
   outfit: {
     id: string;
     name: string;
@@ -45,6 +60,17 @@ export default function TryOnResultPage() {
 
     const fetchOutfitStatus = async () => {
       try {
+        const compareResponse = await fetch(`/api/videos/compare?outfitVideoId=${outfitId}`);
+        if (compareResponse.ok) {
+          const data = await compareResponse.json();
+          setOutfitVideo(data);
+
+          if (data.status === 'PENDING' || data.status === 'PROCESSING')
+            setTimeout(fetchOutfitStatus, 3000);
+
+          return;
+        }
+
         const response = await fetch(`/api/videos/generate-outfit?outfitVideoId=${outfitId}`);
         if (!response.ok) {
           const outfitResponse = await fetch(`/api/outfit/${outfitId}`);
@@ -111,13 +137,23 @@ export default function TryOnResultPage() {
       </div>
     );
 
+  const isComparison = outfitVideo?.isComparison;
   const isPending = outfitVideo?.status === 'PENDING' || outfitVideo?.status === 'PROCESSING';
   const isCompleted = outfitVideo?.status === 'COMPLETED';
   const isFailed = outfitVideo?.status === 'FAILED';
 
+  const getProductImage = (item: OutfitItem) => {
+    const variantColor = item.variant?.color;
+    const colorMatchedImage = variantColor
+      ? item.product.images.find((img) => img.alt?.startsWith(variantColor))
+      : null;
+    const primaryImage = item.product.images.find((img) => img.isPrimary);
+    return colorMatchedImage?.url || primaryImage?.url || item.product.images[0]?.url;
+  };
+
   return (
     <div className="min-h-screen bg-white py-12 px-4">
-      <div className="max-w-4xl mx-auto">
+      <div className="max-w-6xl mx-auto">
         <div className="mb-8">
           <Link
             href="/cart"
@@ -131,19 +167,39 @@ export default function TryOnResultPage() {
                 d="M15 19l-7-7 7-7"
               />
             </svg>
-            Back to Cart
+            Back
           </Link>
         </div>
 
-        <h1 className="text-3xl font-bold text-gray-900 mb-8">Your Outfit Try-On</h1>
+        <h1 className="text-3xl font-bold text-gray-900 mb-8">
+          {isComparison ? 'Compare Try-On Results' : 'Your Outfit Try-On'}
+        </h1>
 
         {isPending && (
           <div className="bg-gray-50 rounded-2xl p-8 text-center mb-8">
             <div className="w-16 h-16 border-4 border-black border-t-transparent rounded-full animate-spin mx-auto mb-6" />
-            <h2 className="text-xl font-bold text-gray-900 mb-2">Generating your try-on...</h2>
+            <h2 className="text-xl font-bold text-gray-900 mb-2">
+              {isComparison ? 'Generating comparison images...' : 'Generating your try-on...'}
+            </h2>
             <p className="text-gray-600">
-              Our AI is creating your personalized outfit preview. This may take a minute.
+              {isComparison
+                ? 'Our AI is creating both try-on images. This may take a couple of minutes.'
+                : 'Our AI is creating your personalized outfit preview. This may take a minute.'}
             </p>
+            {isComparison && outfitVideo?.compareImageA && outfitVideo?.compareImageB && (
+              <div className="mt-4 flex justify-center gap-4 text-sm">
+                <span
+                  className={`px-3 py-1 rounded-full ${outfitVideo.compareImageA.status === 'COMPLETED' ? 'bg-green-100 text-green-700' : outfitVideo.compareImageA.status === 'FAILED' ? 'bg-red-100 text-red-700' : 'bg-yellow-100 text-yellow-700'}`}
+                >
+                  Image A: {outfitVideo.compareImageA.status}
+                </span>
+                <span
+                  className={`px-3 py-1 rounded-full ${outfitVideo.compareImageB.status === 'COMPLETED' ? 'bg-green-100 text-green-700' : outfitVideo.compareImageB.status === 'FAILED' ? 'bg-red-100 text-red-700' : 'bg-yellow-100 text-yellow-700'}`}
+                >
+                  Image B: {outfitVideo.compareImageB.status}
+                </span>
+              </div>
+            )}
           </div>
         )}
 
@@ -175,7 +231,73 @@ export default function TryOnResultPage() {
           </div>
         )}
 
-        {isCompleted && outfitVideo?.videoUrl && (
+        {isCompleted && isComparison && outfitVideo?.compareImageA && outfitVideo?.compareImageB && (
+          <div className="mb-8">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div className="bg-gray-50 rounded-2xl overflow-hidden">
+                <div className="p-4 border-b border-gray-200">
+                  <h3 className="font-bold text-lg text-center">
+                    {outfitVideo.outfit?.items[0]?.product.name || 'Product A'}
+                  </h3>
+                </div>
+                {outfitVideo.compareImageA.videoUrl ? (
+                  <img
+                    src={outfitVideo.compareImageA.videoUrl}
+                    alt="Try-on result A"
+                    className="w-full max-h-[500px] object-contain mx-auto p-4"
+                  />
+                ) : (
+                  <div className="h-[400px] flex items-center justify-center text-gray-400">
+                    Image not available
+                  </div>
+                )}
+                <div className="p-4 border-t border-gray-200">
+                  <p className="text-center font-bold text-xl">
+                    ${outfitVideo.outfit?.items[0]?.product.price.toFixed(2)}
+                  </p>
+                  <Link
+                    href={`/products/${outfitVideo.outfit?.items[0]?.product.slug}`}
+                    className="block mt-2 text-center text-sm text-gray-600 hover:text-black underline"
+                  >
+                    View Product
+                  </Link>
+                </div>
+              </div>
+
+              <div className="bg-gray-50 rounded-2xl overflow-hidden">
+                <div className="p-4 border-b border-gray-200">
+                  <h3 className="font-bold text-lg text-center">
+                    {outfitVideo.outfit?.items[1]?.product.name || 'Product B'}
+                  </h3>
+                </div>
+                {outfitVideo.compareImageB.videoUrl ? (
+                  <img
+                    src={outfitVideo.compareImageB.videoUrl}
+                    alt="Try-on result B"
+                    className="w-full max-h-[500px] object-contain mx-auto p-4"
+                  />
+                ) : (
+                  <div className="h-[400px] flex items-center justify-center text-gray-400">
+                    Image not available
+                  </div>
+                )}
+                <div className="p-4 border-t border-gray-200">
+                  <p className="text-center font-bold text-xl">
+                    ${outfitVideo.outfit?.items[1]?.product.price.toFixed(2)}
+                  </p>
+                  <Link
+                    href={`/products/${outfitVideo.outfit?.items[1]?.product.slug}`}
+                    className="block mt-2 text-center text-sm text-gray-600 hover:text-black underline"
+                  >
+                    View Product
+                  </Link>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {isCompleted && !isComparison && outfitVideo?.videoUrl && (
           <div className="mb-8">
             <div className="bg-gray-100 rounded-2xl overflow-hidden">
               <img
@@ -187,18 +309,12 @@ export default function TryOnResultPage() {
           </div>
         )}
 
-        {outfitVideo?.outfit?.items && outfitVideo.outfit.items.length > 0 && (
+        {!isComparison && outfitVideo?.outfit?.items && outfitVideo.outfit.items.length > 0 && (
           <div>
             <h2 className="text-xl font-bold text-gray-900 mb-4">Items in this outfit</h2>
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
               {outfitVideo.outfit.items.map((item) => {
-                const variantColor = item.variant?.color;
-                const colorMatchedImage = variantColor
-                  ? item.product.images.find((img) => img.alt?.startsWith(variantColor))
-                  : null;
-                const primaryImage = item.product.images.find((img) => img.isPrimary);
-                const imageUrl =
-                  colorMatchedImage?.url || primaryImage?.url || item.product.images[0]?.url;
+                const imageUrl = getProductImage(item);
 
                 return (
                   <Link key={item.id} href={`/products/${item.product.slug}`} className="group">
@@ -229,12 +345,12 @@ export default function TryOnResultPage() {
           >
             Back to Cart
           </Link>
-          <button
-            type="button"
-            className="flex-1 py-3 bg-black text-white font-bold uppercase tracking-wider hover:bg-gray-800 transition-colors rounded-full"
+          <Link
+            href="/checkout"
+            className="flex-1 py-3 bg-black text-white font-bold uppercase tracking-wider hover:bg-gray-800 transition-colors rounded-full text-center"
           >
             Proceed to Checkout
-          </button>
+          </Link>
         </div>
       </div>
     </div>
