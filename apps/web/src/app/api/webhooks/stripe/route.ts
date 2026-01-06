@@ -48,7 +48,10 @@ export async function POST(request: Request) {
     const errorMessage = err instanceof Error ? err.message : 'Unknown error';
     console.error('Webhook signature verification failed:', errorMessage);
     console.error('Secret starts with:', webhookSecret.substring(0, 10));
-    return NextResponse.json({ error: 'Invalid signature', details: errorMessage }, { status: 400 });
+    return NextResponse.json(
+      { error: 'Invalid signature', details: errorMessage },
+      { status: 400 },
+    );
   }
 
   try {
