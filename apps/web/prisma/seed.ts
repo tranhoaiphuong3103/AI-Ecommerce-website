@@ -13,7 +13,11 @@ async function main() {
   console.log('🗑️  Cleaning database...');
   await prisma.orderItem.deleteMany();
   await prisma.order.deleteMany();
+  await prisma.cartItem.deleteMany();
   await prisma.generatedVideo.deleteMany();
+  await prisma.outfitVideo.deleteMany();
+  await prisma.outfitItem.deleteMany();
+  await prisma.outfit.deleteMany();
   await prisma.productVariant.deleteMany();
   await prisma.productImage.deleteMany();
   await prisma.product.deleteMany();
