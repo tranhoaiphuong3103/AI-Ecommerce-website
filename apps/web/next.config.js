@@ -16,6 +16,14 @@ const nextConfig = {
         hostname: 'images.unsplash.com',
       },
       {
+        protocol: 'https',
+        hostname: 'assets.adidas.com',
+      },
+      {
+        protocol: 'https',
+        hostname: 'boo.vn',
+      },
+      {
         protocol: 'http',
         hostname: 'localhost',
       },
