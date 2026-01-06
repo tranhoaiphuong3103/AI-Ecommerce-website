@@ -1,0 +1,76 @@
+{
+  "name": "Order Processing & Email Notifications",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "order-email",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "id": "webhook-order",
+      "name": "Order Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [250, 300],
+      "webhookId": "order-email"
+    },
+    {
+      "parameters": {
+        "operation": "sendEmail",
+        "sendTo": "={{ $json.customerEmail }}",
+        "subject": "=✅ Order Confirmation - Order #{{ $json.orderId }}",
+        "emailType": "html",
+        "message": "=<div style=\"font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;\">\n  <div style=\"background: #000; color: #fff; padding: 20px; text-align: center;\">\n    <h1>🎉 Thank You for Your Order!</h1>\n  </div>\n\n  <div style=\"padding: 20px; background: #f9f9f9;\">\n    <p>Hello {{ $json.customerName }},</p>\n    <p>Your order has been received and is being processed!</p>\n\n    <div style=\"background: #fff; padding: 15px; margin: 15px 0; border-left: 4px solid #000;\">\n      <p><strong>Order ID:</strong> {{ $json.orderId }}</p>\n      <p><strong>Status:</strong> {{ $json.newStatus || 'PROCESSING' }}</p>\n      <p><strong>Total Amount:</strong> ${{ $json.totalAmount }}</p>\n      <p><strong>Shipping Address:</strong><br>{{ $json.shippingAddress }}</p>\n    </div>\n\n    <h3>Order Items:</h3>\n    <div>\n      {{ $json.items.map(item => `\n        <div style=\"border-bottom: 1px solid #ddd; padding: 10px 0;\">\n          <strong>${item.name}</strong> x ${item.quantity}<br>\n          ${item.variant ? 'Variant: ' + item.variant + '<br>' : ''}\n          Price: $${item.price}\n        </div>\n      `).join('') }}\n    </div>\n\n    <p style=\"margin-top: 20px;\">We'll send you another email when your order ships.</p>\n    <p>Thank you for shopping with us!</p>\n  </div>\n\n  <div style=\"text-align: center; padding: 20px; color: #666; font-size: 12px;\">\n    <p>© 2026 AI E-commerce. All rights reserved.</p>\n  </div>\n</div>"
+      },
+      "id": "send-email",
+      "name": "Send Order Email",
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.1,
+      "position": [500, 300]
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ { \"success\": true, \"message\": \"Order confirmation email sent\", \"orderId\": $json.orderId } }}"
+      },
+      "id": "respond-webhook",
+      "name": "Respond to Webhook",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1,
+      "position": [750, 300]
+    }
+  ],
+  "connections": {
+    "Order Webhook": {
+      "main": [
+        [
+          {
+            "node": "Send Order Email",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send Order Email": {
+      "main": [
+        [
+          {
+            "node": "Respond to Webhook",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "staticData": null,
+  "tags": [],
+  "triggerCount": 1,
+  "updatedAt": "2026-01-06T13:00:00.000Z",
+  "versionId": "1"
+}

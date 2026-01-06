@@ -133,6 +133,9 @@ model GeneratedVideo {
   n8nWorkflowId String?
   comfyuiJobId  String?
 
+  comparisonAsA OutfitVideo[] @relation("CompareImageA")
+  comparisonAsB OutfitVideo[] @relation("CompareImageB")
+
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 
@@ -268,6 +271,11 @@ model OutfitVideo {
 
   modelHeight  Float
   modelWeight  Float
+
+  compareImageAId String?
+  compareImageA   GeneratedVideo? @relation("CompareImageA", fields: [compareImageAId], references: [id])
+  compareImageBId String?
+  compareImageB   GeneratedVideo? @relation("CompareImageB", fields: [compareImageBId], references: [id])
 
   createdAt    DateTime @default(now())
   updatedAt    DateTime @updatedAt
