@@ -4,14 +4,14 @@ import { NextResponse } from 'next/server';
 export const dynamic = 'force-dynamic';
 
 interface RouteParams {
-  params: Promise<{
+  params: {
     itemId: string;
-  }>;
+  };
 }
 
 export async function PUT(request: Request, { params }: RouteParams) {
   try {
-    const { itemId } = await params;
+    const { itemId } = params;
     const body = await request.json();
     const { quantity, variantId } = body;
 
@@ -61,7 +61,7 @@ export async function PUT(request: Request, { params }: RouteParams) {
 
 export async function DELETE(_request: Request, { params }: RouteParams) {
   try {
-    const { itemId } = await params;
+    const { itemId } = params;
 
     await prisma.cartItem.delete({
       where: { id: itemId },

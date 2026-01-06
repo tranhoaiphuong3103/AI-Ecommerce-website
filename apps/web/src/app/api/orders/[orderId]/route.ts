@@ -4,12 +4,12 @@ import { NextResponse } from 'next/server';
 export const dynamic = 'force-dynamic';
 
 type RouteParams = {
-  params: Promise<{ orderId: string }>;
+  params: { orderId: string };
 };
 
 export async function GET(_request: Request, { params }: RouteParams) {
   try {
-    const { orderId } = await params;
+    const { orderId } = params;
 
     const order = await prisma.order.findUnique({
       where: { id: orderId },
@@ -45,7 +45,7 @@ export async function GET(_request: Request, { params }: RouteParams) {
 
 export async function PUT(request: Request, { params }: RouteParams) {
   try {
-    const { orderId } = await params;
+    const { orderId } = params;
     const body = await request.json();
     const { status } = body;
 
