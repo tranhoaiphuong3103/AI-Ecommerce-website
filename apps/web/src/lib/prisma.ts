@@ -10,7 +10,7 @@ export const prisma =
     log: ['query', 'error', 'warn'],
     datasources: {
       db: {
-        url: process.env.DATABASE_URL,
+        url: process.env.DATABASE_URL || 'postgresql://user:password@localhost:5432/db',
       },
     },
   });

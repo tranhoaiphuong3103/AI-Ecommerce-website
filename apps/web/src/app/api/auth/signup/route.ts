@@ -3,6 +3,9 @@ import { prisma } from '@/lib/prisma';
 import type { User } from '@/types';
 import { NextResponse } from 'next/server';
 
+export const dynamic = 'force-dynamic';
+export const runtime = 'nodejs';
+
 export async function POST(request: Request) {
   try {
     const body = await request.json();
