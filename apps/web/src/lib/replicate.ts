@@ -48,15 +48,6 @@ function detectGarmentCategory(productCategory?: string): 'upper_body' | 'lower_
   const categoryLower = productCategory.toLowerCase();
 
   if (
-    categoryLower.includes('shoe') ||
-    categoryLower.includes('sneaker') ||
-    categoryLower.includes('boot') ||
-    categoryLower.includes('sandal') ||
-    categoryLower.includes('footwear')
-  )
-    return 'lower_body';
-
-  if (
     categoryLower.includes('pant') ||
     categoryLower.includes('short') ||
     categoryLower.includes('trouser') ||
@@ -66,12 +57,7 @@ function detectGarmentCategory(productCategory?: string): 'upper_body' | 'lower_
   )
     return 'lower_body';
 
-  if (
-    categoryLower.includes('dress') ||
-    categoryLower.includes('gown') ||
-    categoryLower.includes('jumpsuit')
-  )
-    return 'dresses';
+  if (categoryLower.includes('dress')) return 'dresses';
 
   return 'upper_body';
 }
@@ -103,25 +89,6 @@ function generateGarmentDescription(
   const detailEmphasis = hasDetailViews
     ? '⚠️ EXTREME PRIORITY - ULTRA-CRITICAL DETAIL REPRODUCTION: This garment has CLOSE-UP logo/badge detail views that DEMAND ABSOLUTE MAXIMUM CLARITY and PHOTOREALISTIC PRECISION. Every microscopic letter, line, curve, and graphic element MUST be reproduced with KNIFE-EDGE SHARPNESS, ULTRA-HIGH CONTRAST, and PERFECT LEGIBILITY. ZERO tolerance for blur, softness, or detail loss. '
     : '⚠️ MAXIMUM LOGO CLARITY MODE ACTIVATED: ALL logos and text MUST be ULTRA-SHARP with HIGH CONTRAST. ';
-
-  if (
-    categoryLower.includes('shoe') ||
-    categoryLower.includes('sneaker') ||
-    categoryLower.includes('boot') ||
-    categoryLower.includes('sandal') ||
-    categoryLower.includes('footwear')
-  )
-    return `${detailEmphasis}CRITICAL DISTINCTION - SHOES vs PANTS: The product to try on is FOOTWEAR (shoes/sneakers/boots) which goes on the FEET ONLY. PANTS are clothing on the LEGS - these are COMPLETELY DIFFERENT items. DO NOT CONFUSE SHOES WITH PANTS.
-
-MANDATORY RULES:
-1. IDENTIFY CORRECTLY: SHOES = footwear on FEET at bottom of image. PANTS = leg clothing covering LEGS from waist to ankles.
-2. PANTS COLOR ABSOLUTE LOCK: The pants (leg clothing) color in the output MUST BE IDENTICAL to the pants color in the input human image. If input shows WHITE pants, output MUST show WHITE pants. If input shows BLACK pants, output MUST show BLACK pants. DO NOT apply the shoe color to the pants. PANTS and SHOES are separate items with separate colors.
-3. REPLACE ONLY FEET AREA: Only modify the footwear on the person's FEET (bottom of legs). Do NOT modify anything on the LEGS (pants area).
-4. PRESERVE PANTS COMPLETELY: Keep pants color, fabric, style, wrinkles, and all details EXACTLY as they appear in the input human image. ZERO changes to pants allowed.
-5. PRESERVE UPPER BODY: Keep shirt, jacket, face, hands, hair unchanged.
-6. NEW SHOE DETAILS: Apply the new shoe design (from garment image) ONLY to the feet area with accurate colors, logos, laces, and sole details.
-
-VERIFICATION: After generation, check that pants color matches input image pants color, NOT the shoe color. Shoes are on feet, pants are on legs - completely different locations and items.`;
 
   if (categoryLower.includes('jersey'))
     return `${detailEmphasis}ULTRA-CRITICAL LOGO REPRODUCTION - HIGHEST QUALITY MODE: This is a sports jersey with multiple branding elements that MUST be reproduced with ABSOLUTE MAXIMUM SHARPNESS, ULTRA-HIGH CONTRAST, and PHOTOREALISTIC CLARITY.
@@ -161,11 +128,7 @@ GARMENT LENGTH REQUIREMENT: The jersey MUST be long enough to FULLY COVER the mi
 
 QUALITY INSTRUCTION: Generate at HIGHEST POSSIBLE DETAIL LEVEL with MAXIMUM SHARPNESS for all text and logos.`;
 
-  if (
-    categoryLower.includes('shirt') ||
-    categoryLower.includes('tee') ||
-    categoryLower.includes('t-shirt')
-  )
+  if (categoryLower.includes('shirt') || categoryLower.includes('t-shirt'))
     return `${detailEmphasis}ULTRA-CRITICAL LOGO & TEXT REPRODUCTION - HIGHEST QUALITY MODE: ALL logos, graphics, text prints, and brand details MUST be reproduced with ABSOLUTE MAXIMUM SHARPNESS, ULTRA-HIGH CONTRAST, and PHOTOREALISTIC CLARITY.
 
 STRICT REQUIREMENTS - NO COMPROMISES:
@@ -240,25 +203,15 @@ GARMENT LENGTH REQUIREMENT: The jacket/hoodie/sweater MUST be long enough to FUL
 QUALITY INSTRUCTION: Generate at HIGHEST POSSIBLE DETAIL LEVEL with MAXIMUM SHARPNESS for all logos, patches, and text elements.`;
 
   if (
-    categoryLower.includes('pant') ||
-    categoryLower.includes('trouser') ||
-    categoryLower.includes('jean')
+    categoryLower.includes('pants') ||
+    categoryLower.includes('trousers') ||
+    categoryLower.includes('jeans')
   )
     return `Well-fitted pants with natural fabric draping and realistic seams. Keep upper body shirt and shoes unchanged.
 
 CRITICAL SKIN TONE PRESERVATION: The skin tone of ALL visible body parts (hands, arms, midriff, any exposed skin) MUST be EXACTLY IDENTICAL to the skin tone in the input image. DO NOT alter, lighten, darken, or change the hue of ANY skin. Match the EXACT same skin color, undertone, and lighting as the original person image. This is MANDATORY.`;
 
-  if (categoryLower.includes('short'))
-    return `Comfortable shorts with authentic texture. Preserve original top clothing and footwear.
-
-CRITICAL SKIN TONE PRESERVATION: The skin tone of ALL visible body parts (legs, hands, arms, any exposed skin) MUST be EXACTLY IDENTICAL to the skin tone in the input image. DO NOT alter, lighten, darken, or change the hue of ANY skin. Match the EXACT same skin color, undertone, and lighting as the original person image. This is MANDATORY.`;
-
-  if (categoryLower.includes('skirt'))
-    return `Elegant skirt with natural fabric flow. Keep upper body clothing and shoes as is.
-
-CRITICAL SKIN TONE PRESERVATION: The skin tone of ALL visible body parts MUST be EXACTLY IDENTICAL to the skin tone in the input image. DO NOT alter the skin color in any way. This is MANDATORY.`;
-
-  if (categoryLower.includes('dress') || categoryLower.includes('gown'))
+  if (categoryLower.includes('dress'))
     return 'Elegant dress with fine fabric details, natural draping, and authentic texture';
 
   if (category === 'upper_body')
@@ -266,19 +219,10 @@ CRITICAL SKIN TONE PRESERVATION: The skin tone of ALL visible body parts MUST be
 
 GARMENT LENGTH REQUIREMENT: The top MUST be long enough to FULLY COVER the midriff area. NO exposed skin should be visible between the top and the pants/bottom. Extend the garment length slightly if needed to ensure complete coverage of the torso with NO gaps.`;
 
-  if (category === 'lower_body') {
-    if (
-      productCategory &&
-      (productCategory.toLowerCase().includes('shoe') ||
-        productCategory.toLowerCase().includes('sneaker') ||
-        productCategory.toLowerCase().includes('boot'))
-    )
-      return 'Premium footwear with authentic details. ONLY replace shoes. Keep all clothing, face, and accessories unchanged.';
-
+  if (category === 'lower_body')
     return `Premium lower body garment with natural fit. Keep original shirt, upper body, and shoes unchanged.
 
 CRITICAL SKIN TONE PRESERVATION: The skin tone of ALL visible body parts MUST be EXACTLY IDENTICAL to the skin tone in the input image. DO NOT alter, lighten, darken, or change the hue of ANY skin. Match the EXACT same skin color, undertone, and lighting as the original person image. This is MANDATORY.`;
-  }
 
   return '⚠️ ULTRA-CRITICAL LOGO CLARITY MODE ACTIVATED: Premium clothing item with authentic texture and realistic fabric details. Reproduce ALL logos, text, and brand elements with ABSOLUTE MAXIMUM SHARPNESS - KNIFE-EDGE borders, ULTRA-HIGH CONTRAST, PHOTOREALISTIC PRECISION. Every single letter, character, line, and graphic element must be CRYSTAL CLEAR, ULTRA-LEGIBLE, and RAZOR-SHARP at full resolution. NO blur, NO softness, NO fuzzy edges, NO detail loss. Generate at HIGHEST POSSIBLE QUALITY.';
 }

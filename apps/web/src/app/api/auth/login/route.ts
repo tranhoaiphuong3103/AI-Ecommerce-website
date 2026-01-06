@@ -23,7 +23,10 @@ export async function POST(request: Request) {
     const { email, password } = body;
 
     if (!email || !password) {
-      const response = NextResponse.json({ error: 'Email and password are required' }, { status: 400 });
+      const response = NextResponse.json(
+        { error: 'Email and password are required' },
+        { status: 400 },
+      );
       response.headers.set('Access-Control-Allow-Origin', '*');
       return response;
     }
