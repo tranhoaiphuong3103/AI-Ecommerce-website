@@ -207,7 +207,7 @@ function OrderSuccessContent() {
             Continue Shopping
           </Link>
           <Link
-            href="/orders"
+            href="/profile"
             className="flex-1 py-3 bg-black text-white font-bold text-center uppercase tracking-wider hover:bg-gray-800 transition-colors rounded-full"
           >
             View All Orders
