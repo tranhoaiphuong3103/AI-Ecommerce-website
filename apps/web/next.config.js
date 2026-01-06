@@ -24,6 +24,22 @@ const nextConfig = {
         hostname: 'boo.vn',
       },
       {
+        protocol: 'https',
+        hostname: 'cdn.shopify.com',
+      },
+      {
+        protocol: 'https',
+        hostname: 'image.uniqlo.com',
+      },
+      {
+        protocol: 'https',
+        hostname: 'm.media-amazon.com',
+      },
+      {
+        protocol: 'https',
+        hostname: 'www.armstrongaviationclothing.co.uk',
+      },
+      {
         protocol: 'http',
         hostname: 'localhost',
       },
