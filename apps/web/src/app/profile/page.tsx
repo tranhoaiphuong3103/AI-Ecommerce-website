@@ -256,7 +256,7 @@ export default function ProfilePage() {
                         )}
                       </div>
 
-                      <div className="flex-1">
+                      <div className="flex-1 min-w-0">
                         <p className="text-sm text-gray-700">
                           {order.items.length} item{order.items.length > 1 ? 's' : ''}
                         </p>
