@@ -1,5 +1,6 @@
 'use client';
 
+import Image from 'next/image';
 import type { FeaturedProduct } from '@/types';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
@@ -114,10 +115,12 @@ export default function HomeContent({ featuredProducts }: HomeContentProps) {
                     className="relative aspect-square bg-gray-100 overflow-hidden block"
                   >
                     {primaryImage ? (
-                      <img
+                      <Image
                         src={primaryImage.url}
                         alt={primaryImage.alt || product.name}
-                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                        fill
+                        sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 33vw"
+                        className="object-cover group-hover:scale-105 transition-transform duration-500"
                       />
                     ) : (
                       <div className="w-full h-full flex items-center justify-center">

@@ -1,7 +1,9 @@
 import { prisma } from '@/lib/prisma';
-import axios from 'axios';
+import { processOutfit } from '@/lib/video-processing';
+import { waitUntil } from '@vercel/functions';
 import { NextResponse } from 'next/server';
-import { toast } from 'react-toastify';
+
+export const dynamic = 'force-dynamic';
 
 export async function POST(request: Request) {
   try {
@@ -49,15 +51,11 @@ export async function POST(request: Request) {
       },
     });
 
-    const processUrl = process.env.NEXT_PUBLIC_WEB_URL
-      ? `${process.env.NEXT_PUBLIC_WEB_URL}/api/videos/process-outfit`
-      : 'http://localhost:3000/api/videos/process-outfit';
-
     const imageUrls =
       productImageUrls || products.map((product) => product.images[0]?.url).filter(Boolean);
 
-    axios
-      .post(processUrl, {
+    waitUntil(
+      processOutfit({
         outfitVideoId: outfitVideo.id,
         outfitId: outfit.id,
         userId,
@@ -65,10 +63,8 @@ export async function POST(request: Request) {
         productImageUrls: imageUrls,
         modelHeight: modelHeight || 170,
         modelWeight: modelWeight || 65,
-      })
-      .catch((error) => {
-        console.error('Failed to trigger outfit processing:', error);
-      });
+      }),
+    );
 
     return NextResponse.json({
       outfitId: outfit.id,
@@ -78,7 +74,7 @@ export async function POST(request: Request) {
     });
   } catch (error) {
     const errorMessage = error instanceof Error ? error.message : 'Unknown error';
-    toast.error(errorMessage);
+    console.error('Outfit generation error:', errorMessage);
     return NextResponse.json(
       { error: 'Failed to generate outfit try-on', details: errorMessage },
       { status: 500 },

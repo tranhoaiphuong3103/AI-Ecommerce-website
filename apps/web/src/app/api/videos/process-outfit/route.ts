@@ -2,6 +2,8 @@ import { prisma } from '@/lib/prisma';
 import { generateTryOnImage } from '@/lib/replicate';
 import { NextResponse } from 'next/server';
 
+export const dynamic = 'force-dynamic';
+
 interface GarmentInfo {
   imageUrl: string;
   category: 'upper_body' | 'lower_body' | 'dresses';

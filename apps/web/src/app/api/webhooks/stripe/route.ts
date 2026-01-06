@@ -3,6 +3,8 @@ import { stripe } from '@/lib/stripe';
 import { NextResponse } from 'next/server';
 import type Stripe from 'stripe';
 
+export const dynamic = 'force-dynamic';
+
 async function triggerN8nWebhook(payload: Record<string, unknown>) {
   const webhookUrl = process.env.N8N_WEBHOOK_URL;
 
