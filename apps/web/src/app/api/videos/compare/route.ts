@@ -82,22 +82,25 @@ export async function POST(request: Request) {
     });
 
     waitUntil(
-      Promise.all([
-        processImage({
+      (async () => {
+        await processImage({
           imageId: imageA.id,
           productImageUrl: imageUrls[0],
           modelHeight: modelHeight || 170,
           modelWeight: modelWeight || 65,
           productId: productIds[0],
-        }),
-        processImage({
+        });
+
+        await new Promise((resolve) => setTimeout(resolve, 15000));
+
+        await processImage({
           imageId: imageB.id,
           productImageUrl: imageUrls[1],
           modelHeight: modelHeight || 170,
           modelWeight: modelWeight || 65,
           productId: productIds[1],
-        }),
-      ]),
+        });
+      })(),
     );
 
     return NextResponse.json({
