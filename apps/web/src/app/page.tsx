@@ -1,6 +1,8 @@
 import HomeContent from '@/components/HomeContent';
 import { prisma } from '@/lib/prisma';
 
+export const dynamic = 'force-dynamic';
+
 export default async function HomePage() {
   const products = await prisma.product.findMany({
     take: 3,
@@ -11,6 +13,7 @@ export default async function HomePage() {
           url: true,
           alt: true,
           isPrimary: true,
+          order: true,
         },
         orderBy: {
           order: 'asc',
