@@ -1,7 +1,6 @@
 import { prisma } from '@/lib/prisma';
 import axios from 'axios';
 import { NextResponse } from 'next/server';
-import { toast } from 'react-toastify';
 
 export const dynamic = 'force-dynamic';
 
@@ -51,8 +50,8 @@ export async function POST(request: Request) {
         modelHeight,
         modelWeight,
       })
-      .catch(() => {
-        toast.error('Failed to trigger image processing');
+      .catch((error) => {
+        console.error('Failed to trigger image processing:', error);
       });
 
     return NextResponse.json({

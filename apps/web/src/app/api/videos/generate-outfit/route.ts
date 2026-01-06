@@ -1,7 +1,6 @@
 import { prisma } from '@/lib/prisma';
 import axios from 'axios';
 import { NextResponse } from 'next/server';
-import { toast } from 'react-toastify';
 
 export const dynamic = 'force-dynamic';
 
@@ -80,7 +79,7 @@ export async function POST(request: Request) {
     });
   } catch (error) {
     const errorMessage = error instanceof Error ? error.message : 'Unknown error';
-    toast.error(errorMessage);
+    console.error('Outfit generation error:', errorMessage);
     return NextResponse.json(
       { error: 'Failed to generate outfit try-on', details: errorMessage },
       { status: 500 },
