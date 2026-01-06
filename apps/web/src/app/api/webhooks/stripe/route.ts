@@ -35,10 +35,20 @@ export async function POST(request: Request) {
 
   let event: Stripe.Event;
 
+  const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET;
+
+  if (!webhookSecret) {
+    console.error('STRIPE_WEBHOOK_SECRET is not configured');
+    return NextResponse.json({ error: 'Webhook secret not configured' }, { status: 500 });
+  }
+
   try {
-    event = stripe.webhooks.constructEvent(body, signature, process.env.STRIPE_WEBHOOK_SECRET!);
-  } catch {
-    return NextResponse.json({ error: 'Invalid signature' }, { status: 400 });
+    event = stripe.webhooks.constructEvent(body, signature, webhookSecret);
+  } catch (err) {
+    const errorMessage = err instanceof Error ? err.message : 'Unknown error';
+    console.error('Webhook signature verification failed:', errorMessage);
+    console.error('Secret starts with:', webhookSecret.substring(0, 10));
+    return NextResponse.json({ error: 'Invalid signature', details: errorMessage }, { status: 400 });
   }
 
   try {
