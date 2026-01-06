@@ -5,6 +5,35 @@ const replicate = new Replicate({
   auth: process.env.REPLICATE_API_TOKEN,
 });
 
+async function runWithRetry<T>(
+  fn: () => Promise<T>,
+  maxRetries = 3,
+  initialDelay = 15000,
+): Promise<T> {
+  let lastError: Error | null = null;
+
+  for (let attempt = 0; attempt <= maxRetries; attempt++) {
+    try {
+      return await fn();
+    } catch (error) {
+      lastError = error instanceof Error ? error : new Error(String(error));
+
+      const isRateLimit =
+        lastError.message.includes('429') ||
+        lastError.message.includes('rate limit') ||
+        lastError.message.includes('throttled');
+
+      if (!isRateLimit || attempt === maxRetries) throw lastError;
+
+      const delay = initialDelay * Math.pow(2, attempt);
+      console.log(`[Replicate] Rate limited, retrying in ${delay / 1000}s (attempt ${attempt + 1}/${maxRetries})`);
+      await new Promise((resolve) => setTimeout(resolve, delay));
+    }
+  }
+
+  throw lastError || new Error('Unknown error in retry logic');
+}
+
 async function convertToDataUrl(imageUrl: string): Promise<string> {
   if (!imageUrl.includes('localhost')) return imageUrl;
   try {
@@ -248,19 +277,21 @@ export async function generateVirtualTryOn(params: TryOnParams): Promise<TryOnRe
       hasDetailViews,
     );
 
-    const output = await replicate.run(
-      'cuuupid/idm-vton:0513734a452173b8173e907e3a59d19a36266e55b48528559432bd21c7d7e985',
-      {
-        input: {
-          human_img: personImageUrl,
-          garm_img: garmentImageUrl,
-          category: garmentCategory,
-          garment_des: garmentDescription,
-          steps: 40,
-          crop: false,
-          seed: 42,
+    const output = await runWithRetry(() =>
+      replicate.run(
+        'cuuupid/idm-vton:0513734a452173b8173e907e3a59d19a36266e55b48528559432bd21c7d7e985',
+        {
+          input: {
+            human_img: personImageUrl,
+            garm_img: garmentImageUrl,
+            category: garmentCategory,
+            garment_des: garmentDescription,
+            steps: 40,
+            crop: false,
+            seed: 42,
+          },
         },
-      },
+      ),
     );
 
     let resultImageUrl: string | null = null;
