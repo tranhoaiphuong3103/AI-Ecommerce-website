@@ -1,5 +1,6 @@
 import { prisma } from '@/lib/prisma';
-import axios from 'axios';
+import { processImage } from '@/lib/video-processing';
+import { waitUntil } from '@vercel/functions';
 import { NextResponse } from 'next/server';
 
 export const dynamic = 'force-dynamic';
@@ -37,22 +38,15 @@ export async function POST(request: Request) {
       },
     });
 
-    const processUrl = process.env.NEXT_PUBLIC_WEB_URL
-      ? `${process.env.NEXT_PUBLIC_WEB_URL}/api/videos/process`
-      : 'http://localhost:3000/api/videos/process';
-
-    axios
-      .post(processUrl, {
+    waitUntil(
+      processImage({
         imageId: video.id,
-        userId,
-        productId,
         productImageUrl,
         modelHeight,
         modelWeight,
-      })
-      .catch((error) => {
-        console.error('Failed to trigger image processing:', error);
-      });
+        productId,
+      }),
+    );
 
     return NextResponse.json({
       imageId: video.id,
