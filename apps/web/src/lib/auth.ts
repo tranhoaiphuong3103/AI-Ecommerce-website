@@ -2,11 +2,17 @@ import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 
 const JWT_SECRET = process.env.JWT_SECRET || 'your-secret-key-change-in-production';
+const RESET_SECRET = process.env.RESET_SECRET || 'reset-secret-key-change-in-production';
 const SALT_ROUNDS = 10;
 
 export interface JWTPayload {
   userId: string;
   email: string;
+}
+
+export interface ResetTokenPayload {
+  email: string;
+  purpose: 'password_reset';
 }
 
 export async function hashPassword(password: string): Promise<string> {
@@ -37,4 +43,20 @@ export function getUserFromRequest(request: Request): JWTPayload | null {
 
   const token = authHeader.substring(7);
   return verifyToken(token);
+}
+
+export function generateResetToken(email: string): string {
+  return jwt.sign({ email, purpose: 'password_reset' } as ResetTokenPayload, RESET_SECRET, {
+    expiresIn: '1h',
+  });
+}
+
+export function verifyResetToken(token: string): ResetTokenPayload | null {
+  try {
+    const payload = jwt.verify(token, RESET_SECRET) as ResetTokenPayload;
+    if (payload.purpose !== 'password_reset') return null;
+    return payload;
+  } catch {
+    return null;
+  }
 }
