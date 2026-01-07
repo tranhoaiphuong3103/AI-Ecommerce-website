@@ -40,7 +40,7 @@ export async function POST(request: Request) {
     }
 
     const resetToken = generateResetToken(email);
-    const resetUrl = `${process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'}/reset-password/${resetToken}`;
+    const resetUrl = `${process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'}/resetpassword/${resetToken}`;
 
     console.log('Password reset link:', resetUrl);
 
