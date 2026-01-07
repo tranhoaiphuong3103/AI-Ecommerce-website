@@ -101,7 +101,7 @@ export default function LoginForm() {
               />
             </div>
 
-            <div className="flex items-center justify-between text-sm">
+            <div className="flex items-center text-sm">
               <label className="flex items-center space-x-2 cursor-pointer">
                 <input
                   type="checkbox"
@@ -109,9 +109,6 @@ export default function LoginForm() {
                 />
                 <span className="text-gray-600">Remember me</span>
               </label>
-              <Link href="/forgotpassword" className="text-black hover:underline font-semibold">
-                Forgot password?
-              </Link>
             </div>
 
             <button
@@ -123,7 +120,13 @@ export default function LoginForm() {
             </button>
           </form>
 
-          <p className="mt-6 text-center text-sm text-gray-600">
+          <p className="mt-4 text-center text-sm">
+            <Link href="/forgotpassword" className="text-black hover:underline font-semibold">
+              Forgot password?
+            </Link>
+          </p>
+
+          <p className="mt-4 text-center text-sm text-gray-600">
             Don&apos;t have an account?{' '}
             <Link href="/signup" className="text-black hover:underline font-semibold">
               Sign up
