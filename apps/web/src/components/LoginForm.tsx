@@ -1,11 +1,9 @@
 'use client';
 
 import Link from 'next/link';
-import { useRouter } from 'next/navigation';
 import { useState } from 'react';
 
 export default function LoginForm() {
-  const router = useRouter();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
@@ -111,13 +109,9 @@ export default function LoginForm() {
                 />
                 <span className="text-gray-600">Remember me</span>
               </label>
-              <button
-                type="button"
-                onClick={() => router.push('/forgot-password')}
-                className="text-black hover:underline font-semibold"
-              >
+              <Link href="/forgotpassword" className="text-black hover:underline font-semibold">
                 Forgot password?
-              </button>
+              </Link>
             </div>
 
             <button
